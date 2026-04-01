@@ -31,41 +31,44 @@ type BetterAuthOAuthState = {
   codeVerifier?: string;
 };
 
-function getUndici() {
-  const undiciPath = path.resolve(
-    process.cwd(),
-    "node_modules/.pnpm/node_modules/undici"
-  );
-
-  return requireFromHere(undiciPath) as {
-    ProxyAgent: new (url: string) => unknown;
-    fetch: typeof fetch;
-  };
-}
-
 async function fetchWithProxy(input: string, init?: RequestInit) {
-  const { ProxyAgent, fetch: undiciFetch } = getUndici();
-  const proxyCandidates = [
-    process.env.AUTH_PROXY_URL,
-    process.env.HTTPS_PROXY,
-    process.env.HTTP_PROXY,
-    "http://127.0.0.1:7890",
-  ].filter(Boolean) as string[];
-
-  for (const proxyUrl of proxyCandidates) {
-    try {
-      const response = await undiciFetch(input, {
-        ...(init || {}),
-        dispatcher: new ProxyAgent(proxyUrl),
-      } as RequestInit & { dispatcher: unknown });
-
-      return response as Response;
-    } catch (error) {
-      console.warn(`[fetchWithProxy] proxy ${proxyUrl} failed, trying next...`, error);
-    }
+  // Production: direct fetch (no proxy needed)
+  if (process.env.NODE_ENV === "production") {
+    return fetch(input, init);
   }
 
-  // 所有代理失败时，尝试直接连接
+  // Development: try proxy if available
+  try {
+    const undiciPath = path.resolve(
+      process.cwd(),
+      "node_modules/.pnpm/node_modules/undici"
+    );
+    const { ProxyAgent, fetch: undiciFetch } = requireFromHere(undiciPath) as {
+      ProxyAgent: new (url: string) => unknown;
+      fetch: typeof fetch;
+    };
+
+    const proxyCandidates = [
+      process.env.AUTH_PROXY_URL,
+      process.env.HTTPS_PROXY,
+      process.env.HTTP_PROXY,
+    ].filter(Boolean) as string[];
+
+    for (const proxyUrl of proxyCandidates) {
+      try {
+        const response = await undiciFetch(input, {
+          ...(init || {}),
+          dispatcher: new ProxyAgent(proxyUrl),
+        } as RequestInit & { dispatcher: unknown });
+        return response as Response;
+      } catch {
+        // try next proxy
+      }
+    }
+  } catch {
+    // undici not available, use direct fetch
+  }
+
   return fetch(input, init);
 }
 
