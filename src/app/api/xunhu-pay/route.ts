@@ -9,7 +9,7 @@ import { PricingItem } from "@/types/blocks/pricing";
 import { validateDiscountCode } from "@/models/discount";
 import { handlePaidOrder } from "@/services/order";
 
-const xunhuSdk = require("../../../models/xunhu-sdk.js");
+const xunhuSdk = require("@/models/xunhu-sdk.js");
 
 export async function POST(req: Request) {
   try {
