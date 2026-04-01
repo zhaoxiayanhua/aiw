@@ -138,7 +138,7 @@ export default function PolishingOrdersClient({
                         )}
                       </TableCell>
                       <TableCell className="text-sm">
-                        {moment(doc.created_at).format("YYYY-MM-DD HH:mm")}
+                        {moment.utc(doc.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm")}
                       </TableCell>
                       <TableCell>
                         <Button
@@ -303,7 +303,7 @@ function OrderDetail({ doc }: { doc: PolishingDocument }) {
         />
         {doc.order_no && <Row label="订单号" value={doc.order_no} />}
         {doc.paid_at && (
-          <Row label="支付时间" value={moment(doc.paid_at).format("YYYY-MM-DD HH:mm:ss")} />
+          <Row label="支付时间" value={moment.utc(doc.paid_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss")} />
         )}
         {doc.paid_amount != null && (
           <Row label="支付金额" value={`¥${(doc.paid_amount / 100).toFixed(2)}`} />
@@ -311,7 +311,7 @@ function OrderDetail({ doc }: { doc: PolishingDocument }) {
       </Section>
 
       <div className="text-xs text-muted-foreground pt-2 border-t">
-        提交时间: {moment(doc.created_at).format("YYYY-MM-DD HH:mm:ss")} | 文档ID: {doc.uuid}
+        提交时间: {moment.utc(doc.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss")} | 文档ID: {doc.uuid}
       </div>
     </div>
   );

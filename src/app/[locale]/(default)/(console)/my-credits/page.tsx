@@ -68,7 +68,7 @@ export default async function () {
         name: "expired_at",
         callback: (v: any) => {
           if (!v.expired_at) return "-";
-          const expDate = moment(v.expired_at);
+          const expDate = moment.utc(v.expired_at).utcOffset(8);
           const isExpired = expDate.isBefore(moment());
           const formatted = expDate.format("YYYY-MM-DD");
           if (isExpired) {
@@ -81,7 +81,7 @@ export default async function () {
         title: t("my_credits.table.created_at"),
         name: "created_at",
         callback: (v: any) => {
-          return moment(v.created_at).format("YYYY-MM-DD HH:mm:ss");
+          return moment.utc(v.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss");
         },
       },
     ],

@@ -231,7 +231,7 @@ export default function UsersManagement({
                       <QuotaSummary quotas={quotasMap[user.uuid!] || defaultQuotas} />
                     </TableCell>
                     <TableCell>
-                      {moment(user.created_at).format("YYYY-MM-DD HH:mm:ss")}
+                      {moment.utc(user.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss")}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">

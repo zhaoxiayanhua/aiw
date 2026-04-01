@@ -52,7 +52,7 @@ export default async function MyInvitesPage() {
       name: "created_at",
       title: t("my_invites.table.invite_time"),
       callback: (item: any) =>
-        moment(item.created_at).format("YYYY-MM-DD HH:mm:ss"),
+        moment.utc(item.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
       name: "user",

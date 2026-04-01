@@ -40,7 +40,7 @@ export default async function () {
       name: "paid_at",
       title: t("my_orders.table.paid_at"),
       callback: (item: any) =>
-        moment(item.paid_at).format("YYYY-MM-DD HH:mm:ss"),
+        moment.utc(item.paid_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss"),
     },
   ];
 

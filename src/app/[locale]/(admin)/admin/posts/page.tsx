@@ -45,7 +45,7 @@ export default async function () {
         name: "created_at",
         title: "Created At",
         callback: (item: Post) => {
-          return moment(item.created_at).format("YYYY-MM-DD HH:mm:ss");
+          return moment.utc(item.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss");
         },
       },
       {
