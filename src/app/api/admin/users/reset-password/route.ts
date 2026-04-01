@@ -29,27 +29,29 @@ export async function POST(req: Request) {
 
     const supabase = getSupabaseClient();
 
-    // 查找用户的 credential 账号
-    const { data: account, error: accountError } = await supabase
-      .from("account")
-      .select("id")
-      .eq("user_id", user_uuid)
-      .eq("provider_id", "credential")
-      .limit(1)
+    // 查找用户
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("uuid, signin_provider")
+      .eq("uuid", user_uuid)
       .single();
 
-    if (accountError || !account) {
-      return respErr("该用户没有邮箱密码登录方式，无法重置密码");
+    if (userError || !user) {
+      return respErr("用户不存在");
+    }
+
+    if (user.signin_provider !== "credentials") {
+      return respErr("该用户使用第三方登录，无法重置密码");
     }
 
     // 哈希新密码
     const hashedPassword = await hashPassword(new_password);
 
-    // 更新密码
+    // 更新密码（密码存储在 users 表的 signin_openid 字段）
     const { error: updateError } = await supabase
-      .from("account")
-      .update({ password: hashedPassword, updated_at: new Date().toISOString() })
-      .eq("id", account.id);
+      .from("users")
+      .update({ signin_openid: hashedPassword, updated_at: new Date().toISOString() })
+      .eq("uuid", user_uuid);
 
     if (updateError) {
       return respErr("更新密码失败");
