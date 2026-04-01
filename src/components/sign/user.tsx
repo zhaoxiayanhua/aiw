@@ -13,7 +13,6 @@ import {
 
 import { Link } from "@/i18n/navigation";
 import { User } from "@/types/user";
-import { authClient } from "@/lib/auth-client";
 import { useTranslations } from "next-intl";
 import { NavItem } from "@/types/blocks/base";
 
@@ -21,7 +20,7 @@ export default function SignUser({ user }: { user: User }) {
   const t = useTranslations();
 
   const handleSignOut = async () => {
-    await authClient.signOut();
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     window.location.reload();
   };
 

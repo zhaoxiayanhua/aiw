@@ -22,7 +22,6 @@ import {
 import Icon from "@/components/icon";
 
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
 import { useAppContext } from "@/contexts/app";
 import { useTranslations } from "next-intl";
 import { Account } from "@/types/blocks/base";
@@ -35,7 +34,7 @@ export default function SidebarUser({ account }: { account?: Account }) {
   const { isMobile, open } = useSidebar();
 
   const handleSignOut = async () => {
-    await authClient.signOut();
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     window.location.reload();
   };
 

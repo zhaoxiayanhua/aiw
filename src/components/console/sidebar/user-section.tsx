@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ChevronUp, LogOut, Settings, User, CreditCard } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 interface UserSectionProps {
@@ -38,7 +37,7 @@ export default function UserSection({ user, collapsed = false, credits }: UserSe
     : user?.email?.slice(0, 2).toUpperCase() || "U";
 
   const handleSignOut = async () => {
-    await authClient.signOut();
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     window.location.reload();
   };
 
