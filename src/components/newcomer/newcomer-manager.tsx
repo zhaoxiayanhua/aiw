@@ -95,11 +95,11 @@ export default function NewcomerManager() {
         credits: item.credits,
         interval: item.interval,
         amount: item.amount,
-        currency: item.currency,
+        currency: "cny",
         valid_months: item.valid_months,
       };
 
-      const response = await fetch("/api/checkout", {
+      const response = await fetch("/api/xunhu-pay", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -108,7 +108,6 @@ export default function NewcomerManager() {
       });
 
       if (response.status === 401) {
-        // 需要登录
         return;
       }
 
@@ -118,22 +117,8 @@ export default function NewcomerManager() {
         return;
       }
 
-      const { public_key, session_id } = data;
-      
-      // 动态导入 Stripe
-      const { loadStripe } = await import("@stripe/stripe-js");
-      const stripe = await loadStripe(public_key);
-      if (!stripe) {
-        console.error("Stripe 加载失败");
-        return;
-      }
-
-      const result = await stripe.redirectToCheckout({
-        sessionId: session_id,
-      });
-
-      if (result.error) {
-        console.error(result.error.message);
+      if (data.payment_url) {
+        window.location.href = data.payment_url;
       }
     } catch (e) {
       console.error("购买失败:", e);

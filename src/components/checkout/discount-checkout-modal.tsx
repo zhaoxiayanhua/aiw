@@ -13,9 +13,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, CreditCard, Loader2, Wallet, Check } from "lucide-react";
+import { ShoppingCart, Loader2, Wallet, Check } from "lucide-react";
 import { toast } from "sonner";
-import { loadStripe } from "@stripe/stripe-js";
 import { useAppContext } from "@/contexts/app";
 import DiscountCodeInput from "./discount-code-input";
 
@@ -67,17 +66,17 @@ export default function DiscountCheckoutModal({
         return;
       }
 
-      const endpoint = useXunhuPay ? "/api/xunhu-pay" : "/api/checkout";
+      const endpoint = "/api/xunhu-pay";
       const params = {
         product_id: item.product_id,
         product_name: item.product_name,
         credits: item.credits,
         interval: item.interval,
         amount: originalAmount,
-        currency: useXunhuPay ? "cny" : item.currency,
+        currency: "cny",
         valid_months: item.valid_months,
         discount_code: discountData?.code || undefined,
-        ...(useXunhuPay ? { payment_method: paymentMethod } : {}),
+        payment_method: paymentMethod,
         ...extraParams,
       };
 
@@ -114,24 +113,9 @@ export default function DiscountCheckoutModal({
         return;
       }
 
-      if (useXunhuPay && data.payment_url) {
+      if (data.payment_url) {
         window.location.href = data.payment_url;
         return;
-      }
-
-      const { public_key, session_id } = data;
-      const stripe = await loadStripe(public_key);
-      if (!stripe) {
-        toast.error("checkout failed");
-        return;
-      }
-
-      const result = await stripe.redirectToCheckout({
-        sessionId: session_id,
-      });
-
-      if (result.error) {
-        toast.error(result.error.message);
       }
     } catch (error) {
       console.log("checkout failed: ", error);
@@ -343,16 +327,12 @@ export default function DiscountCheckoutModal({
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
+                  处理中...
                 </>
               ) : (
                 <>
-                  {useXunhuPay ? (
-                    <Wallet className="mr-2 h-4 w-4" />
-                  ) : (
-                    <CreditCard className="mr-2 h-4 w-4" />
-                  )}
-                  Pay now CNY {(finalAmount / 100).toFixed(2)}
+                  <Wallet className="mr-2 h-4 w-4" />
+                  立即支付 ¥{(finalAmount / 100).toFixed(2)}
                 </>
               )}
             </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Percent, Tag } from "lucide-react";
+import { Check, Tag } from "lucide-react";
 import { Pricing as PricingType } from "@/types/blocks/pricing";
 import { useMemo } from "react";
 
@@ -171,31 +171,8 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                           </span>
                         </div>
 
-                        {item.cn_amount && item.cn_amount > 0 ? (
-                          <div className="flex items-center gap-x-2.5 rounded-md bg-muted/30 px-3 py-2">
-                            <span className="text-sm font-medium text-foreground/80">
-                              CNY payment
-                            </span>
-                            <span className="text-foreground/60">-&gt;</span>
-                            <DiscountCheckoutModal item={item} cnPay={true}>
-                              <div className="inline-flex items-center gap-1.5 rounded-md p-1.5 transition-all hover:cursor-pointer hover:bg-muted/60">
-                                <img
-                                  src="/imgs/weixinzhifu.svg"
-                                  alt="微信支付"
-                                  className="h-7 w-7 rounded"
-                                />
-                                <img
-                                  src="/imgs/zhifubao.svg"
-                                  alt="支付宝"
-                                  className="h-7 w-7 rounded"
-                                />
-                              </div>
-                            </DiscountCheckoutModal>
-                          </div>
-                        ) : null}
-
                         {item.button && (
-                          <DiscountCheckoutModal item={item}>
+                          <DiscountCheckoutModal item={item} cnPay={true}>
                             <Button className="flex w-full items-center justify-center gap-2 font-semibold shadow-sm transition-all hover:shadow-md">
                               {item.button.icon && (
                                 <Icon
@@ -204,7 +181,6 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                                 />
                               )}
                               <span>{item.button.title}</span>
-                              <Percent className="h-4 w-4" />
                             </Button>
                           </DiscountCheckoutModal>
                         )}
