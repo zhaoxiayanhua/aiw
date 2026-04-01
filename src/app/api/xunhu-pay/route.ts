@@ -9,7 +9,7 @@ import { PricingItem } from "@/types/blocks/pricing";
 import { validateDiscountCode } from "@/models/discount";
 import { handlePaidOrder } from "@/services/order";
 
-const xunhuSdk = require("../../../models/jsSDK(1).js");
+const xunhuSdk = require("../../../models/xunhu-sdk.js");
 
 export async function POST(req: Request) {
   try {
@@ -185,7 +185,7 @@ export async function POST(req: Request) {
       provider: "xunhupay",
       order_no,
       payment_url: String(payment.url || payment.url_qrcode || ""),
-      source: "jsSDK(1).js",
+      source: "xunhu-sdk",
     });
   } catch (e: any) {
     console.log("xunhu checkout failed: ", e);

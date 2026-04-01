@@ -11,7 +11,7 @@ import { validateDiscountCode } from "@/models/discount";
 import { isXunhuConfigured } from "@/services/xunhu-pay";
 import { handlePaidOrder } from "@/services/order";
 
-const xunhuSdk = require("../../models/jsSDK(1).js");
+const xunhuSdk = require("../../models/xunhu-sdk.js");
 
 export async function POST(req: Request) {
   try {
