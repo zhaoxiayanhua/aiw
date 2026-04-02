@@ -33,9 +33,6 @@
 spline-viewer::part(logo) {
   display: none !important;
 }
-spline-viewer > canvas + div {
-  display: none !important;
-}
 
 @layer base {
   * {

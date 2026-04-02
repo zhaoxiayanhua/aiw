@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/providers/theme";
 import SignModal from "@/components/sign/modal";
 import NewcomerManager from "@/components/newcomer/newcomer-manager";
 import WechatFloat from "@/components/wechat-float";
+import SplineWatermarkRemover from "@/components/spline-watermark-remover";
 
 export async function generateMetadata({
   params,
@@ -51,6 +52,7 @@ export default async function LocaleLayout({
           <SignModal />
           <NewcomerManager />
           <WechatFloat />
+          <SplineWatermarkRemover />
         </ThemeProvider>
       </AppContextProvider>
     </NextIntlClientProvider>
