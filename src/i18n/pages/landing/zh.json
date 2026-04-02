@@ -443,7 +443,7 @@
     "buttons": [
       {
         "title": "立即开始使用",
-        "url": "/auth/signin",
+        "url": "/creation-center",
         "target": "_self",
         "icon": "GoArrowUpRight"
       } 
