@@ -31,9 +31,9 @@ export default function Hero({ hero }: { hero: HeroType }) {
     if (!isStartCreatingButton) return;
 
     e.preventDefault();
+    e.stopPropagation();
 
     if (isPending || session) {
-      // Already logged in or still loading — scroll to top
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       setShowSignModal(true);
