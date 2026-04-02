@@ -39,9 +39,11 @@ export function useRouterLoading() {
   // 监听链接点击事件
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
+      if (e.defaultPrevented) return;
+
       const target = e.target as HTMLElement;
       const link = target.closest('a');
-      
+
       if (link && link.href) {
         const currentOrigin = window.location.origin;
         const linkUrl = new URL(link.href, currentOrigin);
