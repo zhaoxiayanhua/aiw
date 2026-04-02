@@ -28,12 +28,14 @@ export default function Hero({ hero }: { hero: HeroType }) {
 
   const handleButtonClick = (e: React.MouseEvent, url: string) => {
     const isStartCreatingButton = url === "/auth/signin" || url === "/creation-center";
+    if (!isStartCreatingButton) return;
 
-    // Session still loading — don't block navigation
-    if (isPending) return;
+    e.preventDefault();
 
-    if (isStartCreatingButton && !session) {
-      e.preventDefault();
+    if (isPending || session) {
+      // Already logged in or still loading — scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
       setShowSignModal(true);
     }
   };
