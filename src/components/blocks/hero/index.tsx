@@ -12,7 +12,7 @@ import { useAppContext } from "@/contexts/app";
 import { useRouter } from "@/i18n/navigation";
 
 export default function Hero({ hero }: { hero: HeroType }) {
-  const { data: session } = useCustomSession();
+  const { data: session, isPending } = useCustomSession();
   const { setShowSignModal } = useAppContext();
   const router = useRouter();
 
@@ -27,9 +27,11 @@ export default function Hero({ hero }: { hero: HeroType }) {
   }
 
   const handleButtonClick = (e: React.MouseEvent, url: string) => {
-    // Check if the button is "免费开始创作" (Start Creating for Free)
     const isStartCreatingButton = url === "/auth/signin" || url === "/creation-center";
-    
+
+    // Session still loading — don't block navigation
+    if (isPending) return;
+
     if (isStartCreatingButton && !session) {
       e.preventDefault();
       setShowSignModal(true);

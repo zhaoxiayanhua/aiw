@@ -38,7 +38,7 @@ import { GlobalLoading } from "@/components/ui/loading";
 import { useState } from "react";
 
 export default function Header({ header }: { header: HeaderType }) {
-  const { data: session } = useCustomSession();
+  const { data: session, isPending } = useCustomSession();
   const { setShowSignModal } = useAppContext();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +49,10 @@ export default function Header({ header }: { header: HeaderType }) {
 
   const handleCreationCenterClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+    if (isPending) {
+      router.push("/creation-center");
+      return;
+    }
     if (!session) {
       setShowSignModal(true);
     } else {
