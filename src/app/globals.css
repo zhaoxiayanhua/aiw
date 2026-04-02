@@ -29,6 +29,14 @@
   }
 }
 
+/* Hide Spline watermark */
+spline-viewer::part(logo) {
+  display: none !important;
+}
+spline-viewer > canvas + div {
+  display: none !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
