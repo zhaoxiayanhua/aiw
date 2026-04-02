@@ -7,12 +7,23 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { Upload, FileText, Mail, MessageCircle, AlertCircle, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import Image from "next/image";
 
 export default function PolishingDetailsModule() {
   const { data, updatePolishingDetails } = useStudyAbroad();
+  const [polishingQrUrl, setPolishingQrUrl] = useState("/imgs/wechat-qr-placeholder.svg");
+
+  useEffect(() => {
+    fetch("/api/admin/site-settings?key=polishing_wechat_qr_url")
+      .then((res: Response) => res.json())
+      .then((result: any) => {
+        if (result.code === 0 && result.data?.value) {
+          setPolishingQrUrl(result.data.value);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [uploading, setUploading] = useState(false);
 
   // Ensure polishingDetails exists with default values
@@ -230,8 +241,8 @@ export default function PolishingDetailsModule() {
                       </p>
                       <div className="flex justify-center">
                         <div className="bg-white p-4 rounded-lg shadow-sm">
-                          <Image
-                            src="/imgs/wechat-qr-placeholder.svg"
+                          <img
+                            src={polishingQrUrl}
                             alt="WeChat QR Code"
                             width={200}
                             height={200}
