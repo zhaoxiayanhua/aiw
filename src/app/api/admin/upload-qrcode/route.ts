@@ -57,7 +57,12 @@ export async function POST(request: NextRequest) {
       disposition: "inline",
     });
 
-    await setSiteSetting("wechat_qr_url", result.url);
+    const settingKey = formData.get("setting_key") as string || "wechat_qr_url";
+    const allowedKeys = ["wechat_qr_url", "polishing_wechat_qr_url"];
+    if (!allowedKeys.includes(settingKey)) {
+      return NextResponse.json({ code: -1, message: "无效的设置项" }, { status: 400 });
+    }
+    await setSiteSetting(settingKey, result.url);
 
     return NextResponse.json({
       code: 0,

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CheckCircle, Clock, Phone, Mail, MessageCircle, User, GraduationCap, Target, Trophy, HelpCircle, ArrowLeft, FileText, CreditCard, Loader2 } from 'lucide-react';
-import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { apiRequest } from '@/lib/api-client';
@@ -23,6 +22,18 @@ export default function StudyAbroadResultClient({ documentUuid }: StudyAbroadRes
   const [documentData, setDocumentData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<string>("unpaid");
+  const [polishingQrUrl, setPolishingQrUrl] = useState("/imgs/wechat-qr-placeholder.svg");
+
+  useEffect(() => {
+    fetch("/api/admin/site-settings?key=polishing_wechat_qr_url")
+      .then((res: Response) => res.json())
+      .then((result: any) => {
+        if (result.code === 0 && result.data?.value) {
+          setPolishingQrUrl(result.data.value);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -249,8 +260,8 @@ export default function StudyAbroadResultClient({ documentUuid }: StudyAbroadRes
                           </p>
                           <div className="flex justify-center">
                             <div className="bg-white p-4 rounded-lg shadow-sm">
-                              <Image
-                                src="/imgs/wechat-qr-placeholder.svg"
+                              <img
+                                src={polishingQrUrl}
                                 alt="WeChat QR Code"
                                 width={150}
                                 height={150}
