@@ -39,9 +39,9 @@ export function useRouterLoading() {
   // 监听链接点击事件
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (e.defaultPrevented) return;
-
       const target = e.target as HTMLElement;
+      if (target.closest('[data-no-loading]')) return;
+
       const link = target.closest('a');
 
       if (link && link.href) {

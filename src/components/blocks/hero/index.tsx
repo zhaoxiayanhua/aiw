@@ -94,6 +94,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
                       href={item.url as any}
                       target={item.target || ""}
                       className="flex items-center"
+                      data-no-loading
                       onClick={(e) => handleButtonClick(e, item.url || '')}
                     >
                       <Button

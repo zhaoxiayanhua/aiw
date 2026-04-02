@@ -47,6 +47,7 @@ export default function CTA({ section }: { section: SectionType }) {
                     key={idx}
                     href={item.url as any || ""}
                     target={item.target}
+                    data-no-loading
                     onClick={(e) => handleButtonClick(e, item.url || "")}
                   >
                     <Button variant={item.variant || "default"}>
