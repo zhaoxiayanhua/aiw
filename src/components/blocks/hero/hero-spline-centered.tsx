@@ -168,10 +168,10 @@ export default function HeroSplineCentered({ section }: { section: SectionType }
               <Link href="/creation-center">
                 <Button
                   size="lg"
-                  className="text-base px-8 py-6 rounded-xl font-medium"
+                  className="text-lg px-12 py-7 rounded-xl font-semibold"
                 >
                   立即开始使用
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-1 h-5 w-5" />
                 </Button>
               </Link>
  

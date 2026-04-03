@@ -50,9 +50,9 @@ export default function ResearchModule() {
         </div>
         <Button
           onClick={handleAdd}
-          className="h-8 px-3 text-xs w-fit"
+          className="h-10 px-5 text-sm w-fit"
         >
-          <Plus className="w-3 h-3 mr-1.5" />
+          <Plus className="w-4 h-4 mr-1.5" />
           添加科研项目
         </Button>
       </div>

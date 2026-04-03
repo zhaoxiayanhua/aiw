@@ -95,10 +95,10 @@ export default function HeroSplineV5({ section }: { section: SectionType }) {
             <Link href="/creation-center">
               <Button
                 size="lg"
-                className="text-base px-8 py-6 rounded-xl font-medium shadow-lg hover:shadow-xl transition-shadow duration-300"
+                className="text-lg px-12 py-7 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
                 立即开始使用
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-1 h-5 w-5" />
               </Button>
             </Link>
           </motion.div>

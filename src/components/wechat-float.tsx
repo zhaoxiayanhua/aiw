@@ -32,21 +32,21 @@ export default function WechatFloat() {
   if (hidden) return null;
 
   return (
-    <div className={`fixed bottom-6 left-6 z-50 ${open ? "" : "pointer-events-none"}`}>
+    <div className={`fixed bottom-6 right-6 z-50 flex flex-col items-end ${open ? "" : "pointer-events-none"}`}>
       <div
         className={`
-          mb-3 w-64 rounded-2xl bg-white shadow-2xl border border-gray-200 overflow-hidden
-          transition-all duration-300 origin-bottom-left
+          mb-3 w-72 rounded-2xl bg-white shadow-2xl border border-gray-200 overflow-hidden
+          transition-all duration-300 origin-bottom-right
           ${open
             ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
             : "opacity-0 scale-95 translate-y-2 pointer-events-none"
           }
         `}
       >
-        <div className="relative bg-gradient-to-r from-green-500 to-green-600 px-4 py-3 text-white">
+        <div className="relative bg-gradient-to-r from-green-500 to-green-600 px-5 py-4 text-white">
           <button
             onClick={() => setOpen(false)}
-            className="absolute top-2 right-2 p-1 rounded-full hover:bg-white/20 transition-colors"
+            className="absolute top-2.5 right-2.5 p-1 rounded-full hover:bg-white/20 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -54,7 +54,7 @@ export default function WechatFloat() {
           <p className="text-xs text-green-100 mt-0.5">扫码添加微信</p>
         </div>
         <div className="p-4 flex flex-col items-center gap-3">
-          <div className="w-40 h-40 relative">
+          <div className="w-44 h-44 relative">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={qrUrl}
@@ -70,13 +70,13 @@ export default function WechatFloat() {
 
       <button
         onClick={() => setOpen(!open)}
-        className="w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center pointer-events-auto"
+        className="w-20 h-20 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center pointer-events-auto"
       >
         <div className={`transition-transform duration-300 ${open ? "rotate-90" : "rotate-0"}`}>
           {open ? (
-            <X className="w-6 h-6" />
+            <X className="w-10 h-10" />
           ) : (
-            <MessageCircle className="w-6 h-6" />
+            <MessageCircle className="w-10 h-10" />
           )}
         </div>
       </button>
