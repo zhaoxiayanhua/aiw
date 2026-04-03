@@ -31,7 +31,7 @@ export default function HeroSplineV7({ section }: { section: SectionType }) {
     setImageLoaded(false);
 
     const isDark = theme === 'dark';
-    const imageSrc = isDark ? '/imgs/coverdark.png' : '/imgs/cover.png';
+    const imageSrc = isDark ? '/imgs/coverdark.png' : '/imgs/cover-v2.png';
 
     const img = new Image();
     img.onload = () => setImageLoaded(true);
@@ -97,7 +97,7 @@ export default function HeroSplineV7({ section }: { section: SectionType }) {
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="absolute inset-0 z-10"
           style={{
-            backgroundImage: imageLoaded ? `url('${mounted && theme === 'dark' ? '/imgs/coverdark.png' : '/imgs/cover.png'}')` : "none",
+            backgroundImage: imageLoaded ? `url('${mounted && theme === 'dark' ? '/imgs/coverdark.png' : '/imgs/cover-v2.png'}')` : "none",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat"
