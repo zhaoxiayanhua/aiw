@@ -26,7 +26,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { KeyRound, Coins } from "lucide-react";
+import { KeyRound, Coins, ShieldCheck, ShieldOff, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import moment from "moment";
 
@@ -74,9 +75,11 @@ function QuotaSummary({ quotas }: { quotas: Record<ServiceType, number> }) {
 export default function UsersManagement({
   users,
   userQuotasMap,
+  adminEmails: initialAdminEmails,
 }: {
   users: User[];
   userQuotasMap: Record<string, Record<ServiceType, number>>;
+  adminEmails: string[];
 }) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [dialogType, setDialogType] = useState<DialogType>(null);
@@ -85,6 +88,8 @@ export default function UsersManagement({
   const [quotaAmount, setQuotaAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [quotasMap, setQuotasMap] = useState(userQuotasMap);
+  const [adminList, setAdminList] = useState<string[]>(initialAdminEmails);
+  const [togglingAdmin, setTogglingAdmin] = useState<string | null>(null);
 
   const openDialog = (user: User, type: DialogType) => {
     setSelectedUser(user);
@@ -169,6 +174,36 @@ export default function UsersManagement({
     }
   };
 
+  const handleToggleAdmin = async (user: User) => {
+    if (!user.email) return;
+    const isAdmin = adminList.includes(user.email);
+    const action = isAdmin ? "remove" : "add";
+
+    setTogglingAdmin(user.uuid || null);
+    try {
+      const res = await fetch("/api/admin/users/toggle-admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, action }),
+      });
+      const result = await res.json();
+      if (result.code === 0) {
+        setAdminList(result.data.admin_emails);
+        toast.success(
+          isAdmin
+            ? `已移除 ${user.email} 的管理员身份`
+            : `已将 ${user.email} 设为管理员`
+        );
+      } else {
+        toast.error(result.message || "操作失败");
+      }
+    } catch (error: any) {
+      toast.error("操作失败");
+    } finally {
+      setTogglingAdmin(null);
+    }
+  };
+
   const defaultQuotas: Record<ServiceType, number> = {
     ps_sop: 0,
     recommendation: 0,
@@ -194,6 +229,7 @@ export default function UsersManagement({
                 <TableHead>Email</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Avatar</TableHead>
+                <TableHead>角色</TableHead>
                 <TableHead>剩余次数</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>操作</TableHead>
@@ -202,59 +238,83 @@ export default function UsersManagement({
             <TableBody>
               {users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={8}>
                     <div className="flex w-full justify-center items-center py-8 text-muted-foreground">
                       <p>暂无用户数据</p>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : (
-                users.map((user: User) => (
-                  <TableRow key={user.uuid}>
-                    <TableCell className="font-mono text-xs max-w-[120px] truncate">
-                      {user.uuid}
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.nickname}</TableCell>
-                    <TableCell>
-                      {user.avatar_url ? (
-                        <img
-                          src={user.avatar_url}
-                          className="w-10 h-10 rounded-full"
-                          alt=""
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-200" />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <QuotaSummary quotas={quotasMap[user.uuid!] || defaultQuotas} />
-                    </TableCell>
-                    <TableCell>
-                      {moment.utc(user.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss")}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openDialog(user, "password")}
-                        >
-                          <KeyRound className="w-3 h-3 mr-1" />
-                          重置密码
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openDialog(user, "credits")}
-                        >
-                          <Coins className="w-3 h-3 mr-1" />
-                          修改次数
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                users.map((user: User) => {
+                  const isAdmin = user.email ? adminList.includes(user.email) : false;
+                  return (
+                    <TableRow key={user.uuid}>
+                      <TableCell className="font-mono text-xs max-w-[120px] truncate">
+                        {user.uuid}
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.nickname}</TableCell>
+                      <TableCell>
+                        {user.avatar_url ? (
+                          <img
+                            src={user.avatar_url}
+                            className="w-10 h-10 rounded-full"
+                            alt=""
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gray-200" />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {isAdmin ? (
+                          <Badge className="bg-primary text-primary-foreground">管理员</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-muted-foreground">普通用户</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <QuotaSummary quotas={quotasMap[user.uuid!] || defaultQuotas} />
+                      </TableCell>
+                      <TableCell>
+                        {moment.utc(user.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss")}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1 flex-wrap">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openDialog(user, "password")}
+                          >
+                            <KeyRound className="w-3 h-3 mr-1" />
+                            重置密码
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openDialog(user, "credits")}
+                          >
+                            <Coins className="w-3 h-3 mr-1" />
+                            修改次数
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={isAdmin ? "destructive" : "outline"}
+                            onClick={() => handleToggleAdmin(user)}
+                            disabled={togglingAdmin === user.uuid}
+                          >
+                            {togglingAdmin === user.uuid ? (
+                              <><Loader2 className="w-3 h-3 mr-1 animate-spin" />处理中</>
+                            ) : isAdmin ? (
+                              <><ShieldOff className="w-3 h-3 mr-1" />移除管理</>
+                            ) : (
+                              <><ShieldCheck className="w-3 h-3 mr-1" />设为管理</>
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

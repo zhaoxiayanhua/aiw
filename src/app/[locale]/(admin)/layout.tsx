@@ -3,6 +3,7 @@ import Empty from "@/components/blocks/empty";
 import { ReactNode } from "react";
 import { Sidebar } from "@/types/blocks/sidebar";
 import { getUserInfo } from "@/services/user";
+import { checkAdmin } from "@/lib/admin";
 import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
@@ -15,8 +16,8 @@ export default async function AdminLayout({
     redirect("/auth/signin?callbackUrl=" + encodeURIComponent("/admin"));
   }
 
-  const adminEmails = process.env.ADMIN_EMAILS?.split(",");
-  if (!adminEmails?.includes(userInfo?.email)) {
+  const isAdmin = await checkAdmin();
+  if (!isAdmin) {
     return <Empty message="No access" />;
   }
 
