@@ -173,8 +173,8 @@ function FlowDemo() {
             </p>
           </div>
 
-          <div className="mx-auto max-w-[980px]">
-            <div className="relative">
+          <div className="mx-auto w-full max-w-[760px]">
+            <div className="relative aspect-square w-full">
               <div className="absolute -inset-1">
                 <div className="absolute -left-4 top-0 h-72 w-72 rounded-full bg-purple-500 opacity-20 blur-3xl mix-blend-multiply filter animate-blob" />
                 <div className="absolute -right-4 top-0 h-72 w-72 rounded-full bg-yellow-500 opacity-20 blur-3xl mix-blend-multiply filter animate-blob animation-delay-2000" />
@@ -204,11 +204,11 @@ function FlowDemo() {
                   <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
                 </div>
 
-                <div className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-gray-800/80 via-gray-800/85 to-gray-900/80 shadow-[0_25px_80px_-10px_rgba(134,240,150,0.3)] backdrop-blur-xl">
+                <div className="relative h-full w-full overflow-hidden rounded-[26px] bg-gradient-to-br from-gray-800/80 via-gray-800/85 to-gray-900/80 shadow-[0_25px_80px_-10px_rgba(134,240,150,0.3)] backdrop-blur-xl">
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
-                  <div className="mx-auto w-full max-w-[700px] px-3 pb-6 pt-3 md:px-5 md:pb-8 md:pt-5 lg:px-6 lg:pb-10 lg:pt-6">
-                    <div className="relative aspect-square w-full overflow-hidden rounded-[24px]">
+                  <div className="w-full">
+                    <div className="relative aspect-square w-full overflow-hidden">
                       <div className="absolute inset-0 overflow-hidden rounded-[24px]">
                         <div className="sparkle-1 absolute left-[20%] top-[10%] h-1 w-1 rounded-full bg-white animate-sparkle" />
                         <div className="sparkle-2 absolute left-[80%] top-[60%] h-1 w-1 rounded-full bg-blue-400 animate-sparkle animation-delay-1000" />
@@ -217,18 +217,15 @@ function FlowDemo() {
                         <div className="sparkle-5 absolute left-[90%] top-[40%] h-1 w-1 rounded-full bg-yellow-400 animate-sparkle animation-delay-4000" />
                       </div>
 
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <img
-                          src={currentStep.image}
-                          alt={currentStep.alt}
-                          className="h-full w-full object-contain"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                      </div>
-                    </div>
+                      <img
+                        src={currentStep.image}
+                        alt={currentStep.alt}
+                        className="absolute inset-0 h-full w-full object-contain"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 
-                    <div className="mt-5 flex justify-center md:mt-6">
-                      <div className="group relative">
+                      <div className="absolute inset-x-0 bottom-5 z-20 flex justify-center md:bottom-6">
+                        <div className="group relative">
                         <div className="absolute -inset-0.5 rounded-[22px] bg-gradient-to-r from-gray-600/20 to-gray-400/20 opacity-75 blur transition duration-300 group-hover:opacity-100" />
 
                         <div className="relative overflow-visible rounded-[20px] border border-white/10 bg-black/40 backdrop-blur-2xl">
@@ -314,6 +311,7 @@ function FlowDemo() {
                               </div>
                             ))}
                           </div>
+                        </div>
                         </div>
                       </div>
                     </div>
