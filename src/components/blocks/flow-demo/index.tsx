@@ -222,97 +222,96 @@ function FlowDemo() {
                         alt={currentStep.alt}
                         className="absolute inset-0 h-full w-full object-contain"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+                    </div>
+                  </div>
+                </div>
 
-                      <div className="absolute inset-x-0 bottom-5 z-20 flex justify-center md:bottom-6">
-                        <div className="group relative">
-                        <div className="absolute -inset-0.5 rounded-[22px] bg-gradient-to-r from-gray-600/20 to-gray-400/20 opacity-75 blur transition duration-300 group-hover:opacity-100" />
+                <div className="mt-5 flex justify-center md:mt-6">
+                  <div className="group relative">
+                    <div className="absolute -inset-0.5 rounded-[22px] bg-gradient-to-r from-gray-600/20 to-gray-400/20 opacity-75 blur transition duration-300 group-hover:opacity-100" />
 
-                        <div className="relative overflow-visible rounded-[20px] border border-white/10 bg-black/40 backdrop-blur-2xl">
-                          <div className="pointer-events-none absolute inset-0 rounded-[20px] bg-gradient-to-b from-white/5 to-transparent" />
+                    <div className="relative overflow-visible rounded-[20px] border border-white/10 bg-black/40 backdrop-blur-2xl">
+                      <div className="pointer-events-none absolute inset-0 rounded-[20px] bg-gradient-to-b from-white/5 to-transparent" />
 
-                          <div className="relative flex h-[76px] items-end gap-1 px-3 pb-2 pt-6">
-                            {stepIcons.map((Icon, step) => (
+                      <div className="relative flex h-[76px] items-end gap-1 px-3 pb-2 pt-6">
+                        {stepIcons.map((Icon, step) => (
+                          <div
+                            key={step}
+                            className={`relative transition-all duration-500 ${
+                              activeStep === step ? 'z-20' : 'z-10'
+                            }`}
+                            style={{ alignSelf: 'flex-end' }}
+                          >
+                            <button
+                              onClick={() => handleStepClick(step)}
+                              className="group/btn relative block"
+                              type="button"
+                            >
                               <div
-                                key={step}
-                                className={`relative transition-all duration-500 ${
-                                  activeStep === step ? 'z-20' : 'z-10'
+                                className={`relative origin-bottom transition-all duration-500 ${
+                                  activeStep === step ? '-mt-10' : 'mt-0'
                                 }`}
-                                style={{ alignSelf: 'flex-end' }}
                               >
-                                <button
-                                  onClick={() => handleStepClick(step)}
-                                  className="group/btn relative block"
-                                  type="button"
+                                {activeStep === step && (
+                                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-black/80 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm transition-all duration-300">
+                                    {flowSteps[step].label}
+                                  </div>
+                                )}
+
+                                <div
+                                  className={`relative overflow-hidden transition-all duration-300 ${
+                                    activeStep === step
+                                      ? 'rounded-[28px] bg-gray-800/90 shadow-2xl ring-[2px] ring-inset ring-white/30 shadow-[inset_0_1px_2px_rgba(255,255,255,0.2)]'
+                                      : 'rounded-[14px] bg-white/5 ring-[2px] ring-inset ring-white/15 hover:bg-white/10'
+                                  }`}
                                 >
+                                  {activeStep === step && (
+                                    <>
+                                      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/20" />
+                                      <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+                                      <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/25 via-white/10 to-transparent" />
+                                    </>
+                                  )}
+
                                   <div
-                                    className={`relative origin-bottom transition-all duration-500 ${
-                                      activeStep === step ? '-mt-10' : 'mt-0'
+                                    className={`relative transition-all duration-300 ${
+                                      activeStep === step
+                                        ? 'px-6 pb-4 pt-8'
+                                        : 'px-5 py-5 group-hover/btn:py-[18px]'
                                     }`}
                                   >
-                                    {activeStep === step && (
-                                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-black/80 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm transition-all duration-300">
-                                        {flowSteps[step].label}
-                                      </div>
+                                    {activeStep === step ? (
+                                      <>
+                                        <div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-white/30 via-white/10 to-transparent blur-sm" />
+                                        <div className="absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+                                      </>
+                                    ) : (
+                                      <div className="absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100" />
                                     )}
 
-                                    <div
-                                      className={`relative overflow-hidden transition-all duration-300 ${
-                                        activeStep === step
-                                          ? 'rounded-[28px] bg-gray-800/90 shadow-2xl ring-[2px] ring-inset ring-white/30 shadow-[inset_0_1px_2px_rgba(255,255,255,0.2)]'
-                                          : 'rounded-[14px] bg-white/5 ring-[2px] ring-inset ring-white/15 hover:bg-white/10'
-                                      }`}
-                                    >
-                                      {activeStep === step && (
-                                        <>
-                                          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/20" />
-                                          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
-                                          <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/25 via-white/10 to-transparent" />
-                                        </>
-                                      )}
-
-                                      <div
-                                        className={`relative transition-all duration-300 ${
+                                    <div className="flex items-center justify-center">
+                                      <Icon
+                                        className={`relative z-10 transition-all duration-300 ${
                                           activeStep === step
-                                            ? 'px-6 pb-4 pt-8'
-                                            : 'px-5 py-5 group-hover/btn:py-[18px]'
+                                            ? 'h-7 w-7 -translate-y-1 transform text-white'
+                                            : 'h-6 w-6 text-gray-400 group-hover/btn:text-white'
                                         }`}
-                                      >
-                                        {activeStep === step ? (
-                                          <>
-                                            <div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-white/30 via-white/10 to-transparent blur-sm" />
-                                            <div className="absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-                                          </>
-                                        ) : (
-                                          <div className="absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100" />
-                                        )}
-
-                                        <div className="flex items-center justify-center">
-                                          <Icon
-                                            className={`relative z-10 transition-all duration-300 ${
-                                              activeStep === step
-                                                ? 'h-7 w-7 -translate-y-1 transform text-white'
-                                                : 'h-6 w-6 text-gray-400 group-hover/btn:text-white'
-                                            }`}
-                                          />
-                                        </div>
-
-                                        {activeStep === step && (
-                                          <div className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-white/80" />
-                                        )}
-                                      </div>
+                                      />
                                     </div>
 
                                     {activeStep === step && (
-                                      <div className="absolute inset-0 -z-10 rounded-[28px] bg-white/20 blur-xl" />
+                                      <div className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-white/80" />
                                     )}
                                   </div>
-                                </button>
+                                </div>
+
+                                {activeStep === step && (
+                                  <div className="absolute inset-0 -z-10 rounded-[28px] bg-white/20 blur-xl" />
+                                )}
                               </div>
-                            ))}
+                            </button>
                           </div>
-                        </div>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
