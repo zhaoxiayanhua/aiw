@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { createPortal } from 'react-dom'
 import { 
   FileText, 
   User, 
@@ -43,6 +44,11 @@ interface FeaturesSection {
 export default function FeaturesGrid({ section }: { section?: FeaturesSection }) {
   const router = useRouter()
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const features: Feature[] = [
     {
@@ -219,7 +225,8 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
       </section>
 
       {/* Feature Detail Modal */}
-      <AnimatePresence>
+      {mounted && createPortal(
+        <AnimatePresence>
         {selectedFeature && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -287,7 +294,9 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   )
 }
