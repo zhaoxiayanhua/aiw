@@ -180,17 +180,25 @@ export const auth = betterAuth({
 export type Session = typeof auth.$Infer.Session;
 export type AuthUser = typeof auth.$Infer.Session.user;
 
+function parseCookieHeader(cookieHeader: string) {
+  return Object.fromEntries(
+    cookieHeader
+      .split(";")
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((part) => {
+        const [key, ...val] = part.split("=");
+        return [key, val.join("=")];
+      })
+  );
+}
+
 export async function getCustomSession(headers: Headers) {
   try {
     const cookieHeader = headers.get("cookie");
     if (!cookieHeader) return null;
 
-    const cookies = Object.fromEntries(
-      cookieHeader.split("; ").map((c) => {
-        const [key, ...val] = c.split("=");
-        return [key, val.join("=")];
-      })
-    );
+    const cookies = parseCookieHeader(cookieHeader);
 
     const sessionToken = cookies["better-auth.session_token"];
     if (!sessionToken) {

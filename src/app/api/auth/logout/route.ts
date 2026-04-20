@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseClient } from "@/models/db";
 
+function parseCookieHeader(cookieHeader: string) {
+  return Object.fromEntries(
+    cookieHeader
+      .split(";")
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((part) => {
+        const [key, ...val] = part.split("=");
+        return [key, val.join("=")];
+      })
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
     const cookieHeader = request.headers.get("cookie") || "";
-    const cookies = Object.fromEntries(
-      cookieHeader.split("; ").map((c: string) => {
-        const [key, ...val] = c.split("=");
-        return [key, val.join("=")];
-      })
-    );
+    const cookies = parseCookieHeader(cookieHeader);
     const sessionToken = cookies["better-auth.session_token"];
 
     // Delete session from DB

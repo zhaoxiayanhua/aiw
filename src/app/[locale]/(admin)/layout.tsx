@@ -8,12 +8,16 @@ import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
   children,
+  params,
 }: {
   children: ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   const userInfo = await getUserInfo();
   if (!userInfo || !userInfo.email) {
-    redirect("/auth/signin?callbackUrl=" + encodeURIComponent("/admin"));
+    const callbackUrl = locale === "zh" ? "/admin" : `/${locale}/admin`;
+    redirect("/auth/signin?callbackUrl=" + encodeURIComponent(callbackUrl));
   }
 
   const isAdmin = await checkAdmin();

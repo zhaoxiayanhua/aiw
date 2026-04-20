@@ -3,6 +3,8 @@ import TableSlot from "@/components/dashboard/slots/table";
 import { Table as TableSlotType } from "@/types/slots/table";
 import { getFeedbacks } from "@/models/feedback";
 import moment from "moment";
+import Dropdown from "@/components/blocks/table/dropdown";
+import { NavItem } from "@/types/blocks/base";
 
 export default async function () {
   const feedbacks = await getFeedbacks(1, 50);
@@ -45,11 +47,17 @@ export default async function () {
     {
       name: "actions",
       title: "Actions",
-      callback: (row) => (
-        <a href={`/admin/users?user_uuid=${row.user_uuid}`} target="_blank">
-          View user
-        </a>
-      ),
+      callback: (row) => {
+        const items: NavItem[] = [
+          {
+            title: "View details",
+            icon: "RiEyeLine",
+            url: `/admin/feedbacks/${row.id}`,
+          },
+        ];
+
+        return <Dropdown items={items} />;
+      },
     },
   ];
 

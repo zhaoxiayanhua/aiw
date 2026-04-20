@@ -30,6 +30,30 @@ export async function findFeedbackByUuid(
   return data;
 }
 
+export async function findFeedbackById(
+  id: number
+): Promise<Feedback | undefined> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("feedbacks")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    return undefined;
+  }
+
+  if (!data) {
+    return undefined;
+  }
+
+  const users = data.user_uuid ? await getUsersByUuids([data.user_uuid]) : [];
+  const user = users[0];
+
+  return { ...data, user };
+}
+
 export async function getFeedbacks(
   page: number = 1,
   limit: number = 50
