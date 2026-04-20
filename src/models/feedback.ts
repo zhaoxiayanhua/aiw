@@ -48,7 +48,8 @@ export async function findFeedbackById(
     return undefined;
   }
 
-  const users = data.user_uuid ? await getUsersByUuids([data.user_uuid]) : [];
+  const userUuids = data.user_uuid ? [data.user_uuid].filter(Boolean) : [];
+  const users = userUuids.length > 0 ? await getUsersByUuids(userUuids) : [];
   const user = users[0];
 
   return { ...data, user };
@@ -78,8 +79,10 @@ export async function getFeedbacks(
     return [];
   }
 
-  const user_uuids = Array.from(new Set(data.map((item) => item.user_uuid)));
-  const users = await getUsersByUuids(user_uuids);
+  const user_uuids = Array.from(
+    new Set(data.map((item) => item.user_uuid).filter(Boolean))
+  );
+  const users = user_uuids.length > 0 ? await getUsersByUuids(user_uuids) : [];
 
   const feedbacks = data.map((item) => {
     const user = users.find((user) => user.uuid === item.user_uuid);

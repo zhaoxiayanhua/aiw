@@ -14,17 +14,33 @@ export default async function () {
       title: "User",
       name: "user",
       callback: (row) => {
-        if (!row.user || !row.user.avatar_url) {
-          return "-";
+        if (!row.user) {
+          return row.user_uuid || "-";
         }
+
+        const displayName =
+          row.user.nickname || row.user.email || row.user.uuid || row.user_uuid;
+        const subText = row.user.email || row.user.uuid || row.user_uuid;
 
         return (
           <div className="flex items-center gap-2">
-            <img
-              src={row.user?.avatar_url || ""}
-              className="w-8 h-8 rounded-full"
-            />
-            <span>{row.user?.nickname}</span>
+            {row.user.avatar_url ? (
+              <img
+                src={row.user.avatar_url}
+                className="h-8 w-8 rounded-full"
+                alt={displayName || "User avatar"}
+              />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
+                {(displayName || "?").slice(0, 1).toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0">
+              <div className="truncate font-medium">{displayName || "-"}</div>
+              <div className="truncate text-xs text-muted-foreground">
+                {subText || "-"}
+              </div>
+            </div>
           </div>
         );
       },
