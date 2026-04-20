@@ -1,156 +1,56 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Star, Gift, Percent, Tag } from "lucide-react";
-import DiscountCheckoutModal from "@/components/checkout/discount-checkout-modal";
-import { PricingItem } from "@/types/blocks/pricing";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Bell,
+  BookOpenText,
+  FileText,
+  TriangleAlert,
+  Clock3,
+  LifeBuoy,
+  ShieldCheck,
+  PencilLine,
+  Lock,
+  Info,
+} from "lucide-react";
 
-interface PricingPackage {
-  name: string;
-  content: string;
-  originalPrice: string;
-  currentPrice: string;
-  discount: string;
-  savings: string;
-  times: number;
-  averagePrice?: string;
-  isRecommended?: boolean;
-  isNewUser?: boolean;
-  pricingItem: PricingItem;
+interface NoticeCard {
+  title: string;
+  description: string;
+  icon: typeof Info;
 }
 
-const pricingData: PricingPackage[] = [
+const noticeCards: NoticeCard[] = [
   {
-    name: "新人专享包",
-    content: "PS/SOP×1 + 简历×1",
-    originalPrice: "¥168",
-    currentPrice: "¥66",
-    discount: "3.9折",
-    savings: "¥102",
-    times: 2,
-    averagePrice: "¥33/次",
-    isNewUser: true,
-    pricingItem: {
-      title: "新人专享包",
-      product_id: "newcomer-package",
-      product_name: "新人专享包",
-      amount: 6600,
-      cn_amount: 6600,
-      currency: "cny",
-      credits: 2,
-      interval: "one-time",
-      valid_months: 3,
-      price: "¥66",
-      original_price: "¥168",
-      label: "🎉 新人专享",
-      description: "首次使用没把握？先来试试新人专享包吧！用过满意，再放心升级其他套餐，0 风险更安心。",
-      features: ["PS/SOP × 1", "简历 × 1", "专业AI生成", "多次修改调整", "3个月有效期"]
-    }
+    title: "请先阅读使用教程",
+    description: "首次使用前，建议先查看使用教程，了解下单流程、内容生成方式及修改说明。",
+    icon: BookOpenText,
   },
   {
-    name: "单校直通套装",
-    content: "标配：PS/SOP×1 + 推荐×2 + 简历×1；赠送 PS/SOP×1",
-    originalPrice: "¥345",
-    currentPrice: "¥199",
-    discount: "5.8折",
-    savings: "¥146",
-    times: 5,
-    averagePrice: "¥39.8/次",
-    pricingItem: {
-      title: "单校直通套装",
-      product_id: "single-school-package",
-      product_name: "单校直通套装",
-      amount: 19900,
-      cn_amount: 19900,
-      currency: "cny",
-      credits: 5,
-      interval: "one-time",
-      valid_months: 6,
-      price: "¥199",
-      original_price: "¥345",
-      description: "标配1篇PS/SOP，额外赠送1篇PS/SOP（用于应对临时更换项目）",
-      features: ["PS/SOP × 1（标配）", "推荐信 × 2", "简历 × 1", "PS/SOP × 1（赠送）", "6个月有效期"]
-    }
+    title: "请完整填写文书资料",
+    description: "填写文书和简历资料时，请尽量提供完整的个人经历、申请方向、项目背景等信息，内容越具体，生成结果越贴合需求。",
+    icon: FileText,
   },
   {
-    name: "多校申请包",
-    content: "PS/SOP×6 + 推荐×2 + 简历×2",
-    originalPrice: "¥810",
-    currentPrice: "¥399",
-    discount: "4.9折",
-    savings: "¥411",
-    times: 10,
-    averagePrice: "¥39.9/次",
-    isRecommended: true,
-    pricingItem: {
-      title: "多校申请包",
-      product_id: "multi-school-package",
-      product_name: "多校申请包",
-      amount: 39900,
-      cn_amount: 39900,
-      currency: "cny",
-      credits: 10,
-      interval: "one-time",
-      valid_months: 12,
-      price: "¥399",
-      original_price: "¥810",
-      label: "⭐ 热门推荐",
-      description: "适合申请4-5所学校，含赠送1次PS生成",
-      features: ["PS/SOP × 6（含赠1次）", "推荐信 × 2", "简历 × 2", "12个月有效期", "适合申请5-6所学校"]
-    }
+    title: "生成后请仔细核对",
+    description: "生成后请核对个人信息、经历细节与申请方向。如需调整表达或重点，可使用赠送的 1 次免费优化机会。",
+    icon: PencilLine,
   },
   {
-    name: "灵活通用包（10）",
-    content: "任意内容×10",
-    originalPrice: "¥990*",
-    currentPrice: "¥419",
-    discount: "4.2折",
-    savings: "¥571",
-    times: 10,
-    averagePrice: "¥41.9/次",
-    pricingItem: {
-      title: "灵活通用包（10次）",
-      product_id: "flexible-package-10",
-      product_name: "灵活通用包（10次）",
-      amount: 41900,
-      cn_amount: 41900,
-      currency: "cny",
-      credits: 10,
-      interval: "one-time",
-      valid_months: 12,
-      price: "¥419",
-      original_price: "¥990",
-      description: "任意内容组合，灵活使用",
-      features: ["任意内容组合 × 10", "PS/SOP/推荐信/简历/Cover Letter", "灵活分配使用", "12个月有效期", "最大使用自由度"]
-    }
+    title: "如遇异常请截图反馈",
+    description: "如遇未发货、内容未显示、生成失败或链接异常，请务必截图保留问题页面，并将截图发送给客服协助处理。",
+    icon: TriangleAlert,
   },
   {
-    name: "全能组合包（20）",
-    content: "任意内容×20",
-    originalPrice: "¥1980*",
-    currentPrice: "¥819",
-    discount: "4.1折",
-    savings: "¥1161",
-    times: 20,
-    averagePrice: "¥40.95/次",
-    pricingItem: {
-      title: "全能组合包（20次）",
-      product_id: "all-in-one-package-20",
-      product_name: "全能组合包（20次）",
-      amount: 81900,
-      cn_amount: 81900,
-      currency: "cny",
-      credits: 20,
-      interval: "one-time",
-      valid_months: 12,
-      price: "¥819",
-      original_price: "¥1980",
-      description: "最大容量，超值优惠",
-      features: ["任意内容组合 × 20", "PS/SOP/推荐信/简历/Cover Letter", "灵活分配使用", "12个月有效期", "最高性价比选择"]
-    }
-  }
+    title: "人工润色建议提前安排",
+    description: "如购买人工润色服务，通常需 5-7 个工作日完成。如有截止时间或加急需求，请尽量提前下单并预留修改时间。",
+    icon: Clock3,
+  },
+  {
+    title: "售后与补发说明",
+    description: "购买后如遇使用疑问、订单异常或系统原因导致的问题，可联系客服协助处理或补发。",
+    icon: ShieldCheck,
+  },
 ];
 
 interface PricingComparisonTableProps {
@@ -159,168 +59,75 @@ interface PricingComparisonTableProps {
 
 export default function PricingComparisonTable({ className }: PricingComparisonTableProps) {
   return (
-    <div className={`w-full py-8 ${className || ""}`}>
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-4 flex items-center justify-center gap-2">
-            <Tag className="w-8 h-8 text-primary" />
-            套餐价格对比
+    <section className={`w-full py-8 sm:py-10 ${className || ""}`} style={{ backgroundColor: "#fff" }}> 
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8" >
+        <div className="mx-auto mb-6 max-w-3xl text-center">
+          <h2 className="mt-5 flex items-center justify-center gap-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <Info className="h-10 w-10 text-emerald-600 mt-1" />
+            使用须知
           </h2>
-          <p className="text-gray-600">选择最适合您的文书生成套餐，享受超值优惠</p>
-          <div className="flex items-center justify-center gap-2 mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg max-w-md mx-auto">
-            <Percent className="w-4 h-4 text-amber-600" />
-            <span className="text-sm text-amber-700 font-medium">
-              所有套餐均支持折扣码，购买时输入更优惠
+          <p className="mt-3 text-base text-gray-600 sm:text-lg">
+            下单前请先阅读，帮助你更高效地使用文书服务
+          </p>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2  sm:px-5" 
+          style={{ backgroundColor: "#fff1ea" }}
+          >
+            <div
+              className="flex h-7 w-7 items-center justify-center rounded-full ml-12"
+              style={{ backgroundColor: "#fff1ea" }}
+            >
+              <Bell className="h-6 w-6" style={{ color: "#c65239" }} />
+            </div>
+            <span className="text-sm font-medium mr-12" style={{ color: "#c65239" }}>
+              温馨提示：首次使用前请先阅读使用教程；如遇系统异常，请截图并联系客服处理。
             </span>
           </div>
         </div>
 
-        {/* 移动端卡片布局 */}
-        <div className="block md:hidden space-y-4">
-          {pricingData.map((pkg, index) => (
-            <Card key={index} className={`relative overflow-visible ${pkg.isRecommended ? 'border-2 border-blue-500' : pkg.isNewUser ? 'border-2 border-green-500' : ''}`}>
-              {pkg.isRecommended && (
-                <Badge className="absolute -top-2.5 right-3 z-10 bg-blue-500 text-white px-2.5 py-0.5 text-xs shadow-sm">
-                  <Star className="w-3 h-3 mr-1" />
-                  热门推荐
-                </Badge>
-              )}
-              {pkg.isNewUser && (
-                <Badge className="absolute -top-2.5 right-3 z-10 bg-green-500 text-white px-2.5 py-0.5 text-xs shadow-sm">
-                  <Gift className="w-3 h-3 mr-1" />
-                  新人专享
-                </Badge>
-              )}
+        <div className="mx-auto max-w-5xl rounded-[28px] border border-emerald-100 bg-white/90 p-4 shadow-[0_18px_45px_-28px_rgba(15,118,110,0.28)] sm:p-5">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4">
+            {noticeCards.map((card) => {
+              const Icon = card.icon;
 
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">{pkg.name}</CardTitle>
-              </CardHeader>
-              
-              <CardContent className="space-y-3">
-                <div className="text-sm text-gray-600">{pkg.content}</div>
-                
-                <div className="flex items-center gap-2">
-                  <span className="text-lg text-gray-500 line-through">{pkg.originalPrice}</span>
-                  <span className="text-2xl font-bold text-green-600">{pkg.currentPrice}</span>
-                </div>
-                
-                <div className="flex items-center gap-4 text-sm">
-                  <Badge variant="destructive">{pkg.discount}</Badge>
-                  <span className="text-green-600">省 {pkg.savings}</span>
-                  <span className="text-gray-600">{pkg.times} 次</span>
-                </div>
-                
-                {pkg.averagePrice && (
-                  <div className="text-sm text-gray-600">
-                    平均单价：{pkg.averagePrice}
-                  </div>
-                )}
-                
-                <DiscountCheckoutModal item={pkg.pricingItem}>
-                  <Button
-                    className="w-full mt-4 flex items-center justify-center gap-2"
-                    variant={pkg.isRecommended ? "default" : "outline"}
-                  >
-                    <Percent className="w-4 h-4" />
-                    立即购买
-                  </Button>
-                </DiscountCheckoutModal>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* 桌面端表格布局 */}
-        <div className="hidden md:block overflow-x-auto">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-            <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-50 border-b">
-                <th className="text-left p-4 font-semibold">名称</th>
-                <th className="text-left p-4 font-semibold">内容</th>
-                <th className="text-left p-4 font-semibold">等效原价</th>
-                <th className="text-left p-4 font-semibold">现价</th>
-                <th className="text-left p-4 font-semibold">折扣</th>
-                <th className="text-left p-4 font-semibold">省</th>
-                <th className="text-left p-4 font-semibold">次数</th>
-                <th className="text-left p-4 font-semibold">操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pricingData.map((pkg, index) => (
-                <tr
-                  key={index}
-                  className={`relative border-b hover:bg-gray-50 transition-all duration-200 ${
-                    pkg.isRecommended ? 'bg-blue-50 border-blue-200 hover:bg-blue-100' :
-                    pkg.isNewUser ? 'bg-green-50 border-green-200 hover:bg-green-100' : 'hover:bg-gray-50'
-                  }`}
+              return (
+                <Card
+                  key={card.title}
+                  className="border-emerald-100/80 bg-white shadow-sm transition-shadow hover:shadow-md"
                 >
-                  <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{pkg.name}</span>
+                  <CardContent className="flex items-start gap-4 p-3">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-emerald-50 ring-1 ring-emerald-100">
+                      <Icon className="h-10 w-10 text-emerald-600" />
                     </div>
-                    {pkg.averagePrice && (
-                      <div className="text-sm text-gray-500 mt-1">
-                        平均{pkg.averagePrice}
-                      </div>
-                    )}
-                  </td>
-                  <td className="p-4 text-sm">{pkg.content}</td>
-                  <td className="p-4">
-                    <span className="text-gray-500 line-through">{pkg.originalPrice}</span>
-                  </td>
-                  <td className="p-4">
-                    <span className="text-xl font-bold text-green-600">{pkg.currentPrice}</span>
-                  </td>
-                  <td className="p-4">
-                    <Badge variant="destructive">{pkg.discount}</Badge>
-                  </td>
-                  <td className="p-4">
-                    <span className="text-green-600 font-medium">{pkg.savings}</span>
-                  </td>
-                  <td className="p-4">
-                    <span className="font-medium">{pkg.times}</span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <DiscountCheckoutModal item={pkg.pricingItem}>
-                        <Button
-                          variant={pkg.isRecommended ? "default" : "outline"}
-                          size="sm"
-                          className="flex items-center gap-1"
-                        >
-                          <Percent className="w-3 h-3" />
-                          立即购买
-                        </Button>
-                      </DiscountCheckoutModal>
-                      {pkg.isRecommended && (
-                        <Badge className="bg-blue-500 text-white text-xs whitespace-nowrap">
-                          <Star className="w-3 h-3 mr-0.5" />
-                          推荐
-                        </Badge>
-                      )}
-                      {pkg.isNewUser && (
-                        <Badge className="bg-green-500 text-white text-xs whitespace-nowrap">
-                          <Gift className="w-3 h-3 mr-0.5" />
-                          新人
-                        </Badge>
-                      )}
+
+                    <div className="min-w-0 pt-0.5">
+                      <h3 className="text-[15px] font-semibold leading-6 text-gray-900 sm:text-base">
+                        {card.title}
+                      </h3>
+                      <p className="mt-1.5 text-sm leading-6 text-gray-600 sm:text-[15px]">
+                        {card.description}
+                      </p>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-            </table>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 flex items-center justify-center gap-2 rounded-2xl bg-emerald-50 px-5 py-2 text-center text-sm font-medium ring-1 ring-emerald-100">
+            <ShieldCheck className="h-7 w-7 shrink-0" style={{ color: "#3eaf70" }} />
+            <span style={{ color: "#3eaf70" }}>
+              请放心使用：如遇生成异常或系统问题，我们会及时协助处理，并按情况补发。
+            </span>
           </div>
         </div>
 
-        {/* 说明文字 */}
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>* 灵活通用包和全能组合包的原价按最贵的PS/SOP计算</p>
-          <p>所有套餐均支持多次修改调整，确保满意为止</p>
-          <p className="mt-2 text-xs text-gray-400">购买后如遇系统生成异常，可联系小助手，我们会及时协助处理并补发相应次数，请放心使用。</p>
+        <div className="mt-4 flex items-start justify-center gap-2 text-center text-xs leading-6 text-gray-500">
+          <Lock className="mt-1.5 h-3.5 w-3.5 shrink-0 text-gray-500" />
+          <p>
+            所有文书内容仅供个人申请使用，请勿用于任何商业用途或违反申请机构要求的行为。
+          </p>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

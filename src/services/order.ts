@@ -1,4 +1,3 @@
-import { updateCreditForOrder } from "./credit";
 import { findOrderByOrderNo, updateOrderStatus } from "@/models/order";
 import { getIsoTimestr } from "@/lib/time";
 import Stripe from "stripe";
@@ -9,6 +8,7 @@ import {
   insertDiscountCodeUsage,
   updateDiscountCodeUsageCount,
 } from "@/models/discount";
+import { updateCreditForOrder } from "./credit";
 
 export async function handlePaidOrder({
   order_no,
@@ -25,6 +25,9 @@ export async function handlePaidOrder({
   }
 
   if (order.status === "paid") {
+    if (order.user_uuid) {
+      await updateCreditForOrder(order);
+    }
     return order;
   }
 

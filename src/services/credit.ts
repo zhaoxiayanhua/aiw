@@ -139,21 +139,18 @@ export async function increaseCredits({
 export async function updateCreditForOrder(order: Order) {
   try {
     const credit = await findCreditByOrderNo(order.order_no);
-    if (credit) {
-      // order already increased credit
-      return;
+    const { addQuotasForOrder } = await import("@/models/service-quota");
+
+    if (!credit) {
+      await increaseCredits({
+        user_uuid: order.user_uuid,
+        trans_type: CreditsTransType.OrderPay,
+        credits: order.credits,
+        expired_at: order.expired_at,
+        order_no: order.order_no,
+      });
     }
 
-    await increaseCredits({
-      user_uuid: order.user_uuid,
-      trans_type: CreditsTransType.OrderPay,
-      credits: order.credits,
-      expired_at: order.expired_at,
-      order_no: order.order_no,
-    });
-
-    // 写入服务配额
-    const { addQuotasForOrder } = await import("@/models/service-quota");
     if (order.product_id) {
       await addQuotasForOrder(
         order.user_uuid,

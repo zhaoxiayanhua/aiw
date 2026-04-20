@@ -19,8 +19,8 @@ export const PRODUCT_QUOTA_MAP: Record<string, Partial<Record<ServiceType, numbe
   "recommendation-single": { recommendation: 1 },
   "coverletter-single": { cover_letter: 1 },
   "resume-single": { resume: 1 },
-  "newcomer-package": { ps_sop: 1, resume: 1 },
-  "single-school-package": { ps_sop: 2, recommendation: 2, resume: 1 },
+  "newcomer-package": { ps_sop: 2, resume: 1 },
+  "single-school-package": { ps_sop: 3, recommendation: 2, resume: 1 },
   "multi-school-package": { ps_sop: 6, recommendation: 2, resume: 2 },
   "flexible-package-10": { universal: 10 },
   "all-in-one-package-20": { universal: 20 },
@@ -52,6 +52,22 @@ export async function addQuotasForOrder(
   if (!quotaMap) return;
 
   const supabase = getSupabaseClient();
+
+  const { data: existingRows, error: existingError } = await supabase
+    .from("service_quotas")
+    .select("id")
+    .eq("user_uuid", userUuid)
+    .eq("order_no", orderNo)
+    .limit(1);
+
+  if (existingError) {
+    console.error("查询订单服务配额失败:", JSON.stringify(existingError));
+    throw existingError;
+  }
+
+  if (existingRows && existingRows.length > 0) {
+    return;
+  }
 
   const rows = Object.entries(quotaMap)
     .filter(([_, count]) => count && count > 0)

@@ -57,7 +57,7 @@ export default function NewcomerPopup({ isOpen, onClose, onPurchase }: NewcomerP
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-lg text-gray-500 line-through">原价 ¥168</span>
-              <span className="text-3xl font-bold text-green-600">现价 ¥66</span>
+              <span className="text-3xl font-bold text-green-600">现价 ¥99</span>
             </div>
             <Badge variant="destructive" className="text-lg px-3 py-1">
               限时 3.9 折 · 仅限 1 次
@@ -92,7 +92,7 @@ export default function NewcomerPopup({ isOpen, onClose, onPurchase }: NewcomerP
               <div className="text-gray-700">
                 <p className="font-medium mb-2">首次使用没把握？先来试试新人专享包吧！</p>
                 <p className="text-sm">
-                  只需 ¥66，就能获得 <strong>1 篇 PS/SOP + 1 份简历</strong>。
+                  只需 ¥99，就能获得 <strong>2 篇 PS/SOP + 1 份简历</strong>。
                   用过满意，再放心升级多校申请包 / 全能组合包，<strong className="text-green-600">0 风险更安心</strong>。
                 </p>
               </div>
@@ -105,7 +105,7 @@ export default function NewcomerPopup({ isOpen, onClose, onPurchase }: NewcomerP
             <div className="grid grid-cols-2 gap-2">
               <div className="flex items-center gap-2 text-sm">
                 <Star className="w-4 h-4 text-green-600" />
-                PS/SOP × 1
+                PS/SOP × 2
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Star className="w-4 h-4 text-green-600" />
@@ -129,7 +129,7 @@ export default function NewcomerPopup({ isOpen, onClose, onPurchase }: NewcomerP
               className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6 font-bold"
               size="lg"
             >
-              立即解锁 ¥66
+              立即解锁 ¥99
             </Button>
             <p className="text-xs text-center text-gray-500">
               每账号限购 1 次 · 新人专享
