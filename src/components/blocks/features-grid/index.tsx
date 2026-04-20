@@ -54,7 +54,7 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
       link: '/personal-statement',
       bgColor: 'from-blue-50 to-blue-100',
       iconColor: 'text-blue-600',
-      image: '/imgs/bento_1.avif'
+      image: '/imgs/module/module1.png'
     },
     {
       id: 'resume',
@@ -65,7 +65,7 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
       link: '/resume-generator',
       bgColor: 'from-purple-50 to-purple-100',
       iconColor: 'text-purple-600',
-      image: '/imgs/30222.avif'
+      image: '/imgs/module/module2.png'
     },
     {
       id: 'sop',
@@ -76,7 +76,7 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
       link: '/sop',
       bgColor: 'from-green-50 to-green-100',
       iconColor: 'text-green-600',
-      image: '/imgs/bento_4.avif'
+      image: '/imgs/module/module3.png'
     },
     {
       id: 'recommendation-cover-letter',
@@ -87,7 +87,7 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
       link: '/recommendation-letter',
       bgColor: 'from-orange-50 to-orange-100',
       iconColor: 'text-orange-600',
-      image: '/imgs/bento_32.avif'
+      image: '/imgs/module/module4.png'
     },
     {
       id: 'free-revision',
@@ -98,7 +98,7 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
       link: '/#pricing',
       bgColor: 'from-pink-50 to-pink-100',
       iconColor: 'text-pink-600',
-      image: '/imgs/bento_5.avif'
+      image: '/imgs/module/module5.png'
     },
     {
       id: 'ai-human-polish',
@@ -109,7 +109,7 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
       link: '/#pricing',
       bgColor: 'from-indigo-50 to-indigo-100',
       iconColor: 'text-indigo-600',
-      image: '/imgs/30222.avif'
+      image: '/imgs/module/module6.png'
     }
   ]
 
@@ -183,14 +183,13 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
                 >
                   {/* Image Section */}
                   {feature.image && (
-                    <div className="relative h-56 w-full overflow-hidden">
+                    <div className="relative aspect-[3/2] w-full overflow-hidden bg-white">
                       <Image
                         src={feature.image}
                         alt={feature.title}
                         fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        className="object-contain transition-transform duration-300 group-hover:scale-[1.01]"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     </div>
                   )}
                   
@@ -240,14 +239,13 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
               <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-br ${selectedFeature.bgColor} border border-gray-200 shadow-2xl`}>
                 {/* Modal Image */}
                 {selectedFeature.image && (
-                  <div className="relative h-64 w-full overflow-hidden">
+                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-white">
                     <Image
                       src={selectedFeature.image}
                       alt={selectedFeature.title}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                   </div>
                 )}
                 
