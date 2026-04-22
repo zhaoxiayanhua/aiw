@@ -442,7 +442,6 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
           description: proj.lab_or_unit || '',
           date: `${formatDateToMMYYYY(proj.res_start_date)} - ${formatDateToMMYYYY(proj.res_end_date)}`,
           summary: [
-            proj.project_background && `Background: ${proj.project_background}`,
             proj.your_contributions && `Contributions: ${proj.your_contributions}`,
             proj.outcomes && `Outcomes: ${proj.outcomes}`
           ].filter(Boolean).join('\n'),

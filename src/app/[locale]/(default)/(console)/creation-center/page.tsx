@@ -1,6 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { getUserInfo } from "@/services/user";
-import { redirect } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -10,11 +8,6 @@ import { AnimatedDivider } from "@/components/ui/animated-divider";
 
 export default async function CreationCenterPage() {
   const t = await getTranslations();
-  const userInfo = await getUserInfo();
-  
-  if (!userInfo || !userInfo.email) {
-    redirect("/auth/signin");
-  }
 
   const allTools = [
     {

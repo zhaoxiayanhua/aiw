@@ -5,10 +5,19 @@ import { getTranslations } from "next-intl/server";
 import { getUserInfo } from "@/services/user";
 import { redirect } from "next/navigation";
 
-export default async function ({ children }: { children: ReactNode }) {
+export default async function ({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const userInfo = await getUserInfo();
   if (!userInfo || !userInfo.email) {
-    redirect("/auth/signin?callbackUrl=" + encodeURIComponent("/creation-center"));
+    const callbackUrl =
+      locale === "zh" ? "/creation-center" : `/${locale}/creation-center`;
+    redirect("/auth/signin?callbackUrl=" + encodeURIComponent(callbackUrl));
   }
 
   const t = await getTranslations();

@@ -50,7 +50,6 @@ export interface ResearchData {
   lab_or_unit: string;
   res_start_date: string;
   res_end_date: string;
-  project_background: string;
   your_contributions: string;
   tools_used: string;
   outcomes: string;
@@ -159,7 +158,6 @@ const REQUIRED_FIELDS = {
     project_title: "项目标题",
     res_start_date: "开始日期",
     res_end_date: "结束日期",
-    project_background: "项目背景",
     your_contributions: "个人贡献",
   },
   activities: {
@@ -362,8 +360,6 @@ const mockResumeData: ResumeData = {
       lab_or_unit: "MIT Interactive Intelligence Lab",
       res_start_date: "2022-10",
       res_end_date: "2023-05",
-      project_background:
-        "Designed a semantic retrieval system for long-form educational videos to improve knowledge discovery.",
       your_contributions:
         "Prototyped model architectures, built preprocessing and evaluation pipelines, and improved retrieval precision by 12%.",
       tools_used: "PyTorch, Hugging Face Transformers, Milvus",
@@ -742,7 +738,6 @@ export function ResumeProvider({
       lab_or_unit: "",
       res_start_date: "",
       res_end_date: "",
-      project_background: "",
       your_contributions: "",
       tools_used: "",
       outcomes: "",

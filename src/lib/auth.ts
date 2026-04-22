@@ -6,6 +6,7 @@ import { hashPassword, verifyPassword } from "@/lib/password";
 import { initServerFetchProxy } from "@/lib/server-fetch-proxy";
 import { getSupabaseClient } from "@/models/db";
 import { findUserByUuid } from "@/models/user";
+import { cookies } from "next/headers";
 
 const pool = process.env.DATABASE_URL
   ? new Pool({
@@ -193,9 +194,31 @@ function parseCookieHeader(cookieHeader: string) {
   );
 }
 
-export async function getCustomSession(headers: Headers) {
+async function getCookieHeader(headers?: Headers) {
+  const cookieHeader = headers?.get("cookie");
+  if (cookieHeader) {
+    return cookieHeader;
+  }
+
   try {
-    const cookieHeader = headers.get("cookie");
+    const cookieStore = await cookies();
+    const requestCookies = cookieStore.getAll();
+
+    if (requestCookies.length === 0) {
+      return null;
+    }
+
+    return requestCookies
+      .map((cookie) => `${cookie.name}=${cookie.value}`)
+      .join("; ");
+  } catch {
+    return null;
+  }
+}
+
+export async function getCustomSession(headers?: Headers) {
+  try {
+    const cookieHeader = await getCookieHeader(headers);
     if (!cookieHeader) return null;
 
     const cookies = parseCookieHeader(cookieHeader);
@@ -256,7 +279,7 @@ export async function getCustomSession(headers: Headers) {
 
 export const customAuth = {
   api: {
-    getSession: async ({ headers }: { headers: Headers }) => {
+    getSession: async ({ headers }: { headers?: Headers } = {}) => {
       return getCustomSession(headers);
     },
   },
