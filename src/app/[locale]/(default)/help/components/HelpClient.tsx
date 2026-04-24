@@ -47,6 +47,7 @@ const SIDEBAR_FOOTER_CLEARANCE_PX = 0.5;
 const SIDEBAR_TIMELINE_CENTER_PX = 6;
 const SIDEBAR_TIMELINE_DOT_SIZE_PX = 7;
 const SIDEBAR_TOP_EXTRA_OFFSET_PX = 4;
+const LAYOUT_RIGHT_SHIFT_PX = 24;
 
 const RESUME_PAGE_ORDER: TutorialPage["key"][] = [
   "resume_page_1",
@@ -116,6 +117,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
     useState<TutorialPage["key"]>("resume_page_1");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pageRootRef = useRef<HTMLDivElement | null>(null);
+  const layoutRef = useRef<HTMLDivElement | null>(null);
   const asideRef = useRef<HTMLElement | null>(null);
 
   const selectedPage = useMemo(
@@ -164,7 +166,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
     if (selectedPage.key === "resume_page_1") {
       return (
         <div className="space-y-4">
-          <div className="-mt-6 grid grid-cols-1 gap-0 md:ml-[10px] md:w-[calc(100%-20px)] md:grid-cols-2">
+          <div className="-mt-6 grid grid-cols-1 gap-0 md:-ml-2 md:w-[calc(100%-20px)] md:grid-cols-2">
             {selectedPage.images.slice(0, 2).map((src, index) => (
               <div
                 key={src}
@@ -179,7 +181,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
                   alt={selectedPage.title}
                   width={1200}
                   height={800}
-                  className="mx-auto h-auto w-[80%]"
+                  className="h-auto w-[80%]"
                   unoptimized
                 />
               </div>
@@ -196,7 +198,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
                   alt={selectedPage.title}
                   width={1600}
                   height={900}
-                  className="mx-auto h-auto w-[86%]"
+                  className="h-auto w-[86%]"
                   unoptimized
                 />
               </div>
@@ -223,10 +225,10 @@ export default function HelpClient({ locale }: HelpClientProps) {
               width={1600}
               height={900}
               className={cn(
-                "mx-auto h-auto w-[86%]",
+                "h-auto w-[86%]",
                 src === "/imgs/jiaocheng/pic7.png" && "w-[calc(86%-5px)]",
                 src === "/imgs/jiaocheng/pic10.png" &&
-                  "w-[calc(86%-6px)] translate-x-[1.5px]"
+                  "w-[calc(86%-6px)]"
               )}
               unoptimized
             />
@@ -254,6 +256,13 @@ export default function HelpClient({ locale }: HelpClientProps) {
       })();
 
       aside.style.top = `${Math.round(topBarVisibleHeight)}px`;
+
+      if (window.innerWidth >= 1024) {
+        const layoutLeft = layoutRef.current?.getBoundingClientRect().left ?? 0;
+        aside.style.left = `${Math.round(layoutLeft + LAYOUT_RIGHT_SHIFT_PX)}px`;
+      } else {
+        aside.style.left = "0px";
+      }
 
       if (window.innerWidth < 1024 || !footer) {
         aside.style.height = `calc(100vh - ${Math.round(topBarVisibleHeight)}px)`;
@@ -348,12 +357,15 @@ export default function HelpClient({ locale }: HelpClientProps) {
         />
       )}
 
-      <div className="border-t-2 border-[#f3f5f7]">
-        <div className="flex w-full lg:pl-[200px]">
+      <div className="border-t-2 border-[#f3f5f7] lg:ml-[10%]">
+        <div
+          ref={layoutRef}
+          className="mx-auto flex w-full max-w-[1480px]"
+        >
         <aside
           ref={asideRef}
           className={cn(
-            "fixed left-0 z-30 h-[calc(100vh-4rem)] w-80 shrink-0 overflow-y-auto border-r-2 border-[#f3f5f7] bg-background transition-transform duration-200 lg:left-[200px]",
+            "fixed left-0 z-30 h-[calc(100vh-4rem)] w-80 shrink-0 overflow-y-auto border-r-2 border-[#f3f5f7] bg-background transition-transform duration-200 lg:translate-x-0",
             isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
           )}
         >
@@ -451,10 +463,10 @@ export default function HelpClient({ locale }: HelpClientProps) {
           </div>
         </aside>
 
-        <main className="flex-1 lg:ml-80">
+        <main className="flex-1 lg:ml-[30%]">
           <div className="bg-muted/30">
-            <div className="mx-auto w-[80%] max-w-5xl px-4 py-3 lg:px-6">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="w-[80%] max-w-5xl px-6 py-3">
+              <div className="ml-1 flex items-center gap-2 text-sm text-muted-foreground">
                 <span>{messages.label}</span>
                 <ChevronRight className="h-3 w-3" />
                 <span>{selectedMainTitle}</span>
@@ -468,21 +480,21 @@ export default function HelpClient({ locale }: HelpClientProps) {
             </div>
           </div>
 
-          <div className="mx-auto w-[80%] max-w-5xl px-6 py-8">
+          <div className="w-[80%] max-w-5xl px-6 py-8">
             <div className="mb-8">
-              <h1 className="mb-3 text-3xl font-bold">
+              <h1 className="ml-1 mb-3 text-3xl font-bold">
                 {selectedMainKey === "resume_cv_tutorial"
                   ? "简历CV使用教程"
                   : selectedMainTitle}
               </h1>
               {selectedMainKey === "resume_cv_tutorial" &&
               selectedPage.key === "resume_page_3" ? (
-                <div className="inline-flex items-center gap-2 rounded-md bg-[#f0fdf4] px-3 py-2 text-green-600 dark:text-green-400">
+                <div className="ml-1 inline-flex items-center gap-2 rounded-md bg-[#f0fdf4] px-3 py-2 text-green-600 dark:text-green-400">
                   <Lightbulb className="h-4 w-4 text-green-600" />
                   <span>{selectedPage.description}</span>
                 </div>
               ) : (
-                <p className="text-muted-foreground">
+                <p className="ml-1 text-muted-foreground">
                   {selectedMainKey === "resume_cv_tutorial"
                     ? selectedPage.description
                     : "该教程内容正在整理中，敬请期待。"}
