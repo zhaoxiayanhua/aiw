@@ -1,9 +1,9 @@
 {
   "help": {
     "name": "help",
-    "label": "帮助中心",
-    "title": "简历功能使用教程",
-    "description": "全面了解如何使用 Essmote AI 简历生成功能，从填写信息到导出简历的完整教程。",
+    "label": "教程中心",
+    "title": "简历CV使用教程",
+    "description": "本页面重点讲解如何填写基础信息、教育经历与实习/工作经历，搭建你的简历基础内容框架。",
     "sections": {
       "getting_started": {
         "title": "开始使用",

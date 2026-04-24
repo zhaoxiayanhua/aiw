@@ -12,11 +12,15 @@
     },
     "nav": {
       "items": [
-
         {
-          "title": "定价",
+          "title": "购买方案",
           "url": "/pricing",
           "icon": "RiMoneyDollarCircleLine"
+        },
+        {
+          "title": "使用教程",
+          "url": "/help",
+          "icon": "RiQuestionAnswerLine"
         },
         {
           "title": "人工润色",
@@ -24,13 +28,8 @@
           "icon": "RiApps2Line"
         },
         {
-          "title": "常见问题",
-          "url": "/#faq",
-          "icon": "RiQuestionAnswerLine"
-        },
-        {
-          "title": "帮助中心",
-          "url": "/help",
+          "title": "联系我们",
+          "url": "/contact",
           "icon": "RiBookOpenLine"
         }
       ]
@@ -56,7 +55,7 @@
         "url": "/creation-center",
         "target": "_self",
         "variant": "default"
-      } 
+      }
     ],
     "show_happy_users": true,
     "show_badge": false
@@ -446,7 +445,7 @@
         "url": "/creation-center",
         "target": "_self",
         "icon": "GoArrowUpRight"
-      } 
+      }
     ]
   },
   "footer": {
