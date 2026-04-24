@@ -453,7 +453,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
 
         <main className="flex-1 lg:ml-80">
           <div className="bg-muted/30">
-            <div className="w-full px-4 py-3 lg:px-6">
+            <div className="mx-auto w-[80%] max-w-5xl px-4 py-3 lg:px-6">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>{messages.label}</span>
                 <ChevronRight className="h-3 w-3" />
@@ -468,7 +468,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
             </div>
           </div>
 
-          <div className="w-[80%] max-w-5xl px-6 py-8">
+          <div className="mx-auto w-[80%] max-w-5xl px-6 py-8">
             <div className="mb-8">
               <h1 className="mb-3 text-3xl font-bold">
                 {selectedMainKey === "resume_cv_tutorial"
