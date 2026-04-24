@@ -57,7 +57,7 @@ const RESUME_PAGE_ORDER: TutorialPage["key"][] = [
 const RESUME_TUTORIAL_PAGES: TutorialPage[] = [
   {
     key: "resume_page_1",
-    title: "第1页：基础信息与主要精力",
+    title: "第1页：基础信息与主要经历",
     description: "本页面重点讲解如何填写基础信息、教育经历与实习/工作经历，搭建你的简历基础内容框架。",
     images: [
       "/imgs/jiaocheng/pic1.png",
@@ -95,7 +95,7 @@ const zhTutorialNavItems: TutorialNavItem[] = [
     key: "resume_cv_tutorial",
     title: "简历 CV 教程",
     children: [
-      { key: "resume_page_1", title: "第1页：基础信息与主要精力" },
+      { key: "resume_page_1", title: "第1页：基础信息与主要经历" },
       { key: "resume_page_2", title: "第2页：经历补充与AI优化" },
       { key: "resume_page_3", title: "第3页：预览、编辑与导出" },
     ],
