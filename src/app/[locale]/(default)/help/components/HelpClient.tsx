@@ -170,8 +170,8 @@ export default function HelpClient({ locale }: HelpClientProps) {
                 key={src}
                 className={cn(
                   "overflow-hidden rounded-xl",
-                  index === 0 && "md:ml-[-20px] md:w-[calc(100%+23px)]",
-                  index === 1 && "md:ml-[-10px] md:w-[calc(100%+27px)]"
+                  index === 0 && "md:ml-[-2px] md:w-[calc(100%+25px)]",
+                  index === 1 && "md:ml-[-26px] md:w-[calc(100%+27px)]"
                 )}
               >
                 <Image
@@ -179,7 +179,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
                   alt={selectedPage.title}
                   width={1200}
                   height={800}
-                  className="h-auto w-full"
+                  className="mx-auto h-auto w-[80%]"
                   unoptimized
                 />
               </div>
@@ -196,7 +196,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
                   alt={selectedPage.title}
                   width={1600}
                   height={900}
-                  className="h-auto w-full"
+                  className="mx-auto h-auto w-[86%]"
                   unoptimized
                 />
               </div>
@@ -223,10 +223,10 @@ export default function HelpClient({ locale }: HelpClientProps) {
               width={1600}
               height={900}
               className={cn(
-                "h-auto w-full",
-                src === "/imgs/jiaocheng/pic7.png" && "w-[calc(100%-5px)]",
+                "mx-auto h-auto w-[86%]",
+                src === "/imgs/jiaocheng/pic7.png" && "w-[calc(86%-5px)]",
                 src === "/imgs/jiaocheng/pic10.png" &&
-                  "mx-auto w-[calc(100%-6px)] translate-x-[1.5px]"
+                  "w-[calc(86%-6px)] translate-x-[1.5px]"
               )}
               unoptimized
             />
@@ -348,15 +348,16 @@ export default function HelpClient({ locale }: HelpClientProps) {
         />
       )}
 
-      <div className="flex border-t-2 border-[#f3f5f7]">
+      <div className="border-t-2 border-[#f3f5f7]">
+        <div className="flex w-full lg:pl-[200px]">
         <aside
           ref={asideRef}
           className={cn(
-            "fixed left-0 z-30 h-[calc(100vh-4rem)] w-72 shrink-0 overflow-y-auto border-r-2 border-[#f3f5f7] bg-background transition-transform duration-200",
+            "fixed left-0 z-30 h-[calc(100vh-4rem)] w-80 shrink-0 overflow-y-auto border-r-2 border-[#f3f5f7] bg-background transition-transform duration-200 lg:left-[200px]",
             isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
           )}
         >
-          <div className="space-y-4 p-4">
+          <div className="space-y-4 py-4 pl-7 pr-3">
             <div className="px-2 py-1">
               <span className="text-base font-semibold">{messages.label}</span>
             </div>
@@ -450,9 +451,9 @@ export default function HelpClient({ locale }: HelpClientProps) {
           </div>
         </aside>
 
-        <main className="flex-1 lg:ml-72">
+        <main className="flex-1 lg:ml-80">
           <div className="bg-muted/30">
-            <div className="mr-auto max-w-5xl px-6 py-3">
+            <div className="w-full px-4 py-3 lg:px-6">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>{messages.label}</span>
                 <ChevronRight className="h-3 w-3" />
@@ -467,7 +468,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
             </div>
           </div>
 
-          <div className="mr-auto max-w-5xl px-6 py-8">
+          <div className="w-[80%] max-w-5xl px-6 py-8">
             <div className="mb-8">
               <h1 className="mb-3 text-3xl font-bold">
                 {selectedMainKey === "resume_cv_tutorial"
@@ -524,6 +525,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
             )}
           </div>
         </main>
+        </div>
       </div>
     </div>
   );
