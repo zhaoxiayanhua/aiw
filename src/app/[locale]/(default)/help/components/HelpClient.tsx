@@ -43,7 +43,7 @@ type TutorialNavItem = {
 const FOOTER_DIVIDER_HEIGHT_PX = 2;
 const FOOTER_DIVIDER_GAP_PX = 16;
 const FOOTER_DIVIDER_SHIFT_DOWN_PX = 1;
-const SIDEBAR_FOOTER_CLEARANCE_PX = 3;
+const SIDEBAR_FOOTER_CLEARANCE_PX = 0.5;
 const SIDEBAR_TIMELINE_CENTER_PX = 6;
 const SIDEBAR_TIMELINE_DOT_SIZE_PX = 7;
 const SIDEBAR_TOP_EXTRA_OFFSET_PX = 4;
@@ -311,6 +311,9 @@ export default function HelpClient({ locale }: HelpClientProps) {
     divider.style.marginBottom = `${FOOTER_DIVIDER_GAP_PX}px`;
     divider.style.position = "relative";
     divider.style.top = `${FOOTER_DIVIDER_SHIFT_DOWN_PX}px`;
+    divider.style.width = "100vw";
+    divider.style.left = "50%";
+    divider.style.transform = "translateX(-50%)";
     divider.style.zIndex = "60";
     divider.style.pointerEvents = "none";
 
