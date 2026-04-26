@@ -105,7 +105,7 @@ const statsConfig = [
   },
   {
     icon: UserCheck,
-    title: "10+ 常驻参与润色的文书老师",
+    title: "10+ 常驻润色老师",
     value: 10,
     suffix: "+",
     unit: "人工润色",
