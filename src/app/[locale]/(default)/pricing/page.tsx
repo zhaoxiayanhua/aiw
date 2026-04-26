@@ -13,7 +13,7 @@ export default async function PricingPage({
   return (
     <>
       {page.pricing && <Pricing pricing={page.pricing} />}
-      <PricingComparisonTable className="bg-gray-50" />
+      <PricingComparisonTable />
     </>
   );
 }

@@ -203,7 +203,6 @@ export default function ActivitiesModule() {
                     contextHint={`${activity.activity_name} ${activity.role}`}
                   />
                 )}
-                <p className="text-[10px] text-muted-foreground">请用英文填写 3-4 条您在活动中的具体工作和贡献，每条以动词开头，用 • 符号分隔</p>
               </div>
             </div>
           </div>

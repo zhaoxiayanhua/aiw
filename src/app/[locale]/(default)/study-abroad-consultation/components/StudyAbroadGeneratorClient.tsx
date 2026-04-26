@@ -131,6 +131,10 @@ function ConfirmationPage() {
         <p className="text-muted-foreground">请确认您填写的信息，提交后我们的顾问将尽快与您联系</p>
       </div>
 
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/20 dark:text-amber-200">
+        人工润色需一定处理时间，每份材料通常需要5–7个工作日完成。
+      </div>
+
       <div className="bg-muted/30 rounded-xl p-6">
         <h3 className="text-lg font-medium text-foreground mb-4">信息汇总</h3>
 
@@ -317,9 +321,9 @@ function StudyAbroadGeneratorContent() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">母语老师对订润色</h1>
+              <h1 className="text-3xl font-bold text-foreground">人工文书润色服务</h1>
               <p className="text-muted-foreground mt-2 text-lg">
-                填写您的信息，获得专业的留学申请指导
+                提交你的申请材料，获得专业老师的语言优化与逻辑梳理
               </p>
             </div>
             

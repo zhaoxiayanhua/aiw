@@ -178,7 +178,7 @@ export default function HeroSplineV6({ section }: { section: SectionType }) {
                 transition={{ duration: 0.6, delay: 0.4 }}
                 className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto"
               >
-                整合写作工具、案例参考与智能辅助，让每份材料都更打动人心。
+                从文书初稿、简历优化到人工润色，帮你更清晰地表达经历、优势与申请目标。
               </motion.p>
             </div>
 

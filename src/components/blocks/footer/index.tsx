@@ -6,6 +6,10 @@ export default function Footer({ footer }: { footer: FooterType }) {
     return null;
   }
 
+  const socialItems = footer.social?.items ?? [];
+  const navItems = footer.nav?.items ?? [];
+  const agreementItems = footer.agreement?.items ?? [];
+
   return (
     <section id={footer.name} className="py-16">
       <div className="max-w-7xl mx-auto px-8">
@@ -35,9 +39,9 @@ export default function Footer({ footer }: { footer: FooterType }) {
                   )}
                 </div>
               )}
-              {footer.social && (
+              {socialItems.length > 0 && (
                 <ul className="flex items-center space-x-6 text-muted-foreground">
-                  {footer.social.items?.map((item, i) => (
+                  {socialItems.map((item, i) => (
                     <li key={i} className="font-medium hover:text-primary">
                       <a href={item.url} target={item.target}>
                         {item.icon && (
@@ -49,8 +53,12 @@ export default function Footer({ footer }: { footer: FooterType }) {
                 </ul>
               )}
             </div>
-            <div className="grid grid-cols-3 gap-6 lg:gap-20">
-              {footer.nav?.items?.map((item, i) => (
+            <div
+              className={`grid gap-6 lg:gap-20 ${
+                navItems.length > 2 ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-2"
+              }`}
+            >
+              {navItems.map((item, i) => (
                 <div key={i}>
                   <p className="mb-6 font-bold">{item.title}</p>
                   <ul className="space-y-4 text-sm text-muted-foreground">
@@ -82,9 +90,9 @@ export default function Footer({ footer }: { footer: FooterType }) {
               </p>
             )}
 
-            {footer.agreement && (
+            {agreementItems.length > 0 && (
               <ul className="flex justify-center gap-4 lg:justify-start">
-                {footer.agreement.items?.map((item, i) => (
+                {agreementItems.map((item, i) => (
                   <li key={i} className="hover:text-primary">
                     <a href={item.url} target={item.target}>
                       {item.title}

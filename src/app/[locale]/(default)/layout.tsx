@@ -19,7 +19,7 @@ export default async function DefaultLayout({
   return (
     <HeroProvider>
       {page.header && <Header header={page.header} />}
-      <main className="overflow-x-hidden">{children}</main>
+      <main className="[overflow-x:clip]">{children}</main>
       {page.footer && <Footer footer={page.footer} />}
       {/* <Feedback socialLinks={page.footer?.social?.items} /> */}
       <GlobalLoadingWrapper />

@@ -44,7 +44,7 @@ export default function Testimonial({ section }: { section: SectionType }) {
           {section.description}
         </p>
       </div>
-      <div className="lg:container lg:mx-auto">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mt-16 space-y-4">
           <Carousel
             opts={{
@@ -54,13 +54,13 @@ export default function Testimonial({ section }: { section: SectionType }) {
             onMouseLeave={() => plugin.current.play()}
             className="relative before:absolute before:bottom-0 before:left-0 before:top-0 before:z-10 before:w-36 before:bg-linear-to-r before:from-background before:to-transparent after:absolute after:bottom-0 after:right-0 after:top-0 after:z-10 after:w-36 after:bg-linear-to-l after:from-background after:to-transparent"
           >
-            <CarouselContent>
+            <CarouselContent className="-ml-4">
               {section.items?.map((item, index) => (
-                <CarouselItem key={index} className="basis-auto">
-                  <Card className="max-w-96 select-none p-6">
+                <CarouselItem key={index} className="basis-auto pl-4 self-stretch">
+                  <Card className="flex h-full min-h-[15.5rem] max-w-[21rem] select-none flex-col p-6 sm:max-w-[22rem]">
                     <div className="flex justify-between">
                       <div className="mb-4 flex gap-4">
-                        <Avatar className="size-14 rounded-full ring-1 ring-input">
+                        <Avatar className="size-[3.25rem] rounded-full ring-1 ring-input">
                           <AvatarImage
                             src={item.image?.src}
                             alt={item.image?.alt || item.title}
@@ -77,12 +77,12 @@ export default function Testimonial({ section }: { section: SectionType }) {
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            className="size-5 fill-amber-500 text-amber-500"
+                            className="size-[18px] fill-amber-500 text-amber-500"
                           />
                         ))}
                       </div>
                     </div>
-                    <q className="leading-7 text-muted-foreground">
+                    <q className="flex-1 leading-7 text-muted-foreground">
                       {item.description}
                     </q>
                   </Card>

@@ -35,16 +35,128 @@ spline-viewer::part(logo) {
 }
 
 @layer base {
+  html {
+    min-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 }
 
 .container {
   @apply mx-auto max-w-7xl px-6 md:px-10 lg:px-14;
+}
+
+.landing-page-compact {
+  --landing-scale: 0.6666667;
+}
+
+.landing-page-compact .container {
+  max-width: calc(80rem * var(--landing-scale));
+}
+
+.landing-page-compact .max-w-7xl {
+  max-width: calc(80rem * var(--landing-scale));
+}
+
+.landing-page-compact .max-w-6xl {
+  max-width: calc(72rem * var(--landing-scale));
+}
+
+.landing-page-compact .max-w-5xl {
+  max-width: calc(64rem * var(--landing-scale));
+}
+
+.landing-page-compact .max-w-4xl {
+  max-width: calc(56rem * var(--landing-scale));
+}
+
+.landing-page-compact .max-w-3xl {
+  max-width: calc(48rem * var(--landing-scale));
+}
+
+.landing-page-compact .max-w-2xl {
+  max-width: calc(42rem * var(--landing-scale));
+}
+
+.landing-page-compact .landing-page-hero-full .max-w-4xl {
+  max-width: 56rem;
+}
+
+.landing-page-compact .landing-page-hero-full .max-w-2xl {
+  max-width: 42rem;
+}
+
+.landing-page-compact [class*="max-w-[760px]"] {
+  max-width: calc(760px * var(--landing-scale));
+}
+
+.landing-page-compact [class*="max-w-(--breakpoint-md)"] {
+  max-width: calc(var(--breakpoint-md) * var(--landing-scale));
+}
+
+.landing-page-compact section > .px-8 {
+  max-width: calc(80rem * var(--landing-scale));
+  margin-inline: auto;
+}
+
+.hero-art-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+}
+
+.hero-art-title-line {
+  display: block;
+  white-space: nowrap;
+  font-family: "STKaiti", "KaiTi", "Kaiti SC", "BiauKai", "DFKai-SB", "Ma Shan Zheng", serif;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.08;
+  text-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transform: skewX(-2deg);
+  transform-origin: center;
+}
+
+.hero-art-title-main {
+  color: #111111;
+}
+
+.hero-art-title-accent {
+  color: #118857;
+}
+
+.hero-art-title-gong {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.18em;
+}
+
+.hero-art-title-gong::after {
+  content: "";
+  position: absolute;
+  left: -0.18em;
+  right: -0.24em;
+  bottom: -0.01em;
+  height: 0.22em;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #48b48d 0%, #7cc9a8 42%, #e2f1eb 100%);
+  transform: rotate(-3deg);
+  transform-origin: center;
+  clip-path: path("M 2 16 C 15 17, 29 15, 43 12 C 56 10, 69 10, 82 11 C 91 12, 99 13, 106 14 L 104 18 C 96 17, 88 16, 80 15 C 68 14, 56 14, 43 16 C 29 18, 16 19, 3 19 Z");
+  opacity: 0.95;
 }
 
 /* 增强的loading动画 */
@@ -307,6 +419,19 @@ spline-viewer::part(logo) {
   transition-duration: 2s;
 }
 
-.delay-100 {
+  .delay-100 {
   animation-delay: 0.1s;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
 }

@@ -171,9 +171,9 @@ export default function HelpClient({ locale }: HelpClientProps) {
               <div
                 key={src}
                 className={cn(
-                  "overflow-hidden rounded-xl",
-                  index === 0 && "md:ml-[-2px] md:w-[calc(100%+25px)]",
-                  index === 1 && "md:ml-[-26px] md:w-[calc(100%+27px)]"
+                  "overflow-hidden",
+                  index === 0 && "md:ml-[8px] md:w-[calc(100%+21px)]",
+                  index === 1 && "md:ml-[-24px] md:w-[calc(100%+25px)]"
                 )}
               >
                 <Image
@@ -181,7 +181,11 @@ export default function HelpClient({ locale }: HelpClientProps) {
                   alt={selectedPage.title}
                   width={1200}
                   height={800}
-                  className="h-auto w-[80%]"
+                  className={cn(
+                    "h-auto w-[80%]",
+                    index === 0 && "md:h-[calc(100%+2px)]",
+                    index === 1 && "md:h-[calc(100%+3px)]"
+                  )}
                   unoptimized
                 />
               </div>
@@ -191,7 +195,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
             {selectedPage.images.slice(2).map((src) => (
               <div
                 key={src}
-                className="overflow-hidden rounded-xl"
+                className="overflow-hidden"
               >
                 <Image
                   src={src}
@@ -214,7 +218,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
           <div
             key={src}
             className={cn(
-              "overflow-hidden rounded-xl",
+              "overflow-hidden",
               src === "/imgs/jiaocheng/pic6.png" && "-mt-2",
               src === "/imgs/jiaocheng/pic10.png" && "-mt-2"
             )}
@@ -226,9 +230,9 @@ export default function HelpClient({ locale }: HelpClientProps) {
               height={900}
               className={cn(
                 "h-auto w-[86%]",
-                src === "/imgs/jiaocheng/pic7.png" && "w-[calc(86%-5px)]",
+                src === "/imgs/jiaocheng/pic7.png" && "w-[calc(86%+0px)]",
                 src === "/imgs/jiaocheng/pic10.png" &&
-                  "w-[calc(86%-6px)]"
+                  "w-[calc(86%-0px)]"
               )}
               unoptimized
             />

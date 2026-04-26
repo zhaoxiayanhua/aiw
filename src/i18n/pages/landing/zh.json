@@ -471,23 +471,43 @@
               "target": "_self"
             },
             {
-              "title": "成功案例",
-              "url": "/#testimonial",
+              "title": "购买方案",
+              "url": "/pricing",
               "target": "_self"
             },
             {
-              "title": "定价",
-              "url": "/pricing",
+              "title": "人工润色",
+              "url": "/study-abroad-consultation",
+              "target": "_self"
+            },
+            {
+              "title": "使用教程",
+              "url": "/help",
               "target": "_self"
             }
           ]
         },
         {
-          "title": "Support",
+          "title": "支持",
           "children": [
             {
               "title": "联系我们",
               "url": "/contact",
+              "target": "_self"
+            },
+            {
+              "title": "常见问题",
+              "url": "/#faq",
+              "target": "_self"
+            },
+            {
+              "title": "隐私政策",
+              "url": "/privacy-policy",
+              "target": "_self"
+            },
+            {
+              "title": "服务条款",
+              "url": "/terms-of-service",
               "target": "_self"
             }
           ]
@@ -495,44 +515,10 @@
       ]
     },
     "social": {
-      "items": [
-        {
-          "title": "X",
-          "icon": "RiTwitterXFill",
-          "url": "https://x.com/zhixiejiang",
-          "target": "_blank"
-        },
-        {
-          "title": "Github",
-          "icon": "RiGithubFill",
-          "url": "https://github.com/zhixiejiang",
-          "target": "_blank"
-        },
-        {
-          "title": "Discord",
-          "icon": "RiDiscordFill",
-          "url": "https://discord.gg/HQNnrzjZQS",
-          "target": "_blank"
-        },
-        {
-          "title": "邮箱",
-          "icon": "RiMailLine",
-          "url": "mailto:support@zhixiejiang.com",
-          "target": "_self"
-        }
-      ]
+      "items": []
     },
     "agreement": {
-      "items": [
-        {
-          "title": "隐私政策",
-          "url": "/privacy-policy"
-        },
-        {
-          "title": "服务条款",
-          "url": "/terms-of-service"
-        }
-      ]
+      "items": []
     }
   }
 }

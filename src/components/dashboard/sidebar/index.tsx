@@ -33,7 +33,6 @@ import { Sidebar as SidebarType } from "@/types/blocks/sidebar";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import SidebarUser from "./user";
-import Footer from "./footer";
 import { Library } from "./library";
 import { BottomNav } from "./bottom_nav";
 
@@ -80,7 +79,6 @@ export default function DashboardSidebar({
       </SidebarContent>
       <SidebarFooter>
         <SidebarUser account={sidebar.account} />
-        {sidebar?.social && <Footer social={sidebar.social} />}
       </SidebarFooter>
     </Sidebar>
   );

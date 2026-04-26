@@ -5,6 +5,7 @@ import { insertDiscountCodeUsage, updateDiscountCodeUsageCount, findDiscountCode
 export enum OrderStatus {
   Created = "created",
   Paid = "paid",
+  Completed = "completed",
   Deleted = "deleted",
 }
 

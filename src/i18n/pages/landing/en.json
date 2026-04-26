@@ -453,106 +453,62 @@
     "nav": {
       "items": [
         {
-          "title": "About",
+          "title": "Product",
           "children": [
             {
-              "title": "Features",
+              "title": "Core Features",
               "url": "/#feature",
               "target": "_self"
             },
             {
-              "title": "Showcases",
-              "url": "/#showcase",
+              "title": "Pricing Plans",
+              "url": "/pricing",
               "target": "_self"
             },
             {
-              "title": "Pricing",
-              "url": "/#pricing",
+              "title": "Human Polishing",
+              "url": "/study-abroad-consultation",
+              "target": "_self"
+            },
+            {
+              "title": "Tutorials",
+              "url": "/help",
               "target": "_self"
             }
           ]
         },
         {
-          "title": "Resources",
+          "title": "Support",
           "children": [
             {
-              "title": "Documents",
-              "url": "https://docs.Essmote AI.ai",
-              "target": "_blank"
+              "title": "Contact Us",
+              "url": "/contact",
+              "target": "_self"
             },
             {
-              "title": "Components",
-              "url": "https://Essmote AI.ai/components",
-              "target": "_blank"
+              "title": "FAQ",
+              "url": "/#faq",
+              "target": "_self"
             },
             {
-              "title": "Templates",
-              "url": "https://Essmote AI.ai/templates",
-              "target": "_blank"
-            }
-          ]
-        },
-        {
-          "title": "Friends",
-          "children": [
-            {
-              "title": "ThinkAny",
-              "url": "https://thinkany.ai",
-              "target": "_blank"
+              "title": "Privacy Policy",
+              "url": "/privacy-policy",
+              "target": "_self"
             },
             {
-              "title": "HeyBeauty",
-              "url": "https://heybeauty.ai",
-              "target": "_blank"
-            },
-            {
-              "title": "Pagen",
-              "url": "https://pagen.so",
-              "target": "_blank"
+              "title": "Terms of Service",
+              "url": "/terms-of-service",
+              "target": "_self"
             }
           ]
         }
       ]
     },
     "social": {
-      "items": [
-        {
-          "title": "X",
-          "icon": "RiTwitterXFill",
-          "url": "https://x.com/Essmote AIai",
-          "target": "_blank"
-        },
-        {
-          "title": "Github",
-          "icon": "RiGithubFill",
-          "url": "https://github.com/Essmote AIai",
-          "target": "_blank"
-        },
-        {
-          "title": "Discord",
-          "icon": "RiDiscordFill",
-          "url": "https://discord.gg/HQNnrzjZQS",
-          "target": "_blank"
-        },
-        {
-          "title": "Email",
-          "icon": "RiMailLine",
-          "url": "mailto:support@Essmote AI.ai",
-          "target": "_self"
-        }
-      ]
+      "items": []
     },
     "agreement": {
-      "items": [
-        {
-          "title": "Privacy Policy",
-          "url": "/privacy-policy"
-        },
-        {
-          "title": "Terms of Service",
-          "url": "/terms-of-service"
-        }
-      ]
+      "items": []
     }
   }
 }

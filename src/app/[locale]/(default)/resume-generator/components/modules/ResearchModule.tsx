@@ -219,9 +219,7 @@ export default function ResearchModule() {
                     contextHint={project.project_title}
                   />
                 )}
-                <p className="text-[10px] text-muted-foreground">
-                  请用英文填写 3-4 条您在项目中的具体贡献，每条以动词开头，用换行分隔
-                </p>
+
               </div>
 
               <div className="grid grid-cols-1 gap-4">

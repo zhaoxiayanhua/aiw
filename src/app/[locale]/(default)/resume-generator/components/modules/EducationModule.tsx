@@ -136,7 +136,6 @@ export default function EducationModule() {
                   onChange={(e) => handleInputChange(index, "degree", e.target.value)}
                   className="h-10 text-xs"
                 />
-                <p className="text-[10px] text-muted-foreground">请用英文填写完整的学位名称</p>
               </div>
 
               {/* 时间信息 */}
@@ -235,7 +234,6 @@ export default function EducationModule() {
                     contextHint={`${education.degree} ${education.school_name}`}
                   />
                 )}
-                <p className="text-[10px] text-muted-foreground">请用英文填写 3-5 门相关课程，用逗号分隔</p>
               </div>
             </div>
           </div>

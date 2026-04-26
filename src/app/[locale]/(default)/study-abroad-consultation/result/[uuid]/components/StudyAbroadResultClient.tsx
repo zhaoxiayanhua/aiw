@@ -22,6 +22,7 @@ export default function StudyAbroadResultClient({ documentUuid }: StudyAbroadRes
   const [documentData, setDocumentData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<string>("unpaid");
+  const [isCompletedStatus, setIsCompletedStatus] = useState(false);
   const [polishingQrUrl, setPolishingQrUrl] = useState("/imgs/wechat-qr-placeholder.svg");
 
   useEffect(() => {
@@ -55,7 +56,13 @@ export default function StudyAbroadResultClient({ documentUuid }: StudyAbroadRes
         const res = await fetch("/api/orders/check-polishing-status?document_uuid=" + documentUuid);
         const result = await res.json();
         if (result.code === 0 && result.data?.status) {
-          setPaymentStatus(result.data.status);
+          if (result.data.status === "completed") {
+            setIsCompletedStatus(true);
+            setPaymentStatus("paid");
+          } else {
+            setIsCompletedStatus(false);
+            setPaymentStatus(result.data.status);
+          }
         }
       } catch (e) {
         // ignore
@@ -94,6 +101,8 @@ export default function StudyAbroadResultClient({ documentUuid }: StudyAbroadRes
   }
 
   const formData = documentData.form_data || {};
+  const isPaidOrCompleted = paymentStatus === "paid" || isCompletedStatus;
+  const isCompleted = isCompletedStatus;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/5">
@@ -113,6 +122,27 @@ export default function StudyAbroadResultClient({ documentUuid }: StudyAbroadRes
         </div>
 
         {/* 支付入口 */}
+        {isCompleted && (
+          <Card className="p-6 mb-6 border border-blue-200 bg-blue-50/80 dark:border-blue-900/50 dark:bg-blue-950/20">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 mt-0.5 text-blue-600 dark:text-blue-400" />
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-semibold text-foreground">人工润色已完成</h2>
+                  <Badge className="bg-blue-100 text-blue-700">已完成</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  您的人工润色订单已经处理完成，请根据您提交时选择的接收方式，及时查看邮箱或微信返回的文档。
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  如果暂未收到，请先检查垃圾邮件、邮箱拦截或微信消息列表；若仍未收到，请尽快联系客服协助处理。
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {!isCompleted && (
         <Card className={`p-8 mb-6 border-2 ${paymentStatus === "paid" ? "border-green-300 bg-gradient-to-r from-green-50 to-green-100" : "border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10"}`}>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex-1">
@@ -136,7 +166,7 @@ export default function StudyAbroadResultClient({ documentUuid }: StudyAbroadRes
               </p>
               {paymentStatus !== "paid" && (
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-primary">¥0.01</span>
+                  <span className="text-3xl font-bold text-primary">¥99</span>
                   <span className="text-sm text-muted-foreground">/篇</span>
                 </div>
               )}
@@ -153,6 +183,7 @@ export default function StudyAbroadResultClient({ documentUuid }: StudyAbroadRes
             </p>
           )}
         </Card>
+        )}
 
         <Card className="p-8 mb-6">
           <h2 className="text-xl font-semibold mb-4">后续流程</h2>
@@ -380,10 +411,10 @@ function PayButton({ orderTitle, documentUuid, locale }: { orderTitle: string; d
     interval: "one-time",
     product_id: "polishing-single",
     product_name: orderTitle,
-    amount: 1,
-    cn_amount: 1,
+    amount: 9900,
+    cn_amount: 9900,
     currency: "cny",
-    price: "¥0.01",
+    price: "¥99",
     unit: "/篇",
     credits: 1,
     valid_months: 6,

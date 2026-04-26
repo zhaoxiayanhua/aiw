@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import moment from "moment";
+import { toast } from "sonner";
+import { ChevronLeft, ChevronRight, Download, Eye, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -10,15 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Eye, ChevronLeft, ChevronRight, Download } from "lucide-react";
-import moment from "moment";
 
 interface PolishingDocument {
   uuid: string;
@@ -34,66 +35,135 @@ interface PolishingDocument {
 
 const PAGE_SIZE = 10;
 
+function isCompleted(status?: string) {
+  return status === "completed";
+}
+
+function isPaidOrCompleted(status?: string) {
+  return status === "paid" || status === "completed";
+}
+
+function renderStatusBadge(status?: string) {
+  if (status === "completed") {
+    return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Completed</Badge>;
+  }
+
+  if (status === "paid") {
+    return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Paid</Badge>;
+  }
+
+  if (status === "created") {
+    return (
+      <Badge variant="outline" className="border-yellow-300 text-yellow-600">
+        Pending Payment
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge variant="outline" className="text-gray-400">
+      Unpaid
+    </Badge>
+  );
+}
+
 export default function PolishingOrdersClient({
   documents,
 }: {
   documents: PolishingDocument[];
 }) {
+  const [rows, setRows] = useState(documents);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<PolishingDocument | null>(null);
+  const [updatingUuid, setUpdatingUuid] = useState<string | null>(null);
 
-  const totalPages = Math.max(1, Math.ceil(documents.length / PAGE_SIZE));
-  const pagedData = documents.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE
-  );
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const pagedData = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const fd = (doc: PolishingDocument) => doc.form_data || {};
 
+  const updateDocumentStatus = (uuid: string, status: string) => {
+    setRows((current) =>
+      current.map((item) => (item.uuid === uuid ? { ...item, payment_status: status } : item))
+    );
+    setSelected((current) =>
+      current && current.uuid === uuid ? { ...current, payment_status: status } : current
+    );
+  };
+
+  const handleMarkCompleted = async (doc: PolishingDocument) => {
+    if (!doc.order_no || isCompleted(doc.payment_status)) {
+      return;
+    }
+
+    try {
+      setUpdatingUuid(doc.uuid);
+
+      const response = await fetch(`/api/admin/polishing-orders/${doc.order_no}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "completed" }),
+      });
+      const result = await response.json();
+
+      if (!response.ok || result.code !== 0) {
+        throw new Error(result.message || "Failed to update order status");
+      }
+
+      updateDocumentStatus(doc.uuid, "completed");
+      toast.success("Order marked as completed");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update order status");
+    } finally {
+      setUpdatingUuid(null);
+    }
+  };
+
   return (
     <>
-      <div className="w-full px-4 md:px-8 py-8 space-y-6">
+      <div className="w-full space-y-6 px-4 py-8 md:px-8">
         <div>
-          <h1 className="text-2xl font-bold">人工润色订单</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            共 {documents.length} 条记录
-          </p>
+          <h1 className="text-2xl font-bold">Polishing Orders</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{rows.length} records</p>
         </div>
 
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>用户姓名</TableHead>
-                <TableHead>联系方式</TableHead>
-                <TableHead>文书文件</TableHead>
-                <TableHead>润色需求</TableHead>
-                <TableHead>返回方式</TableHead>
-                <TableHead>支付状态</TableHead>
-                <TableHead>提交时间</TableHead>
-                <TableHead>操作</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>File</TableHead>
+                <TableHead>Requirements</TableHead>
+                <TableHead>Return Method</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Submitted At</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {pagedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8}>
-                    <div className="flex w-full justify-center items-center py-8 text-muted-foreground">
-                      暂无润色订单
+                    <div className="flex w-full items-center justify-center py-8 text-muted-foreground">
+                      No polishing orders
                     </div>
                   </TableCell>
                 </TableRow>
               ) : (
-                pagedData.map((doc: PolishingDocument) => {
+                pagedData.map((doc) => {
                   const basic = fd(doc).basicInfo || {};
                   const details = fd(doc).polishingDetails || {};
+
                   return (
                     <TableRow key={doc.uuid}>
                       <TableCell>{basic.full_name || "-"}</TableCell>
                       <TableCell>
-                        <div className="text-sm space-y-0.5">
+                        <div className="space-y-0.5 text-sm">
                           {basic.email && <div>{basic.email}</div>}
-                          {basic.wechat && <div>微信: {basic.wechat}</div>}
+                          {basic.wechat && <div>WeChat: {basic.wechat}</div>}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -102,10 +172,10 @@ export default function PolishingOrdersClient({
                             href={details.uploaded_document_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary underline text-sm inline-flex items-center gap-1"
+                            className="inline-flex items-center gap-1 text-sm text-primary underline"
                           >
-                            <Download className="w-3 h-3" />
-                            {details.uploaded_document_name || "下载"}
+                            <Download className="h-3 w-3" />
+                            {details.uploaded_document_name || "Download"}
                           </a>
                         ) : (
                           "-"
@@ -121,34 +191,39 @@ export default function PolishingOrdersClient({
                       </TableCell>
                       <TableCell>
                         {details.return_method === "email" ? (
-                          <Badge variant="outline">邮件</Badge>
+                          <Badge variant="outline">Email</Badge>
                         ) : details.return_method === "wechat" ? (
-                          <Badge variant="outline">微信</Badge>
+                          <Badge variant="outline">WeChat</Badge>
                         ) : (
                           "-"
                         )}
                       </TableCell>
-                      <TableCell>
-                        {doc.payment_status === "paid" ? (
-                          <Badge className="bg-green-100 text-green-700 hover:bg-green-100">已支付</Badge>
-                        ) : doc.payment_status === "created" ? (
-                          <Badge variant="outline" className="text-yellow-600 border-yellow-300">待支付</Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-gray-400">未下单</Badge>
-                        )}
-                      </TableCell>
+                      <TableCell>{renderStatusBadge(doc.payment_status)}</TableCell>
                       <TableCell className="text-sm">
                         {moment.utc(doc.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm")}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setSelected(doc)}
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          详情
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" variant="ghost" onClick={() => setSelected(doc)}>
+                            <Eye className="mr-1 h-4 w-4" />
+                            Details
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={
+                              !isPaidOrCompleted(doc.payment_status) ||
+                              isCompleted(doc.payment_status) ||
+                              updatingUuid === doc.uuid
+                            }
+                            onClick={() => handleMarkCompleted(doc)}
+                          >
+                            {updatingUuid === doc.uuid ? (
+                              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                            ) : null}
+                            Mark Completed
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -158,53 +233,67 @@ export default function PolishingOrdersClient({
           </Table>
         </div>
 
-        {/* 分页 */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            第 {page} / {totalPages} 页
+            Page {page} / {totalPages}
           </p>
           <div className="flex gap-2">
             <Button
               size="sm"
               variant="outline"
               disabled={page <= 1}
-              onClick={() => setPage((p: number) => p - 1)}
+              onClick={() => setPage((current) => current - 1)}
             >
-              <ChevronLeft className="w-4 h-4 mr-1" />
-              上一页
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Prev
             </Button>
             <Button
               size="sm"
               variant="outline"
               disabled={page >= totalPages}
-              onClick={() => setPage((p: number) => p + 1)}
+              onClick={() => setPage((current) => current + 1)}
             >
-              下一页
-              <ChevronRight className="w-4 h-4 ml-1" />
+              Next
+              <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
         </div>
       </div>
 
-      {/* 详情弹窗 */}
       <Dialog
         open={!!selected}
-        onOpenChange={(open: boolean) => {
-          if (!open) setSelected(null);
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelected(null);
+          }
         }}
       >
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>润色订单详情</DialogTitle>
+            <DialogTitle>Polishing Order Details</DialogTitle>
           </DialogHeader>
-          {selected && <OrderDetail doc={selected} />}
+          {selected ? (
+            <OrderDetail
+              doc={selected}
+              updating={updatingUuid === selected.uuid}
+              onMarkCompleted={() => handleMarkCompleted(selected)}
+            />
+          ) : null}
         </DialogContent>
       </Dialog>
     </>
   );
 }
 
-function OrderDetail({ doc }: { doc: PolishingDocument }) {
+function OrderDetail({
+  doc,
+  updating,
+  onMarkCompleted,
+}: {
+  doc: PolishingDocument;
+  updating: boolean;
+  onMarkCompleted: () => void;
+}) {
   const basic = doc.form_data?.basicInfo || {};
   const details = doc.form_data?.polishingDetails || {};
   const academic = doc.form_data?.academicBackground || {};
@@ -214,27 +303,27 @@ function OrderDetail({ doc }: { doc: PolishingDocument }) {
 
   return (
     <div className="space-y-6">
-      <Section title="基本信息">
-        <Row label="姓名" value={basic.full_name} />
-        <Row label="邮箱" value={basic.email} />
-        <Row label="手机" value={basic.phone} />
-        <Row label="微信" value={basic.wechat} />
+      <Section title="Basic Info">
+        <Row label="Name" value={basic.full_name} />
+        <Row label="Email" value={basic.email} />
+        <Row label="Phone" value={basic.phone} />
+        <Row label="WeChat" value={basic.wechat} />
       </Section>
 
-      <Section title="润色详情">
-        <Row label="润色需求" value={details.polishing_requirements} />
+      <Section title="Polishing Details">
+        <Row label="Requirements" value={details.polishing_requirements} />
         <Row
-          label="上传文件"
+          label="Uploaded File"
           value={
             details.uploaded_document_url ? (
               <a
                 href={details.uploaded_document_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary underline inline-flex items-center gap-1"
+                className="inline-flex items-center gap-1 text-primary underline"
               >
-                <Download className="w-3 h-3" />
-                {details.uploaded_document_name || "下载文件"}
+                <Download className="h-3 w-3" />
+                {details.uploaded_document_name || "Download file"}
               </a>
             ) : (
               "-"
@@ -242,76 +331,86 @@ function OrderDetail({ doc }: { doc: PolishingDocument }) {
           }
         />
         <Row
-          label="返回方式"
+          label="Return Method"
           value={
             details.return_method === "email"
-              ? `邮件: ${details.return_email || "-"}`
+              ? `Email: ${details.return_email || "-"}`
               : details.return_method === "wechat"
-              ? `微信: ${details.return_wechat || "-"}`
-              : "-"
+                ? `WeChat: ${details.return_wechat || "-"}`
+                : "-"
           }
         />
       </Section>
 
       {(academic.current_school || academic.major) && (
-        <Section title="学术背景">
-          <Row label="当前学校" value={academic.current_school} />
-          <Row label="专业" value={academic.major} />
-          <Row label="学历" value={academic.degree} />
+        <Section title="Academic Background">
+          <Row label="Current School" value={academic.current_school} />
+          <Row label="Major" value={academic.major} />
+          <Row label="Degree" value={academic.degree} />
           <Row label="GPA" value={academic.gpa} />
-          <Row label="预计毕业" value={academic.graduation_date} />
+          <Row label="Graduation Date" value={academic.graduation_date} />
         </Section>
       )}
 
       {(target.target_school || target.target_program) && (
-        <Section title="目标院校">
-          <Row label="目标学校" value={target.target_school} />
-          <Row label="目标专业" value={target.target_program} />
-          <Row label="学位类型" value={target.degree_type} />
-          <Row label="申请入学时间" value={target.application_year} />
+        <Section title="Target Program">
+          <Row label="Target School" value={target.target_school} />
+          <Row label="Target Program" value={target.target_program} />
+          <Row label="Degree Type" value={target.degree_type} />
+          <Row label="Application Time" value={target.application_year} />
         </Section>
       )}
 
       {(background.research_experience || background.work_experience) && (
-        <Section title="背景经历">
-          <Row label="科研经历" value={background.research_experience} />
-          <Row label="工作/实习经历" value={background.work_experience} />
-          <Row label="课外活动" value={background.extracurricular} />
-          <Row label="获奖情况" value={background.awards} />
+        <Section title="Background Experience">
+          <Row label="Research Experience" value={background.research_experience} />
+          <Row label="Work / Internship" value={background.work_experience} />
+          <Row label="Activities" value={background.extracurricular} />
+          <Row label="Awards" value={background.awards} />
         </Section>
       )}
 
       {(needs.consultation_type || needs.additional_notes) && (
-        <Section title="咨询需求">
-          <Row label="咨询类型" value={needs.consultation_type} />
-          <Row label="补充说明" value={needs.additional_notes} />
+        <Section title="Consultation Needs">
+          <Row label="Type" value={needs.consultation_type} />
+          <Row label="Notes" value={needs.additional_notes} />
         </Section>
       )}
 
-      <Section title="支付信息">
-        <Row
-          label="支付状态"
-          value={
-            doc.payment_status === "paid" ? (
-              <Badge className="bg-green-100 text-green-700 hover:bg-green-100">已支付</Badge>
-            ) : doc.payment_status === "created" ? (
-              <Badge variant="outline" className="text-yellow-600 border-yellow-300">待支付</Badge>
-            ) : (
-              <Badge variant="outline" className="text-gray-400">未下单</Badge>
-            )
-          }
-        />
-        {doc.order_no && <Row label="订单号" value={doc.order_no} />}
+      <Section title="Order Info">
+        <Row label="Status" value={renderStatusBadge(doc.payment_status)} />
+        {doc.order_no && <Row label="Order No." value={doc.order_no} />}
         {doc.paid_at && (
-          <Row label="支付时间" value={moment.utc(doc.paid_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss")} />
+          <Row
+            label="Paid At"
+            value={moment.utc(doc.paid_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss")}
+          />
         )}
         {doc.paid_amount != null && (
-          <Row label="支付金额" value={`¥${(doc.paid_amount / 100).toFixed(2)}`} />
+          <Row label="Amount" value={`¥${(doc.paid_amount / 100).toFixed(2)}`} />
         )}
       </Section>
 
-      <div className="text-xs text-muted-foreground pt-2 border-t">
-        提交时间: {moment.utc(doc.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss")} | 文档ID: {doc.uuid}
+      {doc.order_no ? (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            disabled={
+              !isPaidOrCompleted(doc.payment_status) ||
+              isCompleted(doc.payment_status) ||
+              updating
+            }
+            onClick={onMarkCompleted}
+          >
+            {updating ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
+            Mark as Completed
+          </Button>
+        </div>
+      ) : null}
+
+      <div className="border-t pt-2 text-xs text-muted-foreground">
+        Submitted At: {moment.utc(doc.created_at).utcOffset(8).format("YYYY-MM-DD HH:mm:ss")} |
+        {" "}Document ID: {doc.uuid}
       </div>
     </div>
   );
@@ -326,7 +425,7 @@ function Section({
 }) {
   return (
     <div>
-      <h3 className="font-semibold text-sm mb-3 text-foreground">{title}</h3>
+      <h3 className="mb-3 text-sm font-semibold text-foreground">{title}</h3>
       <div className="grid grid-cols-2 gap-x-6 gap-y-2">{children}</div>
     </div>
   );
@@ -339,11 +438,14 @@ function Row({
   label: string;
   value: React.ReactNode;
 }) {
-  if (!value) return null;
+  if (!value) {
+    return null;
+  }
+
   return (
     <div className="col-span-2 sm:col-span-1">
       <span className="text-xs text-muted-foreground">{label}</span>
-      <div className="text-sm mt-0.5">{value}</div>
+      <div className="mt-0.5 text-sm">{value}</div>
     </div>
   );
 }

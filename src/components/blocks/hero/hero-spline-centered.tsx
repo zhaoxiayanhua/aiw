@@ -2,83 +2,51 @@
 
 import { Section as SectionType } from "@/types/blocks/section";
 import { motion } from "framer-motion";
-import { animate, stagger } from "motion";
-import { splitText } from "motion-plus";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import HeroBg from "./bg";
 
-// Declare the custom element type
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'spline-viewer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
-        url?: string;
-      }, HTMLElement>;
+      "spline-viewer": React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          url?: string;
+        },
+        HTMLElement
+      >;
     }
   }
 }
 
 export default function HeroSplineCentered({ section }: { section: SectionType }) {
-  const titleRef = useRef<HTMLHeadingElement>(null);
   const [isSplineLoaded, setIsSplineLoaded] = useState(false);
 
   useEffect(() => {
-    document.fonts.ready.then(() => {
-      
-      if (!titleRef.current) return;
-
-      // Show the title after fonts are loaded
-      titleRef.current.style.visibility = "visible";
-
-      const { words } = splitText(titleRef.current);
-
-      // Animate the words with initial delay
-      words.forEach((word, index) => {
-        animate(
-          word,
-          { opacity: [0, 1], y: [20, 0], filter: ["blur(10px)", "blur(0px)"] },
-          {
-            type: "spring",
-            duration: 1.5,
-            bounce: 0,
-            delay: 0.2 + index * 0.05, // 0.2s initial delay + stagger
-          }
-        );
-      });
-    });
-  }, []);
-
-  // Handle Spline loading
-  useEffect(() => {
-    // Check if spline-viewer custom element is already defined
     const checkSplineLoaded = () => {
-      if (customElements.get('spline-viewer')) {
+      if (customElements.get("spline-viewer")) {
         setIsSplineLoaded(true);
         return true;
       }
       return false;
     };
 
-    // Check immediately
     if (checkSplineLoaded()) return;
 
-    // Load script only if not already loaded
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = 'https://unpkg.com/@splinetool/viewer@1.10.35/build/spline-viewer.js';
+    const script = document.createElement("script");
+    script.type = "module";
+    script.src = "https://unpkg.com/@splinetool/viewer@1.10.35/build/spline-viewer.js";
     script.onload = () => {
       setIsSplineLoaded(true);
     };
-    
-    // Check if script already exists
+
     const existingScript = document.querySelector(`script[src="${script.src}"]`);
     if (!existingScript) {
       document.head.appendChild(script);
     } else {
-      // Script exists, just wait for element to be defined
       const interval = setInterval(() => {
         if (checkSplineLoaded()) {
           clearInterval(interval);
@@ -87,10 +55,6 @@ export default function HeroSplineCentered({ section }: { section: SectionType }
 
       return () => clearInterval(interval);
     }
-
-    return () => {
-      // Cleanup if needed
-    };
   }, []);
 
   if (section.disabled) {
@@ -98,101 +62,101 @@ export default function HeroSplineCentered({ section }: { section: SectionType }
   }
 
   return (
-    <section id={section.name} className="relative min-h-[70vh] lg:min-h-[80vh] overflow-hidden bg-gradient-to-b from-background to-background/95 flex items-center justify-center">
-        {/* Background grid - shows immediately */}
-        <div className="absolute inset-0 z-0">
-          <HeroBg />
+    <section
+      id={section.name}
+      className="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-gradient-to-b from-background to-background/95 lg:min-h-[80vh]"
+    >
+      <div className="absolute inset-0 z-0">
+        <HeroBg />
+      </div>
+
+      {!isSplineLoaded && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          <div className="animate-pulse text-muted-foreground">Hello...</div>
         </div>
-        
-        {/* Loading indicator for Spline */}
-        {!isSplineLoaded && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center">
-            <div className="text-muted-foreground animate-pulse">
-              Hello...
-            </div>
-          </div>
-        )}
-        {/* Spline 3D Background - Centered behind content */}
+      )}
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: isSplineLoaded ? 1 : 0, scale: isSplineLoaded ? 1 : 0.9 }}
+        transition={{ duration: 1.2, delay: 0.2 }}
+        className="absolute inset-0 z-10 flex items-center justify-center"
+      >
+        <div className="absolute inset-0 bg-background/30" />
+
+        <div className="absolute left-1/2 top-1/2 h-[80%] w-[80%] max-w-4xl -translate-x-[175%] -translate-y-1/2">
+          <spline-viewer
+            url="https://prod.spline.design/JdZgoBYW5zhBLimi/scene.splinecode"
+            className="w-[335%] 2xl:h-full"
+          />
+        </div>
+      </motion.div>
+
+      <div className="relative z-30 px-4 pt-12 text-center md:pt-16 lg:pt-20">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: isSplineLoaded ? 1 : 0, scale: isSplineLoaded ? 1 : 0.9 }}
-          transition={{ duration: 1.2, delay: 0.2 }}
-          className="absolute inset-0 flex items-center justify-center z-10"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="mx-auto w-full max-w-none space-y-8"
         >
-          {/* Subtle gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-background/30" />
-          
-          {/* Spline container - positioned behind title */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-[175%] -translate-y-1/2 w-[80%] h-[80%] max-w-4xl">
-            <spline-viewer 
-              url="https://prod.spline.design/JdZgoBYW5zhBLimi/scene.splinecode"
-              className="w-[335%] 2xl:h-full"
-            />
-          </div>
-        </motion.div>
-
-        {/* Content Container - Centered */}
-        <div className="relative z-30 text-center px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="space-y-8 max-w-4xl mx-auto"
-          >
-            <div className="space-y-6">
-              <h1 
-                ref={titleRef}
-                className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-extrabold leading-tight text-black drop-shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-                style={{ visibility: "hidden" }}
-              >
-                <span className="block">为留学申请打造的 </span>
-                <span className="block"> AI 工作空间</span>
-              </h1>
-              
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto"
-              >
-                整合写作工具、案例参考与智能辅助，让每份材料都更打动人心。
-              </motion.p>
-            </div>
-
+          <div className="space-y-6">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
+              className="mx-auto flex w-[88vw] max-w-[60rem] min-w-0 justify-center md:w-[82vw] lg:w-[58vw] xl:w-[60vw] 2xl:w-[64vw]"
             >
-              <Link href="/creation-center">
-                <Button
-                  size="lg"
-                  className="text-lg px-12 py-7 rounded-xl font-semibold"
-                >
-                  立即开始使用
-                  <ArrowRight className="ml-1 h-5 w-5" />
-                </Button>
-              </Link>
- 
+              <Image
+                src="/imgs/icons/title.svg"
+                alt="为留学申请打造的 AI 工作空间"
+                width={1120}
+                height={340}
+                priority
+                className="h-auto w-full"
+              />
             </motion.div>
 
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className="text-sm text-muted-foreground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mx-auto max-w-none whitespace-nowrap text-base text-muted-foreground md:text-lg lg:text-xl"
             >
+              从文书初稿、简历优化到人工润色，帮你更清晰地表达经历、优势与申请目标。
             </motion.p>
-          </motion.div>
-        </div>
+          </div>
 
-        {/* Background gradient effects */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
-        </div>
-      </section>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex justify-center pt-6"
+          >
+            <Link href="/creation-center">
+              <Button size="lg" className="rounded-xl px-6 py-7 text-lg font-semibold">
+                <span className="grid min-w-[12.5rem] grid-cols-[1.5rem_auto_1.5rem] items-center gap-0">
+                  <Sparkles className="size-7 translate-x-[1px] justify-self-start" />
+                  <span className="text-center">立即开始</span>
+                  <ArrowRight className="size-7 -translate-x-[1px] justify-self-end" />
+                </span>
+              </Button>
+            </Link>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="text-sm text-muted-foreground"
+          />
+        </motion.div>
+      </div>
+
+      <div className="absolute inset-0 z-0">
+        <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 animate-blob rounded-full bg-purple-300 opacity-20 blur-xl mix-blend-multiply filter" />
+        <div className="animation-delay-2000 absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 animate-blob rounded-full bg-yellow-300 opacity-20 blur-xl mix-blend-multiply filter" />
+        <div className="animation-delay-4000 absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 animate-blob rounded-full bg-pink-300 opacity-20 blur-xl mix-blend-multiply filter" />
+      </div>
+    </section>
   );
 }
