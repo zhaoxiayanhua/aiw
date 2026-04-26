@@ -40,6 +40,12 @@ type TutorialNavItem = {
   children?: TutorialNavChild[];
 };
 
+const PS_TUTORIAL_IMAGES = [
+  "/imgs/jiaocheng/new3.svg",
+  "/imgs/jiaocheng/new1.svg",
+  "/imgs/jiaocheng/new2.svg",
+];
+
 const FOOTER_DIVIDER_HEIGHT_PX = 2;
 const FOOTER_DIVIDER_GAP_PX = 16;
 const FOOTER_DIVIDER_SHIFT_DOWN_PX = 1;
@@ -234,6 +240,25 @@ export default function HelpClient({ locale }: HelpClientProps) {
                 src === "/imgs/jiaocheng/pic10.png" &&
                   "w-[calc(86%-0px)]"
               )}
+              unoptimized
+            />
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderPsTutorialImages = () => {
+    return (
+      <div className="space-y-3">
+        {PS_TUTORIAL_IMAGES.map((src) => (
+          <div key={src} className="overflow-hidden">
+            <Image
+              src={src}
+              alt="PS tutorial"
+              width={1600}
+              height={900}
+              className="h-auto w-[86%]"
               unoptimized
             />
           </div>
@@ -498,7 +523,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
                   <span>{selectedPage.description}</span>
                 </div>
               ) : (
-                <p className="ml-1 text-muted-foreground">
+                <p className={cn("ml-1 text-muted-foreground", selectedMainKey === "ps_tutorial" && "hidden")}>
                   {selectedMainKey === "resume_cv_tutorial"
                     ? selectedPage.description
                     : "该教程内容正在整理中，敬请期待。"}
@@ -534,6 +559,8 @@ export default function HelpClient({ locale }: HelpClientProps) {
                   )}
                 </div>
               </>
+            ) : selectedMainKey === "ps_tutorial" ? (
+              <>{renderPsTutorialImages()}</>
             ) : (
               <div className="rounded-xl border border-border/70 p-6 text-sm text-muted-foreground">
                 该教程模块暂未上线。
