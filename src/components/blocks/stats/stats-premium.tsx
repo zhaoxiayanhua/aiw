@@ -1,10 +1,25 @@
 "use client";
 
-import Icon from "@/components/icon";
 import { Section as SectionType } from "@/types/blocks/section";
-import { motion, useMotionValue, useTransform, animate, useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { TrendingUp, Users, Star, FileText, UserCheck, Zap, Target } from "lucide-react";
+import {
+  FileText,
+  Star,
+  Target,
+  TrendingUp,
+  UserCheck,
+  Users,
+  Zap,
+} from "lucide-react";
+
+function formatCounterValue(value: number, decimals: number) {
+  if (decimals > 0) {
+    return value.toFixed(decimals);
+  }
+
+  return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 function AnimatedCounter({
   value,
@@ -12,63 +27,65 @@ function AnimatedCounter({
   prefix = "",
   decimals = 0,
   duration = 2.5,
-  isHovering = false
+  shouldAnimate = false,
+  isHovering = false,
 }: {
   value: number;
   suffix?: string;
   prefix?: string;
   decimals?: number;
   duration?: number;
+  shouldAnimate?: boolean;
   isHovering?: boolean;
 }) {
-  const ref = useRef(null);
   const [displayValue, setDisplayValue] = useState("0");
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [hasAnimated, setHasAnimated] = useState(false);
   const isAnimatingRef = useRef(false);
 
   useEffect(() => {
-    // Animate on first view or when hovering after initial animation
-    if ((isInView && !hasAnimated) || (isHovering && hasAnimated)) {
-      // 如果正在动画中，不重复启动
-      if (isAnimatingRef.current) return;
-      isAnimatingRef.current = true;
+    const needsReplay = isHovering && hasAnimated;
+    const shouldStart = (shouldAnimate && !hasAnimated) || needsReplay;
 
-      let startTime: number | null = null;
-      let animationFrame: number;
-
-      const updateValue = (timestamp: number) => {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
-
-        // 增强的缓动函数 - 更流畅的滚动效果
-        const easedProgress = 1 - Math.pow(1 - progress, 2.5);
-        const currentValue = easedProgress * value;
-
-        if (decimals > 0) {
-          setDisplayValue(currentValue.toFixed(decimals));
-        } else {
-          // Format large numbers with comma separator
-          const rounded = Math.round(currentValue);
-          setDisplayValue(rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-        }
-
-        if (progress < 1) {
-          animationFrame = requestAnimationFrame(updateValue);
-        } else {
-          setHasAnimated(true);
-          isAnimatingRef.current = false;
-        }
-      };
-
-      animationFrame = requestAnimationFrame(updateValue);
-
-      // 不在 cleanup 中取消动画，让动画始终运行到完成
+    if (!shouldStart || isAnimatingRef.current) {
+      return;
     }
-  }, [isInView, value, decimals, duration, isHovering, hasAnimated]);
+
+    isAnimatingRef.current = true;
+
+    let startTime: number | null = null;
+    let animationFrame = 0;
+
+    const updateValue = (timestamp: number) => {
+      if (!startTime) {
+        startTime = timestamp;
+      }
+
+      const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
+      const easedProgress = 1 - Math.pow(1 - progress, 2.5);
+      const currentValue = easedProgress * value;
+
+      setDisplayValue(formatCounterValue(currentValue, decimals));
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(updateValue);
+        return;
+      }
+
+      setDisplayValue(formatCounterValue(value, decimals));
+      setHasAnimated(true);
+      isAnimatingRef.current = false;
+    };
+
+    animationFrame = requestAnimationFrame(updateValue);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      isAnimatingRef.current = false;
+    };
+  }, [decimals, duration, hasAnimated, isHovering, shouldAnimate, value]);
 
   return (
-    <span ref={ref} className="tabular-nums">
+    <span className="tabular-nums">
       {prefix}
       {displayValue}
       {suffix}
@@ -82,7 +99,7 @@ const statsConfig = [
     title: "95% 好评率",
     value: 95,
     suffix: "%",
-    unit: "用户满意率",
+    unit: "用户满意度",
     decimals: 0,
     color: "blue",
   },
@@ -108,7 +125,7 @@ const statsConfig = [
     title: "10+ 常驻润色老师",
     value: 10,
     suffix: "+",
-    unit: "人工润色",
+    unit: "人工润色支持",
     color: "orange",
   },
   {
@@ -135,41 +152,41 @@ export default function StatsPremium({ section }: { section: SectionType }) {
   }
 
   const containerRef = useRef(null);
-  const isInView = useInView(containerRef, { once: true, margin: "-50px" });
+  const isInView = useInView(containerRef, {
+    once: true,
+    margin: "0px 0px -10% 0px",
+  });
 
   return (
-    <section id={section.name} className="py-24 relative overflow-hidden">
-      {/* Linear-style Background */}
+    <section id={section.name} className="relative overflow-hidden py-24">
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        {/* Subtle Grid Pattern */}
         <div className="absolute inset-0 opacity-[0.015] dark:opacity-[0.02]">
-          <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <pattern id="stats-grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+              <pattern
+                id="stats-grid"
+                x="0"
+                y="0"
+                width="40"
+                height="40"
+                patternUnits="userSpaceOnUse"
+              >
                 <path d="M0 40V0h40" fill="none" stroke="currentColor" strokeWidth="0.25" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#stats-grid)" />
           </svg>
         </div>
-        
-        {/* Linear-style Gradient Background */}
+
         <div className="absolute inset-0 stats-bg-gradient" />
-        
-        {/* Subtle Light Beams */}
-        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-[#86f096]/10 to-transparent dark:via-[#86f096]/5" />
-        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-[#3dcd77]/10 to-transparent dark:via-[#3dcd77]/5" />
-        
-        {/* Soft Radial Gradients */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full 
-                        bg-gradient-to-r from-[#86f096]/10 to-[#3dcd77]/10 
-                        blur-[100px] opacity-40 dark:from-[#86f096]/5 dark:to-[#3dcd77]/5" />
+        <div className="absolute top-0 left-1/4 h-full w-px bg-gradient-to-b from-transparent via-[#86f096]/10 to-transparent dark:via-[#86f096]/5" />
+        <div className="absolute top-0 right-1/3 h-full w-px bg-gradient-to-b from-transparent via-[#3dcd77]/10 to-transparent dark:via-[#3dcd77]/5" />
+        <div className="absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#86f096]/10 to-[#3dcd77]/10 blur-[100px] opacity-40 dark:from-[#86f096]/5 dark:to-[#3dcd77]/5" />
       </div>
 
       <div className="container relative">
-        {/* Header */}
-        <motion.div 
-          className="text-center mb-16"
+        <motion.div
+          className="mb-16 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -180,36 +197,38 @@ export default function StatsPremium({ section }: { section: SectionType }) {
             whileInView={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md 
-                       bg-gradient-to-r from-[#86f096]/10 to-[#3dcd77]/10 
-                       backdrop-blur-sm border border-[#3dcd77]/20 dark:border-[#3dcd77]/10 mb-6"
+            className="mb-6 inline-flex items-center gap-2 rounded-md border border-[#3dcd77]/20 bg-gradient-to-r from-[#86f096]/10 to-[#3dcd77]/10 px-3 py-1.5 backdrop-blur-sm dark:border-[#3dcd77]/10"
           >
-            <TrendingUp className="w-4 h-4 text-[#3dcd77] dark:text-[#86f096]" />
-            <span className="text-lg font-semibold text-[#3dcd77] dark:text-[#86f096]">平台数据</span>
+            <TrendingUp className="h-4 w-4 text-[#3dcd77] dark:text-[#86f096]" />
+            <span className="text-lg font-semibold text-[#3dcd77] dark:text-[#86f096]">
+              平台数据
+            </span>
           </motion.div>
-          
-          <h2 className="text-4xl lg:text-5xl font-bold mb-4">
+
+          <h2 className="mb-4 text-4xl font-bold lg:text-5xl">
             {section.title || "我们的用户遍布世界名校"}
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="mx-auto max-w-3xl text-lg text-gray-600 dark:text-gray-400">
             {section.description || "数据是我们实力最好的证明"}
           </p>
         </motion.div>
 
-        {/* Stats Grid - 2行×3列布局 */}
         <div ref={containerRef} className="relative">
           <div className="grid gap-4 lg:gap-6">
-            {/* First Row - 前3个指标 */}
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid gap-4 md:grid-cols-3">
               {statsConfig.slice(0, 3).map((stat, index) => (
-                <StatsCard key={index} stat={stat} index={index} isInView={isInView} />
+                <StatsCard key={index} stat={stat} index={index} shouldAnimate={isInView} />
               ))}
             </div>
 
-            {/* Second Row - 后3个指标 */}
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid gap-4 md:grid-cols-3">
               {statsConfig.slice(3, 6).map((stat, index) => (
-                <StatsCard key={index + 3} stat={stat} index={index + 3} isInView={isInView} />
+                <StatsCard
+                  key={index + 3}
+                  stat={stat}
+                  index={index + 3}
+                  shouldAnimate={isInView}
+                />
               ))}
             </div>
           </div>
@@ -220,12 +239,12 @@ export default function StatsPremium({ section }: { section: SectionType }) {
 }
 
 interface StatsCardProps {
-  stat: typeof statsConfig[0];
+  stat: (typeof statsConfig)[0];
   index: number;
-  isInView: boolean;
+  shouldAnimate: boolean;
 }
 
-function StatsCard({ stat, index, isInView }: StatsCardProps) {
+function StatsCard({ stat, index, shouldAnimate }: StatsCardProps) {
   const IconComponent = stat.icon;
   const [isHovering, setIsHovering] = useState(false);
 
@@ -234,88 +253,70 @@ function StatsCard({ stat, index, isInView }: StatsCardProps) {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      animate={shouldAnimate ? { opacity: 1, y: 0 } : {}}
       transition={{
         duration: 0.5,
         delay: index * 0.08,
         ease: [0.21, 0.47, 0.32, 0.98],
       }}
-      whileHover={{ 
+      whileHover={{
         y: -1,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
       className="group relative"
     >
-      <div className={`
-        relative overflow-hidden rounded-xl
-        transition-all duration-300
-        p-7
-        ${stat.highlight ? 'ring-1 ring-gray-200 dark:ring-[#3dcd77]/20' : ''}
-        bg-white dark:bg-gray-800/50 dark:backdrop-blur-sm
-        border border-gray-200 dark:border-gray-700/50
-        shadow-sm
-        hover:shadow-md dark:hover:shadow-[#3dcd77]/5
-        hover:border-gray-300 dark:hover:border-[#3dcd77]/30
-        group
-      `}>
-        {/* Linear-style Background Pattern */}
+      <div
+        className={`
+          group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-7 shadow-sm transition-all duration-300
+          hover:border-gray-300 hover:shadow-md dark:border-gray-700/50 dark:bg-gray-800/50 dark:backdrop-blur-sm
+          dark:hover:border-[#3dcd77]/30 dark:hover:shadow-[#3dcd77]/5
+          ${stat.highlight ? "ring-1 ring-gray-200 dark:ring-[#3dcd77]/20" : ""}
+        `}
+      >
         <div className="absolute inset-0 opacity-[0.015] dark:opacity-[0.04]">
           <div className="absolute inset-0 bg-gradient-to-br from-[#86f096]/5 via-transparent to-[#3dcd77]/5 dark:from-[#86f096]/10 dark:to-[#3dcd77]/10" />
         </div>
 
-        {/* Subtle Hover Gradient */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
           <div className="absolute inset-0 bg-gradient-to-br from-[#86f096]/5 via-transparent to-[#3dcd77]/5 dark:from-[#86f096]/8 dark:via-transparent dark:to-[#3dcd77]/8" />
         </div>
 
-        {/* Content */}
         <div className="relative">
-          {/* Icon */}
-          <div className="inline-flex items-center justify-center w-9 h-9 rounded-lg mb-4
-                         bg-gradient-to-br from-[#86f096]/10 to-[#3dcd77]/10 dark:from-[#86f096]/15 dark:to-[#3dcd77]/15
-                         border border-[#3dcd77]/20 dark:border-[#3dcd77]/30
-                         group-hover:from-[#86f096]/20 group-hover:to-[#3dcd77]/20 dark:group-hover:from-[#86f096]/25 dark:group-hover:to-[#3dcd77]/25
-                         transition-all duration-200">
-            <IconComponent className="w-4 h-4 text-[#027c50] dark:text-[#86f096]" />
+          <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#3dcd77]/20 bg-gradient-to-br from-[#86f096]/10 to-[#3dcd77]/10 transition-all duration-200 group-hover:from-[#86f096]/20 group-hover:to-[#3dcd77]/20 dark:border-[#3dcd77]/30 dark:from-[#86f096]/15 dark:to-[#3dcd77]/15 dark:group-hover:from-[#86f096]/25 dark:group-hover:to-[#3dcd77]/25">
+            <IconComponent className="h-4 w-4 text-[#027c50] dark:text-[#86f096]" />
           </div>
 
-          {/* Title */}
-          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+          <h3 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
             {stat.title}
           </h3>
 
-          {/* Number */}
-          <div className="font-semibold text-gray-900 dark:text-gray-100 mb-1 text-3xl lg:text-4xl">
-            <AnimatedCounter 
-              value={stat.value} 
+          <div className="mb-1 text-3xl font-semibold text-gray-900 dark:text-gray-100 lg:text-4xl">
+            <AnimatedCounter
+              value={stat.value}
               suffix={stat.suffix}
               decimals={stat.decimals || 0}
               duration={isHovering ? 1.2 : 2.2 + index * 0.15}
+              shouldAnimate={shouldAnimate}
               isHovering={isHovering}
             />
           </div>
 
-          {/* Unit */}
-          <p className="text-sm text-gray-500 dark:text-gray-500">
-            {stat.unit}
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">{stat.unit}</p>
         </div>
 
-        {/* Linear-style Highlight Indicator */}
         {stat.highlight && (
-          <motion.div 
-            className="absolute top-0 left-0 w-full h-0.5"
+          <motion.div
+            className="absolute top-0 left-0 h-0.5 w-full"
             initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
+            animate={shouldAnimate ? { scaleX: 1 } : { scaleX: 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
           >
             <div className="h-full bg-gradient-to-r from-transparent via-[#3dcd77] to-transparent dark:via-[#86f096]" />
           </motion.div>
         )}
 
-        {/* Subtle Corner Accent */}
-        <div className="absolute top-0 right-0 w-12 h-12 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-br from-[#86f096]/10 to-transparent dark:from-[#86f096]/20 dark:to-transparent" />
+        <div className="absolute top-0 right-0 h-12 w-12 overflow-hidden opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="absolute -top-6 -right-6 h-12 w-12 bg-gradient-to-br from-[#86f096]/10 to-transparent dark:from-[#86f096]/20 dark:to-transparent" />
         </div>
       </div>
     </motion.div>
