@@ -284,10 +284,10 @@
           "12个月有效期"
         ],
         "interval": "one-time",
-        "amount": 41900,
-        "cn_amount": 41900,
+        "amount": 45900,
+        "cn_amount": 45900,
         "currency": "cny",
-        "price": "¥419",
+        "price": "¥459",
         "original_price": "¥990",
         "unit": "/10次生成",
         "is_featured": false,

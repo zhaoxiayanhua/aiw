@@ -392,7 +392,7 @@ function ResumeGeneratorContent() {
   const totalModules = modules.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/5">
+    <div className="form-page-scale min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/5">
       {/* Header */}
       <div className="bg-background/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 py-8">

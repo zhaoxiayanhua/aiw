@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useSearchParams } from "next/navigation";
 import { 
   Copy, 
   Download, 
@@ -95,6 +96,7 @@ const AIGeneratingLoader = ({ currentNodeName }: { currentNodeName?: string }) =
 };
 
 function PSResultContent({ documentUuid }: { documentUuid: string }) {
+  const searchParams = useSearchParams();
   const { 
     data,
     updateData,
@@ -110,6 +112,7 @@ function PSResultContent({ documentUuid }: { documentUuid: string }) {
   
   const [hasGenerated, setHasGenerated] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [shouldAutoOpenRevision, setShouldAutoOpenRevision] = useState(false);
 
   // Streaming states
   const [useStreaming, setUseStreaming] = useState(true);
@@ -138,6 +141,10 @@ function PSResultContent({ documentUuid }: { documentUuid: string }) {
   const [isLoadingVersions, setIsLoadingVersions] = useState(false);
   
   const { runRevision, runRevisionStreaming, isRevising } = useDifyRevisePS();
+
+  useEffect(() => {
+    setShouldAutoOpenRevision(searchParams.get('openRevision') === 'true');
+  }, [searchParams]);
   
   // 段落高亮状态
   const [highlightedParagraphIndex, setHighlightedParagraphIndex] = useState<number | null>(null);
@@ -672,6 +679,22 @@ function PSResultContent({ documentUuid }: { documentUuid: string }) {
     }
   }, [hasGenerated, data.target, generationState.isGenerating, handleGenerate, handleGenerateStreaming, useStreaming]); // 添加所有依赖
 
+  useEffect(() => {
+    if (!shouldAutoOpenRevision || generationState.isGenerating || !generationState.generatedContent) {
+      return;
+    }
+
+    if (serverRevisionStatus === true) {
+      setShouldAutoOpenRevision(false);
+      return;
+    }
+
+    if (serverRevisionStatus === false) {
+      setShowRevisionModal(true);
+      setShouldAutoOpenRevision(false);
+    }
+  }, [shouldAutoOpenRevision, generationState.isGenerating, generationState.generatedContent, serverRevisionStatus]);
+
 
   const handleCopy = async () => {
     const contentToCopy = displayContent;
@@ -1115,10 +1138,14 @@ function PSResultContent({ documentUuid }: { documentUuid: string }) {
           disabled={serverRevisionStatus || isRevising || isLoadingVersions || revisingParagraphIndex !== null}
         >
           <Wand2 className="mr-2 h-4 w-4" />
-          修改
-          {serverRevisionStatus && (
+          免费优化一次
+          {serverRevisionStatus ? (
             <Badge variant="secondary" className="ml-2">
               已使用
+            </Badge>
+          ) : (
+            <Badge variant="secondary" className="ml-2">
+              免费
             </Badge>
           )}
         </Button>

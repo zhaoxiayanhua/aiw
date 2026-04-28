@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -230,9 +230,11 @@ interface RecommendationLetterResultContentProps {
 function RecommendationLetterResultContent({ documentUuid }: RecommendationLetterResultContentProps) {
   const t = useTranslations();
   const params = useParams();
+  const searchParams = useSearchParams();
   const locale = params.locale || 'zh';
   const [activeTab, setActiveTab] = useState("basicInfo");
   const [isPreviewMode, setIsPreviewMode] = useState(true);
+  const [shouldAutoOpenRevision, setShouldAutoOpenRevision] = useState(false);
   
   // 调试日志
   console.log('RecommendationLetterResultContent - documentUuid:', documentUuid);
@@ -256,6 +258,10 @@ function RecommendationLetterResultContent({ documentUuid }: RecommendationLette
     // 保留 hasUsedFreeRevision 因为它用于本地缓存备用
     hasUsedFreeRevision
   } = useRecommendationLetter();
+
+  useEffect(() => {
+    setShouldAutoOpenRevision(searchParams.get('openRevision') === 'true');
+  }, [searchParams]);
   
   // 修改相关状态
   const [showRevisionModal, setShowRevisionModal] = useState(false);
@@ -645,6 +651,28 @@ function RecommendationLetterResultContent({ documentUuid }: RecommendationLette
       toast.error('推荐信生成失败，请重试');
     }
   }, [generationState.workflowStatus, generationState.generatedContent]);
+
+  useEffect(() => {
+    if (!shouldAutoOpenRevision || generationState.isGenerating || !generationState.generatedContent) {
+      return;
+    }
+
+    const hasUsed = serverRevisionStatus !== null ? serverRevisionStatus : hasUsedFreeRevision();
+
+    if (hasUsed) {
+      setShouldAutoOpenRevision(false);
+      return;
+    }
+
+    setShowRevisionModal(true);
+    setShouldAutoOpenRevision(false);
+  }, [
+    shouldAutoOpenRevision,
+    generationState.isGenerating,
+    generationState.generatedContent,
+    serverRevisionStatus,
+    hasUsedFreeRevision
+  ]);
 
   const handleCopy = async () => {
     try {
@@ -1107,10 +1135,14 @@ function RecommendationLetterResultContent({ documentUuid }: RecommendationLette
                     size="lg"
                   >
                     <Wand2 className="w-5 h-5 mr-3" />
-                    修改
-                    {(serverRevisionStatus !== null ? serverRevisionStatus : hasUsedFreeRevision()) && (
+                    免费优化一次
+                    {(serverRevisionStatus !== null ? serverRevisionStatus : hasUsedFreeRevision()) ? (
                       <Badge variant="secondary" className="ml-2">
                         已使用
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="ml-2">
+                        免费
                       </Badge>
                     )}
                   </Button>
@@ -1249,10 +1281,14 @@ function RecommendationLetterResultContent({ documentUuid }: RecommendationLette
                       className="bg-background hover:bg-muted text-base px-4 py-2"
                     >
                       <Wand2 className="mr-2 h-5 w-5" />
-                      修改
-                      {serverRevisionStatus && (
+                      免费优化一次
+                      {serverRevisionStatus ? (
                         <Badge variant="secondary" className="ml-2">
                           已使用
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="ml-2">
+                          免费
                         </Badge>
                       )}
                     </Button>

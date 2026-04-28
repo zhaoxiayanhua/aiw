@@ -5,6 +5,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { MetallicIcon } from "@/components/icons/metallic";
 import { Sparkles } from "lucide-react";
 
@@ -27,6 +28,7 @@ export function CreationToolCard({
   index = 0,
   className,
 }: CreationToolCardProps) {
+  const searchParams = useSearchParams();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   
@@ -304,8 +306,23 @@ export function CreationToolCard({
     </motion.div>
   );
 
-  if (url) {
-    return <Link href={url} className="block h-full">{cardContent}</Link>;
+  const href = (() => {
+    if (!url) {
+      return undefined;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    const queryString = params.toString();
+
+    if (!queryString) {
+      return url;
+    }
+
+    return `${url}${url.includes("?") ? "&" : "?"}${queryString}`;
+  })();
+
+  if (href) {
+    return <Link href={href} className="block h-full">{cardContent}</Link>;
   }
 
   return cardContent;

@@ -338,51 +338,67 @@
     "icon": "GoThumbsup",
     "items": [
       {
-        "title": "Cathy Z.",
-        "label": "成功录取 CMU CS硕士",
-        "description": "转专业申请CS真的太难了，尤其是PS不知道怎么写。Essmote AI帮我梳理了我的项目经历，生成的初稿质量超高，逻辑清晰，帮我省了至少两周时间！",
+        "title": "David W.",
+        "label": "MBA PS 生成",
+        "description": "我一开始工作经历很多，但写出来特别散，完全不像一条清晰的职业主线。Essmote 帮我把经历重新梳理后，整个申请故事一下子顺了很多，也让我找到了更适合商学院文书的表达角度。",
         "image": {
           "src": "/imgs/users/1.png"
         }
       },
       {
-        "title": "David W.",
-        "label": "成功录取 LBS MBA",
-        "description": "申请商学院的Essay很讲究故事性。Essmote AI的AI头脑风暴功能给了我很多灵感，帮我把零散的工作经历串成了一个非常有说服力的职业故事。",
+        "title": "Sophie L.",
+        "label": "传媒 PS 初稿生成",
+        "description": "我之前只知道自己想申请传媒方向，但完全不知道怎么把课程、实习和兴趣连成一个完整故事。Essmote 帮我生成第一版后，申请动机变得清楚很多，后面修改也终于有方向了。",
         "image": {
           "src": "/imgs/users/2.png"
         }
       },
       {
-        "title": "Serena L.",
-        "label": "成功录取 剑桥大学 MPhil",
-        "description": "我的研究计划被导师说太空洞。用了Essmote AI之后，它引导我把研究问题具体化，还提供了很多相关的文献参考，最后导师都对我的RP赞不绝口。",
+        "title": "Kevin Z.",
+        "label": "计算机方向 SOP 生成",
+        "description": "我的项目经历不少，但以前写出来就像简历复述，没有重点。Essmote 帮我把项目背景、技术方法和未来方向串起来后，SOP 终于像一篇完整的申请文书了。",
         "image": {
           "src": "/imgs/users/3.png"
         }
       },
       {
-        "title": "Alex Q.",
-        "label": "成功录取 MIT 博士全奖",
-        "description": "博士申请，文书和科研经历同样重要。Essmote AI不仅帮我润色了我的SOP，还帮我优化了CV的格式和描述，让我的申请材料看起来非常专业。",
+        "title": "Emily C.",
+        "label": "英文简历表达优化",
+        "description": "我原来的英文简历有很多直译句子，看起来不够专业。Essmote 帮我重新优化后，实习和项目经历的表达清晰了很多，整体质感也明显提升了。",
         "image": {
           "src": "/imgs/users/4.png"
         }
       },
       {
-        "title": "Fiona S.",
-        "label": "成功录取 港大 金融硕士",
-        "description": "港校申请时间很紧，要准备的材料又多。Essmote AI简直是我的救星，一天之内就帮我搞定了PS和CV的初稿，让我有更多时间准备面试。",
+        "title": "Mia H.",
+        "label": "多校申请文书准备",
+        "description": "申请多个项目时，最崩溃的就是每篇文书都要重新组织。Essmote 先帮我生成不同方向的初稿框架，再根据学校要求调整，真的省了很多前期准备时间。",
         "image": {
           "src": "/imgs/users/5.png"
         }
       },
       {
-        "title": "Ben Y.",
-        "label": "成功录取 斯坦福 LLM",
-        "description": "作为律师，我知道文书的严谨性有多重要。Essmote AI的语法和风格检查功能比Word强大太多了，帮我发现了很多我自己都没注意到的细节问题。",
+        "title": "Jason T.",
+        "label": "初稿 + 人工润色",
+        "description": "AI 初稿先帮我解决了从零开始写的问题，人工润色又进一步调整了语言和段落逻辑。最后的版本不仅更自然，也更像我自己认真写出来的申请材料。",
         "image": {
           "src": "/imgs/users/6.png"
+        }
+      },
+      {
+        "title": "Claire Y.",
+        "label": "商科 PS 生成",
+        "description": "我之前一直担心 GPA 不够理想，不知道怎么在文书里处理这个问题。Essmote 帮我把重点重新放回项目经历、实习成果和申请动机上，整篇文书的表达积极了很多。",
+        "image": {
+          "src": "/imgs/users/1.png"
+        }
+      },
+      {
+        "title": "Ryan K.",
+        "label": "商科转数据分析申请",
+        "description": "我本科是商科背景，申请数据分析时最怕被觉得方向跳得太突然。Essmote 帮我把课程、实习和数据相关经历连起来后，转方向的逻辑终于说得通了。",
+        "image": {
+          "src": "/imgs/users/2.png"
         }
       }
     ]

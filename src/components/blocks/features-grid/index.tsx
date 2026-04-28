@@ -101,7 +101,7 @@ export default function FeaturesGrid({ section }: { section?: FeaturesSection })
       title: section?.freeRevision?.title || '生成后附赠1次免费优化',
       description: section?.freeRevision?.description || '每份文书生成后均可享受一次免费AI优化服务。',
       hasDirectAccess: true,
-      link: '/#pricing',
+      link: '/creation-center?intent=free-revision',
       bgColor: 'from-pink-50 to-pink-100',
       iconColor: 'text-pink-600',
       image: '/imgs/module/module5.png'

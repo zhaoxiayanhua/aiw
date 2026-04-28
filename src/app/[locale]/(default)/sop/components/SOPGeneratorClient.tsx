@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -38,6 +38,7 @@ function SOPForm() {
   const t = useTranslations();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const locale = params.locale || 'zh';
   
   const { 
@@ -107,7 +108,14 @@ function SOPForm() {
       }
       
       // 跳转到结果页面，带上文档ID和自动生成标记
-      router.push(`/${locale}/sop/result/${document.uuid}?autoGenerate=true`);
+      const shouldOpenRevision = searchParams.get('intent') === 'free-revision' || searchParams.get('openRevision') === 'true';
+      const resultParams = new URLSearchParams({ autoGenerate: 'true' });
+
+      if (shouldOpenRevision) {
+        resultParams.set('openRevision', 'true');
+      }
+
+      router.push(`/${locale}/sop/result/${document.uuid}?${resultParams.toString()}`);
     } catch (error) {
       console.error('Error creating document:', error);
       toast.error('创建文档失败，请重试');
@@ -118,7 +126,7 @@ function SOPForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="form-page-scale max-w-4xl mx-auto space-y-6">
       {/* 页面标题 */}
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">

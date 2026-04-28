@@ -57,7 +57,7 @@ export default function Testimonial({ section }: { section: SectionType }) {
             <CarouselContent className="-ml-4">
               {section.items?.map((item, index) => (
                 <CarouselItem key={index} className="basis-auto pl-4 self-stretch">
-                  <Card className="flex h-full min-h-[15.5rem] max-w-[21rem] select-none flex-col p-6 sm:max-w-[22rem]">
+                  <Card className="flex h-[24rem] w-[22rem] select-none flex-col p-6 sm:h-[24.5rem] sm:w-[22rem]">
                     <div className="flex justify-between">
                       <div className="mb-4 flex gap-4">
                         <Avatar className="size-[3.25rem] rounded-full ring-1 ring-input">
@@ -67,8 +67,8 @@ export default function Testimonial({ section }: { section: SectionType }) {
                           />
                         </Avatar>
                         <div>
-                          <p className="font-medium">{item.title}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-base font-semibold">{item.title}</p>
+                          <p className="text-sm leading-5 text-muted-foreground">
                             {item.label}
                           </p>
                         </div>
@@ -82,7 +82,7 @@ export default function Testimonial({ section }: { section: SectionType }) {
                         ))}
                       </div>
                     </div>
-                    <q className="flex-1 leading-7 text-muted-foreground">
+                    <q className="flex-1 text-sm leading-6 text-muted-foreground sm:text-[0.92rem]">
                       {item.description}
                     </q>
                   </Card>

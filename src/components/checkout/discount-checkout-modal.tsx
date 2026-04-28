@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { PricingItem } from "@/types/blocks/pricing";
@@ -40,6 +40,7 @@ export default function DiscountCheckoutModal({
   cnPay = false,
   extraParams = {},
 }: DiscountCheckoutModalProps) {
+  const isWechatPayComingSoon = true;
   const { user, setShowSignModal } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -270,26 +271,34 @@ export default function DiscountCheckoutModal({
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod("wechat")}
-                    className={`relative flex items-center gap-3 rounded-lg border-2 px-4 py-3 transition-all duration-200 cursor-pointer ${
-                      paymentMethod === "wechat"
-                        ? "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-sm"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    disabled={isWechatPayComingSoon}
+                    aria-disabled={isWechatPayComingSoon}
+                    className={`relative flex items-center gap-3 rounded-lg border-2 px-4 py-3 transition-all duration-200 ${
+                      isWechatPayComingSoon
+                        ? "cursor-not-allowed border-gray-200 bg-gray-100 opacity-60 dark:border-gray-700 dark:bg-gray-800"
+                        : paymentMethod === "wechat"
+                          ? "cursor-pointer border-green-500 bg-green-50 dark:bg-green-950/30 shadow-sm"
+                          : "cursor-pointer border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                     }`}
                   >
                     <div
                       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
-                        paymentMethod === "wechat"
+                        !isWechatPayComingSoon && paymentMethod === "wechat"
                           ? "border-green-500 bg-green-500"
                           : "border-gray-300 dark:border-gray-600"
                       }`}
                     >
-                      {paymentMethod === "wechat" && (
+                      {!isWechatPayComingSoon && paymentMethod === "wechat" && (
                         <Check className="h-3 w-3 text-white" />
                       )}
                     </div>
                     <img src="/imgs/weixinzhifu.svg" alt="微信支付" className="h-6 w-6 shrink-0" />
-                    <span className="text-sm font-medium">微信支付</span>
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-300">微信支付</span>
+                      <Badge variant="secondary" className="shrink-0">
+                        即将上线
+                      </Badge>
+                    </div>
                   </button>
 
                   <button

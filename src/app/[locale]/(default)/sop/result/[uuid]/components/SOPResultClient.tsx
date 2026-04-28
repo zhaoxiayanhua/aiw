@@ -28,7 +28,7 @@ import { useDify } from '@/hooks/useDify';
 import { useDifyReviseSOP } from '@/hooks/useDifyReviseSOP';
 import { smartWordCount } from '@/lib/word-count';
 import { exportSOPToTXT, exportSOPToPDF, exportSOPToDOCX } from '@/lib/sop-document-export';
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RevisionModal from "../../../components/RevisionModal";
 import FullRevisionModal, { RevisionSettings } from "../../../components/FullRevisionModal";
@@ -100,6 +100,7 @@ const AIGeneratingLoader = ({ currentNodeName }: { currentNodeName?: string }) =
 
 function SOPResultContent({ documentUuid }: { documentUuid: string }) {
   const params = useParams();
+  const searchParams = useSearchParams();
   const locale = params.locale || 'zh';
   
   const { 
@@ -118,6 +119,7 @@ function SOPResultContent({ documentUuid }: { documentUuid: string }) {
 
   const [hasGenerated, setHasGenerated] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [shouldAutoOpenRevision, setShouldAutoOpenRevision] = useState(false);
 
   // 流式输出相关状态
   const [useStreaming, setUseStreaming] = useState(true); // 默认使用流式输出
@@ -154,6 +156,10 @@ function SOPResultContent({ documentUuid }: { documentUuid: string }) {
   const [showVersionComparison, setShowVersionComparison] = useState(false);
   
   const { runRevision, runRevisionStreaming, isRevising } = useDifyReviseSOP();
+
+  useEffect(() => {
+    setShouldAutoOpenRevision(searchParams.get('openRevision') === 'true');
+  }, [searchParams]);
   
   // 使用计算属性获取显示内容 - 根据当前版本选择内容
   const displayContent = currentVersion > 1 && versions.length > 0
@@ -598,6 +604,22 @@ function SOPResultContent({ documentUuid }: { documentUuid: string }) {
       toast.error(`导出失败: ${error instanceof Error ? error.message : '未知错误'}`);
     }
   };
+
+  useEffect(() => {
+    if (!shouldAutoOpenRevision || generationState.isGenerating || !generationState.generatedContent) {
+      return;
+    }
+
+    if (serverRevisionStatus === true) {
+      setShouldAutoOpenRevision(false);
+      return;
+    }
+
+    if (serverRevisionStatus === false) {
+      setShowRevisionModal(true);
+      setShouldAutoOpenRevision(false);
+    }
+  }, [shouldAutoOpenRevision, generationState.isGenerating, generationState.generatedContent, serverRevisionStatus]);
 
   const handleSave = async () => {
     try {
@@ -1091,10 +1113,14 @@ function SOPResultContent({ documentUuid }: { documentUuid: string }) {
           disabled={serverRevisionStatus || isRevising || isLoadingVersions || revisingParagraphIndex !== null}
         >
           <Wand2 className="mr-2 h-4 w-4" />
-          修改
-          {serverRevisionStatus && (
+          免费优化一次
+          {serverRevisionStatus ? (
             <Badge variant="secondary" className="ml-2">
               已使用
+            </Badge>
+          ) : (
+            <Badge variant="secondary" className="ml-2">
+              免费
             </Badge>
           )}
         </Button>

@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslations } from "next-intl";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { CheckCircle, Square, CheckSquare, ArrowRight, AlertTriangle, RefreshCw, Globe, Trash2 } from "lucide-react";
 import { toast } from 'sonner';
 import { GlobalLoading } from "@/components/ui/loading";
@@ -48,6 +48,7 @@ function ConfirmationPage() {
   const t = useTranslations();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const locale = params.locale || 'zh';
   const { 
     getConfirmationData, 
@@ -129,7 +130,14 @@ function ConfirmationPage() {
       }
       
       // 跳转到结果页面，带上文档ID
-      router.push(`/${locale}/recommendation-letter/result/${document.uuid}?autoGenerate=true`);
+      const shouldOpenRevision = searchParams.get('intent') === 'free-revision' || searchParams.get('openRevision') === 'true';
+      const resultParams = new URLSearchParams({ autoGenerate: 'true' });
+
+      if (shouldOpenRevision) {
+        resultParams.set('openRevision', 'true');
+      }
+
+      router.push(`/${locale}/recommendation-letter/result/${document.uuid}?${resultParams.toString()}`);
     } catch (error) {
       console.error('Error creating document:', error);
       toast.error('创建文档失败，请重试');
@@ -369,7 +377,7 @@ function RecommendationLetterGeneratorContent() {
   return (
     <>
       <GlobalLoading isVisible={generationState.isGenerating} />
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/5">
+      <div className="form-page-scale min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/5">
       {/* Header */}
       <div className="bg-background/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 py-8">

@@ -187,6 +187,7 @@ function CoverLetterResultContent({ documentUuid }: CoverLetterResultContentProp
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingContent, setEditingContent] = useState("");
+  const [shouldAutoOpenRevision, setShouldAutoOpenRevision] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Generation streaming states
@@ -221,6 +222,10 @@ function CoverLetterResultContent({ documentUuid }: CoverLetterResultContentProp
   
   const { runWorkflow, runWorkflowStreamingWithCallbacks } = useDify({ functionType: 'cover-letter' });
   const { runRevision, runRevisionStreaming, isRevising } = useDifyReviseCoverLetter();
+
+  useEffect(() => {
+    setShouldAutoOpenRevision(searchParams.get('openRevision') === 'true');
+  }, [searchParams]);
 
   const {
     data,
@@ -590,6 +595,22 @@ function CoverLetterResultContent({ documentUuid }: CoverLetterResultContentProp
       }
     }
   }, [currentDbVersionId, dbVersions]);
+
+  useEffect(() => {
+    if (!shouldAutoOpenRevision || isGenerating || !generatedContent) {
+      return;
+    }
+
+    if (serverRevisionStatus === true) {
+      setShouldAutoOpenRevision(false);
+      return;
+    }
+
+    if (serverRevisionStatus === false) {
+      setShowRevisionModal(true);
+      setShouldAutoOpenRevision(false);
+    }
+  }, [shouldAutoOpenRevision, isGenerating, generatedContent, serverRevisionStatus]);
 
   const handleCopy = async () => {
     const contentToCopy = isEditMode ? editingContent : generatedContent;
@@ -1141,8 +1162,8 @@ function CoverLetterResultContent({ documentUuid }: CoverLetterResultContentProp
                 >
                   <Wand2 className="w-6 h-6 mr-3" />
                   {(serverRevisionStatus !== null ? serverRevisionStatus : hasUsedFreeRevision()) 
-                    ? '已使用修改机会' 
-                    : '修改文书'}
+                    ? '免费优化已使用' 
+                    : '免费优化一次'}
                 </Button>
               </div>
             </div>
@@ -1231,10 +1252,14 @@ function CoverLetterResultContent({ documentUuid }: CoverLetterResultContentProp
                       disabled={serverRevisionStatus || revisingParagraphIndex !== null || isLoadingVersions}
                     >
                       <Wand2 className="mr-2 h-4 w-4" />
-                      修改
-                      {serverRevisionStatus && (
+                      免费优化一次
+                      {serverRevisionStatus ? (
                         <Badge variant="secondary" className="ml-2">
                           已使用
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="ml-2">
+                          免费
                         </Badge>
                       )}
                     </Button>

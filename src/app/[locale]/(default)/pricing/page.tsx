@@ -11,9 +11,9 @@ export default async function PricingPage({
   const page = await getPricingPage(locale);
 
   return (
-    <>
+    <div className="pricing-page-scale">
       {page.pricing && <Pricing pricing={page.pricing} />}
       <PricingComparisonTable />
-    </>
+    </div>
   );
 }
