@@ -1129,7 +1129,7 @@ function ResumeResultContent() {
                           </div>
                         </div>
                         <div className="relative flex items-center gap-2">
-                          <DropdownMenu>
+                          <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
                               <Button
                                 variant="outline"
@@ -1148,7 +1148,8 @@ function ResumeResultContent() {
                             </DropdownMenuTrigger>
                           <DropdownMenuContent
                             align="end"
-                            className="w-44"
+                            sideOffset={8}
+                            className="z-[140] w-44 bg-white shadow-xl"
                           >
                             <DropdownMenuLabel>选择导出格式</DropdownMenuLabel>
                             <DropdownMenuItem
