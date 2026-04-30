@@ -142,6 +142,22 @@ function PSResultContent({ documentUuid }: { documentUuid: string }) {
   
   const { runRevision, runRevisionStreaming, isRevising } = useDifyRevisePS();
 
+  const getVersionContentSafely = useCallback(
+    (version: any) => {
+      if (typeof version?.content === "string" && version.content.trim() !== "") {
+        return version.content;
+      }
+      if (
+        typeof generationState.generatedContent === "string" &&
+        generationState.generatedContent.trim() !== ""
+      ) {
+        return generationState.generatedContent;
+      }
+      return "";
+    },
+    [generationState.generatedContent]
+  );
+
   useEffect(() => {
     setShouldAutoOpenRevision(searchParams.get('openRevision') === 'true');
   }, [searchParams]);
@@ -157,11 +173,13 @@ function PSResultContent({ documentUuid }: { documentUuid: string }) {
   const getCurrentDbVersion = () => {
     if (currentDbVersionId && dbVersions.length > 0) {
       const version = dbVersions.find(v => v.uuid === currentDbVersionId);
-      return version?.content || generationState.generatedContent || '';
+      return getVersionContentSafely(version);
     }
     // 兼容旧的版本管理
     if (currentVersion > 1 && versions.length > 0) {
-      return versions.find(v => v.version === currentVersion)?.content || generationState.generatedContent || '';
+      return getVersionContentSafely(
+        versions.find(v => v.version === currentVersion)
+      );
     }
     return generationState.generatedContent || '';
   };
@@ -556,8 +574,9 @@ function PSResultContent({ documentUuid }: { documentUuid: string }) {
             const targetVersion = versionData.find((v: any) => v.uuid === forceVersionId);
             if (targetVersion) {
               setCurrentDbVersionId(forceVersionId);
-              if (targetVersion.content) {
-                updateGeneratedContent(targetVersion.content);
+              const resolvedContent = getVersionContentSafely(targetVersion);
+              if (resolvedContent) {
+                updateGeneratedContent(resolvedContent);
               }
               console.log('[PS] Set current version to new revision:', forceVersionId);
             }
@@ -566,15 +585,17 @@ function PSResultContent({ documentUuid }: { documentUuid: string }) {
             const originalVersion = versionData.find((v: any) => v.version_type === 'original');
             const versionToSet = originalVersion || versionData[0]; // 如果没有原始版本，使用第一个版本
             setCurrentDbVersionId(versionToSet.uuid);
-            if (versionToSet.content) {
-              updateGeneratedContent(versionToSet.content);
+            const resolvedContent = getVersionContentSafely(versionToSet);
+            if (resolvedContent) {
+              updateGeneratedContent(resolvedContent);
             }
             console.log('[PS] Set current version to:', versionToSet.uuid, 'Version:', versionToSet.version);
           } else {
             // 如果已经有当前版本ID，尝试更新内容
             const currentVersion = versionData.find((v: any) => v.uuid === currentDbVersionId);
-            if (currentVersion?.content) {
-              updateGeneratedContent(currentVersion.content);
+            const resolvedContent = getVersionContentSafely(currentVersion);
+            if (resolvedContent) {
+              updateGeneratedContent(resolvedContent);
             }
             console.log('[PS] Keeping current version:', currentDbVersionId);
           }
@@ -942,8 +963,9 @@ function PSResultContent({ documentUuid }: { documentUuid: string }) {
   const handleDbVersionSwitch = (versionId: string) => {
     setCurrentDbVersionId(versionId);
     const versionData = dbVersions.find(v => v.uuid === versionId);
-    if (versionData) {
-      updateGeneratedContent(versionData.content);
+    const resolvedContent = getVersionContentSafely(versionData);
+    if (resolvedContent) {
+      updateGeneratedContent(resolvedContent);
     }
   };
 

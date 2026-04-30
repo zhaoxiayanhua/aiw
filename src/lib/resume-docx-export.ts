@@ -646,7 +646,7 @@ const buildDittoDocument = (
     skills: 'Skills',
     certifications: 'Certifications',
     awards: 'Awards',
-    languages: 'Languages',
+    languages: 'LANGUAGE SKILLS',
     references: 'References'
   };
 
@@ -1195,7 +1195,10 @@ const buildDittoDocument = (
 
     switch (item as SectionKey) {
       case 'skills':
-        pushSidebarSection(resolveTitle('skills', sections.skills.name), buildSkills());
+        pushSidebarSection(resolveTitle('skills', sections.skills.name), [
+          ...buildSkills(),
+          ...buildLanguages()
+        ]);
         break;
       case 'certifications':
         pushSidebarSection(resolveTitle('certifications', sections.certifications.name), buildCertifications());
@@ -1204,7 +1207,6 @@ const buildDittoDocument = (
         pushSidebarSection(resolveTitle('awards', sections.awards.name), buildAwards());
         break;
       case 'languages':
-        pushSidebarSection(resolveTitle('languages', sections.languages.name), buildLanguages());
         break;
       case 'references':
         pushSidebarSection(resolveTitle('references', sections.references.name), buildReferences());
@@ -1391,11 +1393,11 @@ const getTemplateSectionTitleOverrides = (
       experience: 'WORK EXPERIENCE',
       education: 'EDUCATION',
       projects: 'RESEARCH EXPERIENCE',
-      activities: 'LEADERSHIP & VOLUNTEERING EXPERIENCE',
-      skills: 'SKILLS AND COMPETENCIES',
+      activities: 'EXTRACURRICULAR ACTIVITIES',
+      skills: 'LANGUAGE SKILLS',
       certifications: 'Certifications',
       awards: 'HONOURS & AWARDS',
-      languages: 'Languages',
+      languages: 'LANGUAGE SKILLS',
       references: 'References'
     };
   }
@@ -1593,7 +1595,6 @@ export const exportResumeDocx = async (
           createAlignedParagraph({
             left: item.description,
             right: item.location,
-            leftBold: true,
             spacingBefore: 0,
             spacingAfter: 20
           })
@@ -1614,38 +1615,71 @@ export const exportResumeDocx = async (
     },
 
     skills: () => {
-      const skillParagraphs: Array<Paragraph | null> = resume.sections.skills.items.map((item, idx) =>
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: toPlainText(item.name),
-              font: FONT_FAMILY,
-              bold: true,
-              size: BASE_FONT_SIZE
-            }),
-            ...(item.description
-              ? [
-                  new TextRun({
-                    text: ` - ${toPlainText(item.description)}`,
-                    font: FONT_FAMILY,
-                    size: BASE_FONT_SIZE
-                  })
-                ]
-              : []),
-            ...(item.keywords?.length
-              ? [
-                  new TextRun({
-                    text: ` (${item.keywords.map(toPlainText).join(', ')})`,
-                    font: FONT_FAMILY,
-                    size: BASE_FONT_SIZE
-                  })
-                ]
-              : [])
-          ],
-          spacing: { before: idx === 0 ? 40 : 120, after: 40 }
-        })
+      const skillParagraphs: Array<Paragraph | null> = [
+        ...resume.sections.skills.items.map((item, idx) =>
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: toPlainText(item.name),
+                font: FONT_FAMILY,
+                bold: true,
+                size: BASE_FONT_SIZE
+              }),
+              ...(item.description
+                ? [
+                    new TextRun({
+                      text: ` - ${toPlainText(item.description)}`,
+                      font: FONT_FAMILY,
+                      size: BASE_FONT_SIZE
+                    })
+                  ]
+                : []),
+              ...(item.keywords?.length
+                ? [
+                    new TextRun({
+                      text: ` (${item.keywords.map(toPlainText).join(', ')})`,
+                      font: FONT_FAMILY,
+                      size: BASE_FONT_SIZE
+                    })
+                  ]
+                : [])
+            ],
+            spacing: { before: idx === 0 ? 40 : 120, after: 40 }
+          })
+        ),
+        ...resume.sections.languages.items.map((item, idx) =>
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: toPlainText(item.name),
+                font: FONT_FAMILY,
+                bold: true,
+                size: BASE_FONT_SIZE
+              }),
+              ...(item.description
+                ? [
+                    new TextRun({
+                      text: ` - ${toPlainText(item.description)}`,
+                      font: FONT_FAMILY,
+                      size: BASE_FONT_SIZE
+                    })
+                  ]
+                : [])
+            ],
+            spacing: {
+              before:
+                resume.sections.skills.items.length === 0 && idx === 0 ? 40 : 120,
+              after: 40
+            }
+          })
+        )
+      ];
+      pushSection(
+        'skills',
+        resume.sections.skills.name,
+        resume.sections.skills.visible || resume.sections.languages.visible,
+        skillParagraphs
       );
-      pushSection('skills', resume.sections.skills.name, resume.sections.skills.visible, skillParagraphs);
     },
 
     awards: () => {
@@ -1707,29 +1741,7 @@ export const exportResumeDocx = async (
     },
 
     languages: () => {
-      const languageParagraphs: Array<Paragraph | null> = resume.sections.languages.items.map((item, idx) =>
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: toPlainText(item.name),
-              font: FONT_FAMILY,
-              bold: true,
-              size: BASE_FONT_SIZE
-            }),
-            ...(item.description
-              ? [
-                  new TextRun({
-                    text: ` - ${toPlainText(item.description)}`,
-                    font: FONT_FAMILY,
-                    size: BASE_FONT_SIZE
-                  })
-                ]
-              : [])
-          ],
-          spacing: { before: idx === 0 ? 40 : 120, after: 40 }
-        })
-      );
-      pushSection('languages', resume.sections.languages.name, resume.sections.languages.visible, languageParagraphs);
+      return;
     },
 
     certifications: () => {
@@ -1816,11 +1828,13 @@ export const exportResumeDocx = async (
     }
   }
 
-  // 鐢熸垚 layoutOrder 涓湭鍖呭惈浣嗗湪榛樿椤哄簭涓殑妯″潡锛堣拷鍔犲埌鏈熬锛?
-  for (const section of DEFAULT_SECTION_ORDER) {
-    if (!generatedSections.has(section) && sectionGenerators[section]) {
-      sectionGenerators[section]();
-      generatedSections.add(section);
+  // 仅在未显式提供布局顺序时，才补上默认顺序中的其他模块。
+  if (!options.layoutOrder) {
+    for (const section of DEFAULT_SECTION_ORDER) {
+      if (!generatedSections.has(section) && sectionGenerators[section]) {
+        sectionGenerators[section]();
+        generatedSections.add(section);
+      }
     }
   }
 

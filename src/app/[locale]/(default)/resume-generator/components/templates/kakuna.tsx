@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { StandardResumeData } from "@/lib/resume-field-mapping";
 import { cn, formatRelevantCoursework, isEmptyString } from "./shared/utils";
 import { Rating } from "./shared/components";
@@ -220,11 +220,6 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                       <div className="text-base text-black">
                         {item.date}
                       </div>
-                      {item.location && (
-                        <div className="text-base text-black">
-                          {item.location}
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -261,9 +256,14 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                       </div>
                     </div>
                   </div>
-                  {/* 第二行：项目描述（左） */}
-                  {item.description && (
-                    <div className="font-bold text-lg text-black">{item.description}</div>
+                  {/* 第二行：研究单位（左） + 地点（右） */}
+                  {(item.description || item.location) && (
+                    <div className="flex justify-between items-start">
+                      <div className="text-lg text-black">{item.description}</div>
+                      {item.location && (
+                        <div className="text-base text-black">{item.location}</div>
+                      )}
+                    </div>
                   )}
                 </div>
                 {item.keywords && item.keywords.length > 0 && (
@@ -287,7 +287,7 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
         );
       case 'activities':
         return (
-          <Section section={sections.activities} title="LEADERSHIP & VOLUNTEERING EXPERIENCE" theme={theme}>
+          <Section section={sections.activities} title="EXTRACURRICULAR ACTIVITIES" theme={theme}>
             {sections.activities?.items?.map((item) => (
               <div key={item.id} className="mb-4">
                 <div className="mb-2">
@@ -316,34 +316,64 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
             ))}
           </Section>
         );
-      case 'skills':
-        return sections.skills?.visible && sections.skills?.items?.length > 0 && (
-          <Section section={sections.skills} title="SKILLS AND COMPETENCIES" theme={theme}>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-1 ">
-              {sections.skills?.items?.flatMap((skill) => {
-                // 如果有 keywords，展开每个 keyword 为独立项
-                if (skill.keywords && skill.keywords.length > 0) {
-                  return skill.keywords.map((keyword, index) => (
-                    <div key={`${skill.id}-${index}`} className="flex items-start text-base -mb-1.5">
-                      <span className="mr-2">•</span>
-                      <span>{keyword}</span>
-                    </div>
-                  ));
-                }
-                // 如果只有 description，返回单个项
-                if (skill.description) {
-                  return (
-                    <div key={skill.id} className="flex items-start text-base ">
-                      <span className="mr-2">•</span>
-                      <span>{skill.description}</span>
-                    </div>
-                  );
-                }
-                return [];
-              })}
+      case 'skills': {
+        const skillItems =
+          sections.skills?.items?.flatMap((skill) => {
+            if (skill.keywords && skill.keywords.length > 0) {
+              return skill.keywords.map((keyword, index) => (
+                <div key={`${skill.id}-${index}`} className="flex items-start text-base -mb-1.5">
+                  <span className="mr-2">•</span>
+                  <span>{keyword}</span>
+                </div>
+              ));
+            }
+            if (skill.description) {
+              return (
+                <div key={skill.id} className="flex items-start text-base ">
+                  <span className="mr-2">•</span>
+                  <span>{skill.description}</span>
+                </div>
+              );
+            }
+            return [];
+          }) ?? [];
+
+        const languageItems =
+          sections.languages?.items?.map((item) => (
+            <div
+              key={item.id}
+              className="text-base text-black"
+              style={{ display: "block" }}
+            >
+              <span className="font-bold text-xl">{item.name}</span>
+              {item.description && (
+                <span className="text-base text-black"> – {item.description}</span>
+              )}
             </div>
+          )) ?? [];
+
+        if (
+          (!sections.skills?.visible || skillItems.length === 0) &&
+          (!sections.languages?.visible || languageItems.length === 0)
+        ) {
+          return null;
+        }
+
+        return (
+          <Section section={{ ...sections.skills, visible: true }} title="LANGUAGE SKILLS" theme={theme}>
+            {skillItems.length > 0 && (
+              <div className="grid grid-cols-2 gap-x-8 gap-y-1 ">
+                {skillItems}
+              </div>
+            )}
+            {languageItems.length > 0 && (
+              <div className="space-y-2">
+                {languageItems}
+              </div>
+            )}
           </Section>
         );
+      }
       case 'certifications':
         return sections.certifications?.visible && sections.certifications?.items?.length > 0 && (
           <Section section={sections.certifications} title="Certifications" theme={theme}>
@@ -388,34 +418,50 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
           </Section>
         );
       case 'languages':
-        return sections.languages?.visible && sections.languages?.items?.length > 0 && (
-          <Section section={sections.languages} title="LANGUAGE SKILLS" theme={theme}>
-            <div className="space-y-2">
-              {sections.languages?.items?.map((item) => (
-                <div
-                  key={item.id}
-                  className="text-base text-black"
-                  style={{ display: "block" }}
-                >
-                  <span className="font-bold text-xl">{item.name}</span>
-                  {item.description && (
-                    <span className="text-base text-black"> – {item.description}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </Section>
-        );
+        return null;
       default:
         return null;
     }
   };
 
-  // 使用布局配置或默认配置
-  // 对于 kakuna 模板，合并主要部分和侧边栏部分，因为它是单栏布局
-  const allSections = layoutConfiguration
-    ? [...layoutConfiguration.mainSections, ...layoutConfiguration.sidebarSections.filter(s => s !== 'profiles')] // 排除 profiles，因为它不适合在主内容中显示
-    : ['experience', 'education', 'research', 'activities', 'skills', 'awards', 'languages'];
+  // 对于 kakuna 单栏模板，只合并 skills + languages。
+  // awards 保持独立 section；若旧布局配置缺项，则只把缺失的可见 section 补回。
+  const defaultSectionOrder = ['experience', 'education', 'research', 'activities', 'skills', 'awards'];
+  const configuredSections = layoutConfiguration
+    ? [
+        ...layoutConfiguration.mainSections,
+        ...layoutConfiguration.sidebarSections.filter((s) => s !== 'profiles' && s !== 'languages'),
+      ]
+    : [];
+
+  const visibleFallbackSections = defaultSectionOrder.filter((sectionId) => {
+    switch (sectionId) {
+      case 'experience':
+        return sections.experience?.visible && sections.experience?.items?.length > 0;
+      case 'education':
+        return sections.education?.visible && sections.education?.items?.length > 0;
+      case 'research':
+        return sections.projects?.visible && sections.projects?.items?.length > 0;
+      case 'activities':
+        return sections.activities?.visible && sections.activities?.items?.length > 0;
+      case 'skills':
+        return (
+          (sections.skills?.visible && sections.skills?.items?.length > 0) ||
+          (sections.languages?.visible && sections.languages?.items?.length > 0)
+        );
+      case 'awards':
+        return sections.awards?.visible && sections.awards?.items?.length > 0;
+      default:
+        return false;
+    }
+  });
+
+  const allSections = Array.from(
+    new Set([
+      ...configuredSections,
+      ...visibleFallbackSections,
+    ])
+  );
 
   return (
     <div className="space-y-1">

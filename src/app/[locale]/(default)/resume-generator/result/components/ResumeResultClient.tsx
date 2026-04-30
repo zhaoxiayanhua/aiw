@@ -24,6 +24,7 @@ import {
   Check,
   AlertCircle,
   Loader2,
+  X,
 } from "lucide-react";
 import { exportMultiPagePDF } from "@/lib/multi-page-pdf-export";
 import { toast } from "sonner";
@@ -80,12 +81,69 @@ const SECTION_KEY_MAP: Record<string, string> = {
   'skillsLanguage': 'skills',
 };
 
+const normalizeSidebarSections = (sidebarSections: string[]) =>
+  Array.from(
+    new Set(
+      sidebarSections.map((moduleId) =>
+        moduleId === "languages" ? "skills" : moduleId
+      )
+    )
+  ).filter((moduleId) => moduleId !== "profiles" && moduleId !== "certifications");
+
 export interface ResumeModule {
   id: string;
   title: string;
   icon: React.ComponentType<{ className?: string }>;
   component: React.ComponentType;
 }
+
+const FloatingTip = ({
+  icon: Icon,
+  message,
+  description,
+  onClose,
+  className,
+  arrowClassName,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  message: string;
+  description?: string;
+  onClose: () => void;
+  className: string;
+  arrowClassName: string;
+}) => {
+  return (
+    <div
+      className={`absolute z-[80] max-w-[240px] rounded-2xl border border-primary/15 bg-white/98 px-3 py-2.5 shadow-[0_10px_24px_rgba(15,23,42,0.12)] backdrop-blur-sm ${className}`}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute right-2 top-2 text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+      <div className="flex items-start gap-2 pr-5">
+        <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Icon className="h-3.5 w-3.5" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-medium leading-5 text-foreground">
+            {message}
+          </p>
+          {description ? (
+            <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+              {description}
+            </p>
+          ) : null}
+        </div>
+      </div>
+      <div
+        className={`absolute h-4 w-4 rotate-45 border-primary/15 bg-white/98 ${arrowClassName}`}
+      />
+    </div>
+  );
+};
 
 // 可拖拽的模块组件
 const DraggableModuleItem = ({
@@ -213,6 +271,9 @@ function ResumeResultContent() {
   const [zoomLevel, setZoomLevel] = useState(1); // Will be calculated dynamically
   const [defaultZoom, setDefaultZoom] = useState(1); // Store the calculated default
   const [isExporting, setIsExporting] = useState(false); // PDF导出状态
+  const [showContentTip, setShowContentTip] = useState(true);
+  const [showExportTip, setShowExportTip] = useState(true);
+  const [showLayoutTip, setShowLayoutTip] = useState(true);
   const resumeContainerRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -245,6 +306,14 @@ function ResumeResultContent() {
       ? getThemeFromScale(themeKey)
       : getThemeColor(themeKey);
   }, [data.themeColor]);
+
+  const effectiveLayoutConfiguration = useMemo(
+    () => ({
+      ...data.layoutConfiguration,
+      sidebarSections: normalizeSidebarSections(data.layoutConfiguration.sidebarSections),
+    }),
+    [data.layoutConfiguration]
+  );
 
   // 计算适合屏幕的默认缩放比例
   const calculateDefaultZoom = () => {
@@ -317,20 +386,19 @@ function ResumeResultContent() {
   }, []);
 
   // 获取模块显示名称
-  const getSectionDisplayName = (moduleId: string): string => {
-    const sectionNames: { [key: string]: string } = {
-      experience: "工作经历",
-      education: "教育背景",
-      research: "研究项目",
-      activities: "课外活动",
-      profiles: "个人资料",
-      skills: "技能与胜任力",
-      certifications: "证书",
-      awards: "获奖情况",
-      languages: "语言技能",
+    const getSectionDisplayName = (moduleId: string): string => {
+      const sectionNames: { [key: string]: string } = {
+        experience: "工作经历",
+        education: "教育背景",
+        research: "研究项目",
+        activities: "课外活动",
+        profiles: "个人资料",
+        skills: "语言技能",
+        certifications: "证书",
+        awards: "获奖情况",
+      };
+      return sectionNames[moduleId] || moduleId;
     };
-    return sectionNames[moduleId] || moduleId;
-  };
 
   type LayoutPanelItem = {
     moduleId: string;
@@ -346,28 +414,29 @@ function ResumeResultContent() {
   ]);
 
   const managedSidebarSectionIds = new Set([
-    "skills",
-    "awards",
-    "languages",
-  ]);
+      "skills",
+      "awards",
+    ]);
 
-  const mainLayoutItems: LayoutPanelItem[] =
-    data.layoutConfiguration.mainSections
-      .filter((moduleId) => managedMainSectionIds.has(moduleId))
+    const normalizedSidebarSectionIds = effectiveLayoutConfiguration.sidebarSections;
+
+    const mainLayoutItems: LayoutPanelItem[] =
+      effectiveLayoutConfiguration.mainSections
+        .filter((moduleId) => managedMainSectionIds.has(moduleId))
       .map((moduleId, index) => ({
         moduleId,
         area: "main" as const,
         index,
       }));
 
-  const sidebarLayoutItems: LayoutPanelItem[] =
-    data.layoutConfiguration.sidebarSections
-      .filter((moduleId) => managedSidebarSectionIds.has(moduleId))
-      .map((moduleId) => ({
-        moduleId,
-        area: "sidebar" as const,
-        index: data.layoutConfiguration.sidebarSections.indexOf(moduleId),
-      }));
+    const sidebarLayoutItems: LayoutPanelItem[] =
+      normalizedSidebarSectionIds
+        .filter((moduleId) => managedSidebarSectionIds.has(moduleId))
+        .map((moduleId) => ({
+          moduleId,
+          area: "sidebar" as const,
+          index: effectiveLayoutConfiguration.sidebarSections.indexOf(moduleId),
+        }));
 
   const layoutPanelItems: LayoutPanelItem[] = [
     ...mainLayoutItems,
@@ -381,12 +450,12 @@ function ResumeResultContent() {
     area: "main" | "sidebar"
   ) => {
     if (area === "main") {
-      const newMainSections = [...data.layoutConfiguration.mainSections];
+      const newMainSections = [...effectiveLayoutConfiguration.mainSections];
       const draggedItem = newMainSections.splice(dragIndex, 1)[0];
       newMainSections.splice(hoverIndex, 0, draggedItem);
       reorderMainSections(newMainSections);
     } else {
-      const newSidebarSections = [...data.layoutConfiguration.sidebarSections];
+      const newSidebarSections = [...effectiveLayoutConfiguration.sidebarSections];
       const draggedItem = newSidebarSections.splice(dragIndex, 1)[0];
       newSidebarSections.splice(hoverIndex, 0, draggedItem);
       reorderSidebarSections(newSidebarSections);
@@ -780,17 +849,18 @@ function ResumeResultContent() {
         });
 
         // 将 layoutConfiguration 的模块名映射为 StandardResumeData 的 section key
-        const mainLayoutOrder = data.layoutConfiguration.mainSections.map(
+        const mainLayoutOrder = effectiveLayoutConfiguration.mainSections.map(
           (section: string) => SECTION_KEY_MAP[section] || section
         );
-        const sidebarLayoutOrder = data.layoutConfiguration.sidebarSections.map(
+        const sidebarLayoutOrder = effectiveLayoutConfiguration.sidebarSections.map(
           (section: string) => SECTION_KEY_MAP[section] || section
         );
+        const layoutOrder = [...mainLayoutOrder, ...sidebarLayoutOrder];
 
         await exportResumeDocx(standardResumeData, {
           filename: `${baseFilename}.docx`,
           themePrimary: themePalette.primary,
-          layoutOrder: mainLayoutOrder,
+          layoutOrder,
           mainLayoutOrder,
           sidebarLayoutOrder,
         });
@@ -882,11 +952,27 @@ function ResumeResultContent() {
           <div className="overflow-x-auto px-4 md:px-6 custom-scrollbar">
             <div className="flex flex-col xl:flex-row gap-3 xl:gap-4 min-h-[calc(100vh-150px)] min-w-[1300px] xl:min-w-0">
               {/* Left Column - Module Navigation Tabs */}
-              <div className="w-full xl:w-64 2xl:w-72 flex-shrink-0">
+              <div
+                className={`relative z-[70] w-full flex-shrink-0 overflow-visible xl:w-64 2xl:w-72 ${
+                  showContentTip ? "pt-16 xl:pt-[4.5rem]" : ""
+                }`}
+              >
+                {showContentTip && (
+                  <FloatingTip
+                    icon={Edit3}
+                    message="选择并编辑内容"
+                    description="勾选需要展示的模块，并在编辑区填写或修改内容。"
+                    onClose={() => setShowContentTip(false)}
+                    className="left-4 top-0"
+                    arrowClassName="-bottom-2 left-7 border-b border-r"
+                  />
+                )}
                 <div className="bg-card/70 backdrop-blur-sm rounded-2xl p-3 xl:p-4 2xl:p-6 shadow-sm h-full xl:h-full min-h-[300px]">
-                  <h3 className="font-semibold text-xs xl:text-sm text-muted-foreground uppercase tracking-wide mb-2">
-                    内容模块
-                  </h3>
+                  <div className="mb-2 flex items-center gap-2">
+                    <h3 className="font-semibold text-xs xl:text-sm text-muted-foreground uppercase tracking-wide">
+                      内容模块
+                    </h3>
+                  </div>
                   <p className="text-xs text-muted-foreground mb-4 xl:mb-6">
                     勾选需要在简历上呈现的部分
                   </p>
@@ -1002,10 +1088,24 @@ function ResumeResultContent() {
                 </div>
 
                 {/* Resume Preview Area */}
-                <div className="w-full xl:w-[480px] 2xl:flex-1 flex-shrink-0">
+                <div
+                  className={`relative z-[60] w-full flex-shrink-0 overflow-visible xl:w-[480px] 2xl:flex-1 ${
+                    showExportTip ? "pt-14 xl:pt-16" : ""
+                  }`}
+                >
+                  {showExportTip && (
+                    <FloatingTip
+                      icon={Download}
+                      message="支持导出 Word"
+                      description="下载后也可继续修改"
+                      onClose={() => setShowExportTip(false)}
+                      className="right-0 top-0"
+                      arrowClassName="-bottom-2 right-7 border-b border-r"
+                    />
+                  )}
                   <div className="bg-card/70 backdrop-blur-sm rounded-2xl shadow-sm h-full flex flex-col min-h-[600px]">
                     {/* Preview Header */}
-                    <div className="border-b border-border p-3">
+                    <div className="relative overflow-visible border-b border-border p-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -1028,23 +1128,24 @@ function ResumeResultContent() {
                             </p>
                           </div>
                         </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={isExporting}
-                              className="bg-white/80 border-white/20 shadow-sm hover:bg-white hover:shadow-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {isExporting ? (
-                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                              ) : (
-                                <Download className="w-3 h-3 mr-1" />
-                              )}
-                              {isExporting ? "导出中..." : "导出"}
-                              <ChevronDown className="w-3 h-3 ml-1 opacity-70" />
-                            </Button>
-                          </DropdownMenuTrigger>
+                        <div className="relative flex items-center gap-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isExporting}
+                                className="bg-white/80 border-white/20 shadow-sm hover:bg-white hover:shadow-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {isExporting ? (
+                                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                ) : (
+                                  <Download className="w-3 h-3 mr-1" />
+                                )}
+                                {isExporting ? "导出中..." : "导出"}
+                                <ChevronDown className="w-3 h-3 ml-1 opacity-70" />
+                              </Button>
+                            </DropdownMenuTrigger>
                           <DropdownMenuContent
                             align="end"
                             className="w-44"
@@ -1067,7 +1168,8 @@ function ResumeResultContent() {
                               Word (.docx)
                             </DropdownMenuItem>
                           </DropdownMenuContent>
-                        </DropdownMenu>
+                          </DropdownMenu>
+                        </div>
                       </div>
                     </div>
 
@@ -1110,7 +1212,7 @@ function ResumeResultContent() {
                                 <TemplateComponent
                                   resume={standardResumeData}
                                   themeColor={data.themeColor}
-                                  layoutConfiguration={data.layoutConfiguration}
+                                  layoutConfiguration={effectiveLayoutConfiguration}
                                 />
                               </div>
                             );
@@ -1164,7 +1266,9 @@ function ResumeResultContent() {
               </div>
 
               {/* Right Column - Template & Color Selection */}
-              <div className="w-full xl:w-[280px] 2xl:w-[340px] flex-shrink-0">
+              <div
+                className="relative z-[70] w-full flex-shrink-0 overflow-visible xl:w-[280px] 2xl:w-[340px]"
+              >
                 <div className="bg-card/70 backdrop-blur-sm rounded-2xl shadow-sm h-full flex flex-col min-h-[500px]">
                   {/* Template Selection Section */}
                   <div className="border-b border-border p-3 xl:p-4 2xl:p-5">
@@ -1230,7 +1334,7 @@ function ResumeResultContent() {
                   </div>
 
                   {/* Layout Management Section */}
-                  <div className="border-b border-border p-3 xl:p-4 2xl:p-5">
+                  <div className="relative overflow-visible border-b border-border p-3 xl:p-4 2xl:p-5">
                     <div className="flex items-center gap-2 xl:gap-3 mb-3 xl:mb-4">
                       <div className="w-5 h-5 xl:w-6 xl:h-6 rounded-lg bg-primary/10 flex items-center justify-center">
                         <Layout className="w-3 h-3 text-primary" />
@@ -1245,7 +1349,7 @@ function ResumeResultContent() {
                     </p>
 
                     <div className="space-y-4">
-                      <div>
+                      <div className="relative">
                         <div className="flex items-center gap-2 mb-2 xl:mb-3">
                           <div className="w-2.5 h-2.5 xl:w-3 xl:h-3 rounded bg-blue-500"></div>
                           <h4 className="text-xs xl:text-sm font-medium text-foreground">
@@ -1255,6 +1359,16 @@ function ResumeResultContent() {
                             ({layoutPanelItems.length}个模块)
                           </span>
                         </div>
+                        {showLayoutTip && (
+                          <FloatingTip
+                            icon={GripVertical}
+                            message="想换顺序？拖一下试试"
+                            description="拖动模块即可调整简历里的展示顺序。"
+                            onClose={() => setShowLayoutTip(false)}
+                            className="top-[39px] right-0"
+                            arrowClassName="left-5 -bottom-2 border-b border-r"
+                          />
+                        )}
                       </div>
 
                       <div>
@@ -1264,7 +1378,11 @@ function ResumeResultContent() {
                             主内容区
                           </h4>
                         </div>
-                        <div className="space-y-2">
+                        <div
+                          className={`space-y-2 ${
+                            showLayoutTip ? "pt-14 xl:pt-16" : ""
+                          }`}
+                        >
                           {mainLayoutItems.map((item) => (
                             <DraggableModuleItem
                               key={item.moduleId}
