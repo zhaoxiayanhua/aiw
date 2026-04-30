@@ -104,6 +104,7 @@ function ConfirmationPage() {
       const response = await fetch('/api/documents/resume', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({
           resumeData: data,
           template: data.selectedTemplate,
@@ -182,6 +183,9 @@ function ConfirmationPage() {
 
       {/* 所有模块的可选择列表 */}
       <div className="bg-muted/30 rounded-xl p-6">
+        <div className="mb-4 rounded-lg border border-primary/15 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
+          {"\u751F\u6210\u540E\u4ECD\u53EF\u5728\u9884\u89C8\u9875\u624B\u52A8\u4FEE\u6539\uFF0C\u4E5F\u53EF\u4EE5\u76F4\u63A5\u5BFC\u51FA Word \u7248\u672C\u540E\u7EE7\u7EED\u8C03\u6574\u3002"}
+        </div>
         <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <CheckCircle className="w-5 h-5 text-muted-foreground" />
           文书模块：

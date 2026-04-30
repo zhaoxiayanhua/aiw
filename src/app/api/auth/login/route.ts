@@ -111,6 +111,16 @@ export async function POST(request: NextRequest) {
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
+    if (process.env.NODE_ENV === "production") {
+      response.cookies.set("__Secure-better-auth.session_token", sessionToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+      });
+    }
+
     return response;
 
   } catch (error: unknown) {

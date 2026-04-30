@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -101,7 +101,7 @@ export default function EducationModule() {
                   <Input
                     id={`edu_city_${index}`}
                     type="text"
-                    placeholder="例如：北京"
+                    placeholder="例如：Beijing"
                     value={education.edu_city}
                     onChange={(e) => handleInputChange(index, "edu_city", e.target.value)}
                     className="h-10 text-xs"
@@ -115,7 +115,7 @@ export default function EducationModule() {
                   <Input
                     id={`edu_country_${index}`}
                     type="text"
-                    placeholder="例如：中国"
+                    placeholder="例如：China"
                     value={education.edu_country}
                     onChange={(e) => handleInputChange(index, "edu_country", e.target.value)}
                     className="h-10 text-xs"
@@ -148,7 +148,7 @@ export default function EducationModule() {
                     id={`edu_start_date_${index}`}
                     value={education.edu_start_date}
                     onChange={(value) => handleInputChange(index, "edu_start_date", value)}
-                    placeholder="选择入学时间"
+                    placeholder="例如：2022-09"
                   />
                 </div>
 
@@ -160,7 +160,7 @@ export default function EducationModule() {
                     id={`edu_end_date_${index}`}
                     value={education.edu_end_date}
                     onChange={(value) => handleInputChange(index, "edu_end_date", value)}
-                    placeholder="选择毕业时间"
+                    placeholder="例如：2026-06"
                   />
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function EducationModule() {
                 <Input
                   id={`gpa_or_rank_${index}`}
                   type="text"
-                  placeholder="例如：3.8/4.0 或 Top 10%"
+                  placeholder="例如：3.8/4.0 or Top 10%"
                   value={education.gpa_or_rank}
                   onChange={(e) => handleInputChange(index, "gpa_or_rank", e.target.value)}
                   className="h-10 text-xs"
@@ -242,3 +242,4 @@ export default function EducationModule() {
     </div>
   );
 }
+

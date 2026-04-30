@@ -1,6 +1,6 @@
 import React from "react";
 import { StandardResumeData } from "@/lib/resume-field-mapping";
-import { cn, isEmptyString } from "./shared/utils";
+import { cn, formatRelevantCoursework, isEmptyString } from "./shared/utils";
 import { Rating } from "./shared/components";
 import { getThemeColor, getThemeFromScale } from "./shared/theme-colors";
 
@@ -171,23 +171,19 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
     switch (sectionId) {
       case 'experience':
         return (
-          <Section section={sections.experience} title="INTERNSHIP EXPERIENCE" theme={theme}>
+          <Section section={sections.experience} title="WORK EXPERIENCE" theme={theme}>
             {sections.experience?.items?.map((item) => (
               <div key={item.id} className="mb-4">
                 <div className="-mb-1.5">
                   {/* 第一行：公司名称（左） + 地址（右） */}
                   <div className="flex justify-between items-start -mb-1.5">
-                    <div className="font-bold text-xl">{item.company}</div>
-                    {item.location && <div className="font-bold text-base text-black">{item.location}</div>}
+                    <div className="font-bold text-xl">{item.position}</div>
+                    <div className="text-base text-black">{item.date}</div>
                   </div>
                   {/* 第二行：职位（左） + 时间（右） */}
                   <div className="flex justify-between items-start">
-                    <div className="font-bold text-lg text-black">{item.position}</div>
-                    <div className="whitespace-nowrap text-right">
-                      <div className="text-base text-black">
-                        {item.date}
-                      </div>
-                    </div>
+                    <div className="text-lg italic text-black">{item.company}</div>
+                    {item.location && <div className="text-base text-black">{item.location}</div>}
                   </div>
                 </div>
                 {item.summary && !isEmptyString(item.summary) && (
@@ -217,27 +213,34 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                   </div>
                   {/* 第二行：专业/学位（左） + 时间（右） */}
                   <div className="flex justify-between items-start">
-                    <div className="font-bold text-lg text-black">
+                    <div className="text-lg text-black">
                       {item.area}
-                      {item.score && <span>, GPA: {item.score}</span>}
                     </div>
                     <div className="whitespace-nowrap text-right">
                       <div className="text-base text-black">
                         {item.date}
                       </div>
+                      {item.location && (
+                        <div className="text-base text-black">
+                          {item.location}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-                {item.courses && !isEmptyString(item.courses) && (
-                  <div className="mb-1 text-base text-black ml-4 leading-snug -mt-1.5">
-                    <span className="text-[1.2rem] font-medium italic">Relevant coursework:</span> <span className="text-[1.2rem]">{item.courses.split(',').map(course => course.trim()).join(', ')}</span>
-                  </div>
-                )}
-                {/* {item.summary && !isEmptyString(item.summary) && (
-                  <div className="text-base text-black">
-                    {item.summary}
-                  </div>
-                )} */}
+                {[
+                  item.score
+                    ? `GPA: ${/^\s*gpa\b/i.test(item.score) ? item.score.replace(/^\s*gpa\s*:?\s*/i, "") : item.score}`
+                    : "",
+                  item.summary ? `Honors: ${item.summary}` : "",
+                  item.courses ? `Relevant Coursework: ${formatRelevantCoursework(item.courses)}` : "",
+                ]
+                  .filter((line) => !isEmptyString(line))
+                  .map((line, idx) => (
+                    <div key={idx} className="ml-4 text-base text-black leading-snug">
+                      {`\u2022 ${line}`}
+                    </div>
+                  ))}
               </div>
             ))}
           </Section>
@@ -290,17 +293,13 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                 <div className="mb-2">
                   {/* 第一行：活动名称（左） + 地址（右） */}
                   <div className="flex justify-between items-start -mb-1.5">
-                    <div className="font-bold text-xl">{item.name}</div>
-                    {item.location && <div className="font-bold text-base text-black">{item.location}</div>}
+                    <div className="font-bold text-xl">{item.role}</div>
+                    <div className="text-base text-black">{item.date}</div>
                   </div>
                   {/* 第二行：角色（左） + 时间（右） */}
                   <div className="flex justify-between items-start ">
-                    <div className="font-bold text-lg text-black">{item.role}</div>
-                    <div className="whitespace-nowrap text-right">
-                      <div className="text-base text-black">
-                        {item.date}
-                      </div>
-                    </div>
+                    <div className="text-lg text-black">{item.name}</div>
+                    {item.location && <div className="text-base text-black">{item.location}</div>}
                   </div>
                 </div>
                 {item.summary && !isEmptyString(item.summary) && (

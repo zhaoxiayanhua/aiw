@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import { useResume, WorkExperienceData } from "../ResumeContext";
+import { useResumeAI } from "@/hooks/useResumeAI";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AITextarea } from "@/components/ui/ai-textarea";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
-// import { Card } from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
-import { useResume, WorkExperienceData } from "../ResumeContext";
-import { useResumeAI } from "@/hooks/useResumeAI";
 
 export default function WorkExperienceModule() {
-  const { data, updateWorkExperienceData, addWorkExperience, removeWorkExperience, isEditMode } = useResume();
+  const { data, updateWorkExperienceData, addWorkExperience, removeWorkExperience, isEditMode } =
+    useResume();
   const workExperiences = data.workExperience;
   const { generateContent, isGenerating } = useResumeAI();
   const [generatingIndex, setGeneratingIndex] = useState<number | null>(null);
@@ -32,7 +32,6 @@ export default function WorkExperienceModule() {
     }
   };
 
-  // 确保至少有一个工作经历条目
   useEffect(() => {
     if (workExperiences.length === 0) {
       addWorkExperience();
@@ -43,23 +42,26 @@ export default function WorkExperienceModule() {
     <div className="space-y-4">
       <div className="flex flex-col gap-2">
         <div>
-          <p className="text-muted-foreground text-xs">
-            请填写您的工作经历，包括公司信息、职位、工作内容等详细信息。
+          <p className="text-xs text-muted-foreground">
+            请填写您的工作经历，包括公司信息、职位、地点、时间和具体职责。
+          </p>
+          <p className="mt-1 text-[10px] text-muted-foreground">
+            英文简历中的城市 / 国家请直接输入英文，例如 Melbourne, Australia
           </p>
         </div>
-        <Button
-          onClick={handleAdd}
-          className="h-10 px-5 text-sm w-fit"
-        >
-          <Plus className="w-4 h-4 mr-1.5" />
+        <Button onClick={handleAdd} className="h-10 w-fit px-5 text-sm">
+          <Plus className="mr-1.5 h-4 w-4" />
           添加工作经历
         </Button>
       </div>
-      
+
       <div className="space-y-4">
         {workExperiences.map((experience, index) => (
-          <div key={index} className="p-4 xl:p-6 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 border-0">
-            <div className="flex items-center justify-between mb-4">
+          <div
+            key={index}
+            className="rounded-xl border-0 bg-gradient-to-br from-primary/5 to-primary/10 p-4 xl:p-6"
+          >
+            <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-foreground">
                 工作经历 {index + 1}
               </h3>
@@ -68,15 +70,14 @@ export default function WorkExperienceModule() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleRemove(index)}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 px-2"
+                  className="h-7 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="h-3 w-3" />
                 </Button>
               )}
             </div>
 
             <div className="space-y-4">
-              {/* 公司和职位信息 */}
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor={`company-${index}`} className="text-xs font-medium text-foreground">
@@ -85,13 +86,13 @@ export default function WorkExperienceModule() {
                   <Input
                     id={`company-${index}`}
                     type="text"
-                    placeholder="例如：腾讯科技有限公司"
+                    placeholder="例如：ByteDance Ltd."
                     value={experience.company}
                     onChange={(e) => handleInputChange(index, "company", e.target.value)}
                     className="h-10 text-xs"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor={`job_title-${index}`} className="text-xs font-medium text-foreground">
                     职位名称 <span className="text-destructive">*</span>
@@ -99,7 +100,7 @@ export default function WorkExperienceModule() {
                   <Input
                     id={`job_title-${index}`}
                     type="text"
-                    placeholder="例如：软件工程师"
+                    placeholder="例如：Software Engineer Intern"
                     value={experience.job_title}
                     onChange={(e) => handleInputChange(index, "job_title", e.target.value)}
                     className="h-10 text-xs"
@@ -107,7 +108,6 @@ export default function WorkExperienceModule() {
                 </div>
               </div>
 
-              {/* 工作地点信息 */}
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor={`work_city-${index}`} className="text-xs font-medium text-foreground">
@@ -116,13 +116,13 @@ export default function WorkExperienceModule() {
                   <Input
                     id={`work_city-${index}`}
                     type="text"
-                    placeholder="例如：深圳"
+                    placeholder="例如：Shenzhen"
                     value={experience.work_city}
                     onChange={(e) => handleInputChange(index, "work_city", e.target.value)}
                     className="h-10 text-xs"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor={`work_country-${index}`} className="text-xs font-medium text-foreground">
                     国家 <span className="text-destructive">*</span>
@@ -130,7 +130,7 @@ export default function WorkExperienceModule() {
                   <Input
                     id={`work_country-${index}`}
                     type="text"
-                    placeholder="例如：中国"
+                    placeholder="例如：China"
                     value={experience.work_country}
                     onChange={(e) => handleInputChange(index, "work_country", e.target.value)}
                     className="h-10 text-xs"
@@ -138,7 +138,6 @@ export default function WorkExperienceModule() {
                 </div>
               </div>
 
-              {/* 工作时间 */}
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor={`work_start_date-${index}`} className="text-xs font-medium text-foreground">
@@ -148,10 +147,10 @@ export default function WorkExperienceModule() {
                     id={`work_start_date-${index}`}
                     value={experience.work_start_date}
                     onChange={(value) => handleInputChange(index, "work_start_date", value)}
-                    placeholder="选择开始时间"
+                    placeholder="例如：2024-06"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor={`work_end_date-${index}`} className="text-xs font-medium text-foreground">
                     结束时间 <span className="text-destructive">*</span>
@@ -160,13 +159,14 @@ export default function WorkExperienceModule() {
                     id={`work_end_date-${index}`}
                     value={experience.work_end_date}
                     onChange={(value) => handleInputChange(index, "work_end_date", value)}
-                    placeholder="选择结束时间"
+                    placeholder="例如：2024-08"
                   />
-                  <p className="text-[10px] text-muted-foreground">如果仍在职，请填写预计离职时间或当前日期</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    如果仍在职，请填写预计离职时间或当前日期
+                  </p>
                 </div>
               </div>
 
-              {/* 工作职责 */}
               <div className="space-y-2">
                 <Label htmlFor={`responsibilities-${index}`} className="text-xs font-medium text-foreground">
                   具体职责 <span className="text-destructive">*</span>
@@ -174,7 +174,7 @@ export default function WorkExperienceModule() {
                 {isEditMode ? (
                   <Textarea
                     id={`responsibilities-${index}`}
-                    placeholder="请用英文描述您的工作职责，每行一个要点"
+                    placeholder="例如：Analyzed user data and built weekly dashboards, one bullet per line"
                     value={experience.responsibilities}
                     onChange={(e) => handleInputChange(index, "responsibilities", e.target.value)}
                     className="min-h-[100px] resize-none text-xs"
@@ -183,7 +183,7 @@ export default function WorkExperienceModule() {
                 ) : (
                   <AITextarea
                     id={`responsibilities-${index}`}
-                    placeholder="请描述您的工作职责，每行一个要点"
+                    placeholder="例如：Analyzed user data and built weekly dashboards, one bullet per line"
                     value={experience.responsibilities}
                     onChange={(e) => handleInputChange(index, "responsibilities", e.target.value)}
                     className="min-h-[100px] resize-none text-xs"
@@ -191,7 +191,6 @@ export default function WorkExperienceModule() {
                     rows={4}
                     aiGenerating={isGenerating && generatingIndex === index}
                     onAIGenerate={async () => {
-                      // Type 2: Work Experience - Responsibilities
                       setGeneratingIndex(index);
                       const context = { workExperience: [experience] };
                       const generatedContent = await generateContent(context, 2);
@@ -210,4 +209,4 @@ export default function WorkExperienceModule() {
       </div>
     </div>
   );
-} 
+}

@@ -33,6 +33,7 @@ export interface EducationData {
   edu_end_date: string;
   gpa_or_rank: string;
   relevant_courses: string;
+  awards_or_honors: string;
 }
 
 export interface WorkExperienceData {
@@ -48,11 +49,12 @@ export interface WorkExperienceData {
 export interface ResearchData {
   project_title: string;
   lab_or_unit: string;
+  res_city: string;
+  res_country: string;
   res_start_date: string;
   res_end_date: string;
   your_contributions: string;
   tools_used: string;
-  outcomes: string;
 }
 
 export interface ActivitiesData {
@@ -145,7 +147,6 @@ const REQUIRED_FIELDS = {
     degree: "学位",
     edu_start_date: "开始日期",
     edu_end_date: "结束日期",
-    gpa_or_rank: "GPA/排名",
   },
   workExperience: {
     company: "公司名称",
@@ -240,8 +241,8 @@ interface ResumeContextType {
   getSelectedData: () => any;
   // 新增：布局管理相关方法
   updateLayoutConfiguration: (layout: LayoutConfiguration) => void;
-  moveModuleToMain: (moduleId: string) => void;
-  moveModuleToSidebar: (moduleId: string) => void;
+  moveModuleToMain: (moduleId: string, targetIndex?: number) => void;
+  moveModuleToSidebar: (moduleId: string, targetIndex?: number) => void;
   reorderMainSections: (newOrder: string[]) => void;
   reorderSidebarSections: (newOrder: string[]) => void;
   // 新增：生成状态管理
@@ -297,7 +298,7 @@ const defaultResumeData: ResumeData = {
   themeColor: "sky-500",
   // 默认布局配置：基于 ditto 模板的结构
   layoutConfiguration: {
-    mainSections: ["experience", "education", "research", "activities"],
+    mainSections: ["education", "experience", "research", "activities"],
     sidebarSections: [
       "profiles",
       "skills",
@@ -330,6 +331,8 @@ const mockResumeData: ResumeData = {
       gpa_or_rank: "GPA: 3.8/4.0 (Dean's List)",
       relevant_courses:
         "Algorithms, Distributed Systems, Machine Learning, Computer Systems, Product Design",
+      awards_or_honors:
+        "Dean's List, Academic Excellence Scholarship",
     },
   ],
   workExperience: [
@@ -358,13 +361,13 @@ const mockResumeData: ResumeData = {
     {
       project_title: "Multimodal Information Retrieval System",
       lab_or_unit: "MIT Interactive Intelligence Lab",
+      res_city: "Cambridge",
+      res_country: "United States",
       res_start_date: "2022-10",
       res_end_date: "2023-05",
       your_contributions:
         "Prototyped model architectures, built preprocessing and evaluation pipelines, and improved retrieval precision by 12%.",
       tools_used: "PyTorch, Hugging Face Transformers, Milvus",
-      outcomes:
-        "Published one conference paper at the Northeast Computing Symposium and received the MIT iQuHACK research award.",
     },
   ],
   activities: [
@@ -408,7 +411,7 @@ const mockResumeData: ResumeData = {
   selectedTemplate: "ditto",
   themeColor: "sky-500",
   layoutConfiguration: {
-    mainSections: ["experience", "education", "research", "activities"],
+    mainSections: ["education", "experience", "research", "activities"],
     sidebarSections: [
       "profiles",
       "skills",
@@ -667,6 +670,7 @@ export function ResumeProvider({
       edu_end_date: "",
       gpa_or_rank: "",
       relevant_courses: "",
+      awards_or_honors: "",
     };
     setData((prev) => ({
       ...prev,
@@ -736,11 +740,12 @@ export function ResumeProvider({
     const newResearch: ResearchData = {
       project_title: "",
       lab_or_unit: "",
+      res_city: "",
+      res_country: "",
       res_start_date: "",
       res_end_date: "",
       your_contributions: "",
       tools_used: "",
-      outcomes: "",
     };
     setData((prev) => ({
       ...prev,
@@ -1069,17 +1074,24 @@ export function ResumeProvider({
     saveToCache();
   };
 
-  const moveModuleToMain = (moduleId: string) => {
+  const moveModuleToMain = (moduleId: string, targetIndex?: number) => {
     setData((prev) => {
       const newLayout = { ...prev.layoutConfiguration };
-      // 从sidebar中移除
+      // 从两个区域中先移除，避免重复
       newLayout.sidebarSections = newLayout.sidebarSections.filter(
         (id) => id !== moduleId
       );
-      // 添加到main末尾
-      if (!newLayout.mainSections.includes(moduleId)) {
-        newLayout.mainSections.push(moduleId);
-      }
+      newLayout.mainSections = newLayout.mainSections.filter(
+        (id) => id !== moduleId
+      );
+
+      const nextIndex =
+        typeof targetIndex === "number"
+          ? Math.max(0, Math.min(targetIndex, newLayout.mainSections.length))
+          : newLayout.mainSections.length;
+
+      newLayout.mainSections.splice(nextIndex, 0, moduleId);
+
       return {
         ...prev,
         layoutConfiguration: newLayout,
@@ -1088,17 +1100,27 @@ export function ResumeProvider({
     saveToCache();
   };
 
-  const moveModuleToSidebar = (moduleId: string) => {
+  const moveModuleToSidebar = (moduleId: string, targetIndex?: number) => {
     setData((prev) => {
       const newLayout = { ...prev.layoutConfiguration };
-      // 从main中移除
+      // 从两个区域中先移除，避免重复
       newLayout.mainSections = newLayout.mainSections.filter(
         (id) => id !== moduleId
       );
-      // 添加到sidebar末尾
-      if (!newLayout.sidebarSections.includes(moduleId)) {
-        newLayout.sidebarSections.push(moduleId);
-      }
+      newLayout.sidebarSections = newLayout.sidebarSections.filter(
+        (id) => id !== moduleId
+      );
+
+      const nextIndex =
+        typeof targetIndex === "number"
+          ? Math.max(
+              0,
+              Math.min(targetIndex, newLayout.sidebarSections.length)
+            )
+          : newLayout.sidebarSections.length;
+
+      newLayout.sidebarSections.splice(nextIndex, 0, moduleId);
+
       return {
         ...prev,
         layoutConfiguration: newLayout,
@@ -1188,6 +1210,7 @@ export function ResumeProvider({
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
             body: JSON.stringify(payload),
           }
         );
@@ -1196,12 +1219,25 @@ export function ResumeProvider({
         response = await fetch("/api/documents/resume", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
           body: JSON.stringify(payload),
         });
       }
 
       if (!response.ok) {
-        throw new Error("Failed to save document");
+        let errorMessage = "Failed to save document";
+
+        try {
+          const errorResult = await response.json();
+          errorMessage =
+            errorResult?.error ||
+            errorResult?.message ||
+            `${errorMessage} (${response.status})`;
+        } catch {
+          errorMessage = `${errorMessage} (${response.status})`;
+        }
+
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -1241,13 +1277,29 @@ export function ResumeProvider({
         documentUuid: uuid,
       }));
 
-      const response = await fetch(`/api/documents/resume/${uuid}`);
+      const response = await fetch(`/api/documents/resume/${uuid}`, {
+        credentials: "same-origin",
+      });
+      
 
       if (!response.ok) {
+        let errorMessage = "Failed to load document";
+
+        try {
+          const errorResult = await response.json();
+          errorMessage =
+            errorResult?.error ||
+            errorResult?.message ||
+            `${errorMessage} (${response.status})`;
+        } catch {
+          errorMessage = `${errorMessage} (${response.status})`;
+        }
+
         if (response.status === 404) {
           throw new Error("Document not found");
         }
-        throw new Error("Failed to load document");
+
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -1272,6 +1324,20 @@ export function ResumeProvider({
             formData.layoutConfiguration || resumeData.layoutConfiguration;
           moduleSelection =
             formData.moduleSelection || resumeData.moduleSelection;
+        } else if (
+          formData.header ||
+          formData.education ||
+          formData.workExperience ||
+          formData.research ||
+          formData.activities ||
+          formData.awards ||
+          formData.skillsLanguage
+        ) {
+          resumeData = formData;
+          template = formData.template || formData.selectedTemplate;
+          themeColor = formData.themeColor;
+          layoutConfiguration = formData.layoutConfiguration;
+          moduleSelection = formData.moduleSelection;
         } else {
           ({
             resumeData,
@@ -1283,25 +1349,118 @@ export function ResumeProvider({
         }
 
         // Extract the actual resume data fields
-        // 处理 education 数据兼容性：如果是旧的单对象格式，转换为数组
-        let educationData = resumeData.education || defaultResumeData.education;
-        if (educationData && !Array.isArray(educationData)) {
-          // 旧数据格式（单个对象），转换为数组
-          educationData = [educationData];
-        }
+        // ??? education ?????????????????????????????????
+        const resolvedResumeData = resumeData || defaultResumeData;
+
+        const normalizeArrayItems = <T extends Record<string, unknown>>(
+          value: T[] | T | undefined,
+          defaults: T
+        ): T[] => {
+          if (!value) return [];
+          const items = Array.isArray(value) ? value : [value];
+          return items.map((item) => ({
+            ...defaults,
+            ...item,
+          }));
+        };
+
+        const educationData = normalizeArrayItems(
+          resolvedResumeData.education,
+          {
+            school_name: "",
+            edu_city: "",
+            edu_country: "",
+            degree: "",
+            edu_start_date: "",
+            edu_end_date: "",
+            gpa_or_rank: "",
+            relevant_courses: "",
+            awards_or_honors: "",
+          }
+        );
+
+        const workExperienceData = normalizeArrayItems(
+          resolvedResumeData.workExperience,
+          {
+            company: "",
+            job_title: "",
+            work_city: "",
+            work_country: "",
+            work_start_date: "",
+            work_end_date: "",
+            responsibilities: "",
+          }
+        );
+
+        const researchData = normalizeArrayItems(
+          resolvedResumeData.research,
+          {
+            project_title: "",
+            lab_or_unit: "",
+            res_city: "",
+            res_country: "",
+            res_start_date: "",
+            res_end_date: "",
+            your_contributions: "",
+            tools_used: "",
+          }
+        );
+
+        const activitiesData = normalizeArrayItems(
+          resolvedResumeData.activities,
+          {
+            activity_name: "",
+            role: "",
+            act_city: "",
+            act_country: "",
+            act_start_date: "",
+            act_end_date: "",
+            description: "",
+          }
+        );
+
+        const awardsData = normalizeArrayItems(
+          resolvedResumeData.awards,
+          {
+            award_name: "",
+            award_year: "",
+            award_issuer: "",
+            award_rank: "",
+            certificate_name: "",
+            certificate_issuer: "",
+          }
+        );
 
         const extractedData = {
-          header: resumeData.header || defaultResumeData.header,
+          header: {
+            ...defaultResumeData.header,
+            ...(resolvedResumeData.header || {}),
+          },
           education: educationData,
-          workExperience: resumeData.workExperience || defaultResumeData.workExperience,
-          research: resumeData.research || defaultResumeData.research,
-          activities: resumeData.activities || defaultResumeData.activities,
-          awards: resumeData.awards || defaultResumeData.awards,
-          skillsLanguage: resumeData.skillsLanguage || defaultResumeData.skillsLanguage,
-          moduleSelection: moduleSelection || resumeData.moduleSelection || defaultResumeData.moduleSelection,
-          selectedTemplate: template || resumeData.selectedTemplate || defaultResumeData.selectedTemplate,
-          themeColor: themeColor || resumeData.themeColor || defaultResumeData.themeColor,
-          layoutConfiguration: layoutConfiguration || resumeData.layoutConfiguration || defaultResumeData.layoutConfiguration
+          workExperience: workExperienceData,
+          research: researchData,
+          activities: activitiesData,
+          awards: awardsData,
+          skillsLanguage: {
+            ...defaultResumeData.skillsLanguage,
+            ...(resolvedResumeData.skillsLanguage || {}),
+          },
+          moduleSelection:
+            moduleSelection ||
+            resolvedResumeData.moduleSelection ||
+            defaultResumeData.moduleSelection,
+          selectedTemplate:
+            template ||
+            resolvedResumeData.selectedTemplate ||
+            defaultResumeData.selectedTemplate,
+          themeColor:
+            themeColor ||
+            resolvedResumeData.themeColor ||
+            defaultResumeData.themeColor,
+          layoutConfiguration:
+            layoutConfiguration ||
+            resolvedResumeData.layoutConfiguration ||
+            defaultResumeData.layoutConfiguration,
         };
 
         // Ensure required modules remain selected

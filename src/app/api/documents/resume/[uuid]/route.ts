@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { headers } from "next/headers";
 import { customAuth } from "@/lib/auth";
 import { findUserByUuid } from "@/models/user";
 import { getResumeDocument, updateResumeDocument } from "@/services/resume-document";
@@ -13,7 +12,7 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await customAuth.api.getSession({ headers: await headers() });
+    const session = await customAuth.api.getSession({ headers: request.headers });
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -53,7 +52,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await customAuth.api.getSession({ headers: await headers() });
+    const session = await customAuth.api.getSession({ headers: request.headers });
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -109,7 +108,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await customAuth.api.getSession({ headers: await headers() });
+    const session = await customAuth.api.getSession({ headers: request.headers });
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

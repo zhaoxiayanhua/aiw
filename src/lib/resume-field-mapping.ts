@@ -1,5 +1,51 @@
 import { ResumeData } from '@/app/[locale]/(default)/resume-generator/components/ResumeContext';
 
+function normalizeRelevantCoursework(value: string): string {
+  if (!value || value.trim().length === 0) {
+    return '';
+  }
+
+  const normalized = value
+    .replace(/^relevant\s+coursework\s*:?\s*/i, '')
+    .replace(/\r\n?/g, '\n')
+    .replace(/[;\uFF1B]/g, '\n');
+
+  const courseNames = normalized
+    .split(/\n+/)
+    .flatMap((line) => line.split(','))
+    .map((part) => part.replace(/^[-\u2022\u25CF\s]+/, '').trim())
+    .map((part) => part.split(/\s(?:-|\u2013|\u2014)\s|:\s*/)[0]?.trim() ?? '')
+    .map((part) => part.replace(/[.\u3002;\uFF1B]+$/, '').trim())
+    .filter(Boolean)
+    .filter((part) => !/^(and|or|with|including|covered|focus|focused|such as)\b/i.test(part));
+
+  return Array.from(new Set(courseNames)).join(', ');
+}
+
+function safeText(value: unknown): string {
+  if (value == null) return '';
+  const normalized = String(value).trim();
+  return normalized === 'undefined' || normalized === 'null' ? '' : normalized;
+}
+
+function joinParts(parts: unknown[], separator: string): string {
+  return parts
+    .map((part) => safeText(part))
+    .filter(Boolean)
+    .join(separator);
+}
+
+function buildLocation(...parts: unknown[]): string {
+  return joinParts(parts, ', ');
+}
+
+function buildDateRange(start: unknown, end: unknown): string {
+  return joinParts(
+    [formatDateToMMYYYY(safeText(start)), formatDateToMMYYYY(safeText(end))],
+    ' - '
+  );
+}
+
 // Helper function to format date to MM/YYYY format
 function formatDateToMMYYYY(dateStr: string): string {
   if (!dateStr) return '';
@@ -140,6 +186,7 @@ export interface StandardResumeData {
         id: string;
         name: string;
         description: string;
+        location: string;
         date: string;
         summary: string;
         keywords: string[];
@@ -350,7 +397,7 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
       headline: '', // You don't have this field, so empty
       email: data.header.email || '',
       phone: data.header.phone || '',
-      location: `${data.header.city}${data.header.country ? `, ${data.header.country}` : ''}`,
+      location: buildLocation(data.header.city, data.header.country),
       url: { href: '', label: '' }, // No website field in your form
       customFields: [
         ...(data.header.linkedin ? [{
@@ -387,11 +434,11 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
         name: 'Work Experience',
         items: data.workExperience.map((exp, index) => ({
           id: `exp-${index}`,
-          company: exp.company || '',
-          position: exp.job_title || '',
-          location: `${exp.work_city}${exp.work_country ? `, ${exp.work_country}` : ''}`,
-          date: `${formatDateToMMYYYY(exp.work_start_date)} - ${formatDateToMMYYYY(exp.work_end_date)}`,
-          summary: exp.responsibilities || '',
+          company: safeText(exp.company),
+          position: safeText(exp.job_title),
+          location: buildLocation(exp.work_city, exp.work_country),
+          date: buildDateRange(exp.work_start_date, exp.work_end_date),
+          summary: safeText(exp.responsibilities),
           url: { href: '', label: '' },
           visible: true
         })),
@@ -404,14 +451,14 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
         name: 'Education',
         items: data.education.map((edu, index) => ({
           id: `edu-${index}`,
-          institution: edu.school_name || '',
-          area: edu.degree || '',
+          institution: safeText(edu.school_name),
+          area: safeText(edu.degree),
           studyType: '', // You don't distinguish study type
-          score: edu.gpa_or_rank || '',
-          date: `${formatDateToMMYYYY(edu.edu_start_date)} - ${formatDateToMMYYYY(edu.edu_end_date)}`,
-          summary: edu.relevant_courses || '',
-          location: `${edu.edu_city}${edu.edu_country ? `, ${edu.edu_country}` : ''}`,
-          courses: edu.relevant_courses || '',
+          score: safeText(edu.gpa_or_rank),
+          date: buildDateRange(edu.edu_start_date, edu.edu_end_date),
+          summary: safeText(((edu as unknown) as Record<string, unknown>).awards_or_honors),
+          location: buildLocation(edu.edu_city, edu.edu_country),
+          courses: normalizeRelevantCoursework(safeText(edu.relevant_courses)),
           url: { href: '', label: '' },
           visible: true
         })),
@@ -425,9 +472,12 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
         items: data.moduleSelection.skillsLanguage && data.skillsLanguage.skills ? [{
           id: 'skills-0',
           name: 'Technical Skills',
-          description: data.skillsLanguage.skills,
+          description: safeText(data.skillsLanguage.skills),
           level: 0,
-          keywords: data.skillsLanguage.skills.split(',').map(s => s.trim()),
+          keywords: safeText(data.skillsLanguage.skills)
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean),
           visible: true
         }] : [],
         visible: data.moduleSelection.skillsLanguage,
@@ -438,14 +488,17 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
         name: 'Research Projects',
         items: data.research.map((proj, index) => ({
           id: `proj-${index}`,
-          name: proj.project_title || '',
-          description: proj.lab_or_unit || '',
-          date: `${formatDateToMMYYYY(proj.res_start_date)} - ${formatDateToMMYYYY(proj.res_end_date)}`,
-          summary: [
-            proj.your_contributions && `Contributions: ${proj.your_contributions}`,
-            proj.outcomes && `Outcomes: ${proj.outcomes}`
-          ].filter(Boolean).join('\n'),
-          keywords: proj.tools_used ? proj.tools_used.split(',').map(t => t.trim()).filter(t => t.length > 0) : [],
+          name: safeText(proj.project_title),
+          description: safeText(proj.lab_or_unit),
+          location: buildLocation(
+            ((proj as unknown) as Record<string, unknown>).res_city,
+            ((proj as unknown) as Record<string, unknown>).res_country
+          ),
+          date: buildDateRange(proj.res_start_date, proj.res_end_date),
+          summary: safeText(proj.your_contributions),
+          keywords: safeText(proj.tools_used)
+            ? safeText(proj.tools_used).split(',').map(t => t.trim()).filter(t => t.length > 0)
+            : [],
           url: { href: '', label: '' },
           visible: true
         })),
@@ -458,11 +511,11 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
         name: 'Activities',
         items: data.activities.map((activity, index) => ({
           id: `activity-${index}`,
-          name: activity.activity_name || '',
-          role: activity.role || '',
-          location: `${activity.act_city}${activity.act_country ? `, ${activity.act_country}` : ''}`,
-          date: `${formatDateToMMYYYY(activity.act_start_date)} - ${formatDateToMMYYYY(activity.act_end_date)}`,
-          summary: activity.description || '',
+          name: safeText(activity.activity_name),
+          role: safeText(activity.role),
+          location: buildLocation(activity.act_city, activity.act_country),
+          date: buildDateRange(activity.act_start_date, activity.act_end_date),
+          summary: safeText(activity.description),
           url: { href: '', label: '' },
           visible: true
         })),

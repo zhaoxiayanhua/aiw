@@ -61,12 +61,12 @@ export function DatePicker({
           variant="outline"
           disabled={disabled}
           className={cn(
-            "justify-start text-left font-normal h-14 text-lg border-gray-200 focus:border-green-500 focus:ring-green-500/20 rounded-xl",
+            "h-10 w-full justify-start rounded-xl border-gray-200 px-3 text-left text-xs font-normal focus:border-green-500 focus:ring-green-500/20",
             !date && "text-muted-foreground",
             className
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <CalendarIcon className="mr-2 h-3.5 w-3.5 shrink-0" />
           {date ? format(date, "yyyy年MM月dd日") : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>

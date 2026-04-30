@@ -80,7 +80,7 @@ export default function AwardsModule() {
                   <Input
                     id={`award_name-${index}`}
                     type="text"
-                    placeholder="例如：国家奖学金、优秀学生干部"
+                    placeholder="例如：National Scholarship, Outstanding Student Leader"
                     value={award.award_name}
                     onChange={(e) => handleInputChange(index, "award_name", e.target.value)}
                     className="h-10 text-xs"
@@ -95,7 +95,7 @@ export default function AwardsModule() {
                     id={`award_year-${index}`}
                     value={award.award_year}
                     onChange={(value) => handleInputChange(index, "award_year", value)}
-                    placeholder="选择获奖年份"
+                    placeholder="例如：2024"
                   />
                 </div>
               </div>
@@ -109,7 +109,7 @@ export default function AwardsModule() {
                   <Input
                     id={`award_issuer-${index}`}
                     type="text"
-                    placeholder="例如：教育部、清华大学"
+                    placeholder="例如：Ministry of Education, Tsinghua University"
                     value={award.award_issuer}
                     onChange={(e) => handleInputChange(index, "award_issuer", e.target.value)}
                     className="h-10 text-xs"
@@ -123,7 +123,7 @@ export default function AwardsModule() {
                   <Input
                     id={`award_rank-${index}`}
                     type="text"
-                    placeholder="例如：Top 5%、前10名"
+                    placeholder="例如：Top 5%, Top 10"
                     value={award.award_rank}
                     onChange={(e) => handleInputChange(index, "award_rank", e.target.value)}
                     className="h-10 text-xs"
@@ -146,7 +146,7 @@ export default function AwardsModule() {
                     <Input
                       id={`certificate_name-${index}`}
                       type="text"
-                      placeholder="例如：英语四级证书、计算机二级证书"
+                      placeholder="例如：CET-4 Certificate, Computer Level-2 Certificate"
                       value={award.certificate_name}
                       onChange={(e) => handleInputChange(index, "certificate_name", e.target.value)}
                       className="h-10 text-xs"
@@ -160,7 +160,7 @@ export default function AwardsModule() {
                     <Input
                       id={`certificate_issuer-${index}`}
                       type="text"
-                      placeholder="例如：教育部考试中心、工信部"
+                      placeholder="例如：National Education Examinations Authority, MIIT"
                       value={award.certificate_issuer}
                       onChange={(e) => handleInputChange(index, "certificate_issuer", e.target.value)}
                       className="h-10 text-xs"

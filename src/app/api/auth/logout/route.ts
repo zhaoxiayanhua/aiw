@@ -18,7 +18,9 @@ export async function POST(request: NextRequest) {
   try {
     const cookieHeader = request.headers.get("cookie") || "";
     const cookies = parseCookieHeader(cookieHeader);
-    const sessionToken = cookies["better-auth.session_token"];
+    const sessionToken =
+      cookies["better-auth.session_token"] ||
+      cookies["__Secure-better-auth.session_token"];
 
     // Delete session from DB
     if (sessionToken) {
@@ -36,6 +38,14 @@ export async function POST(request: NextRequest) {
       maxAge: 0,
     });
 
+    response.cookies.set("__Secure-better-auth.session_token", "", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+    });
+
     return response;
   } catch (error) {
     console.error("Logout error:", error);
@@ -43,6 +53,11 @@ export async function POST(request: NextRequest) {
     response.cookies.set("better-auth.session_token", "", {
       path: "/",
       maxAge: 0,
+    });
+    response.cookies.set("__Secure-better-auth.session_token", "", {
+      path: "/",
+      maxAge: 0,
+      secure: true,
     });
     return response;
   }

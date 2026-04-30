@@ -322,6 +322,16 @@ export async function GET(request: NextRequest) {
       path: "/",
       maxAge: 7 * 24 * 60 * 60,
     });
+
+    if (process.env.NODE_ENV === "production") {
+      response.cookies.set("__Secure-better-auth.session_token", sessionToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60,
+      });
+    }
     response.cookies.delete("better-auth.state");
     response.cookies.delete("better-auth.oauth_state");
     response.cookies.delete("app.auth_callback_url");

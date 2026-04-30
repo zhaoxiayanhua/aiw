@@ -35,7 +35,7 @@ export default function SkillsLanguageModule() {
           {isEditMode ? (
             <Textarea
               id="skills"
-              placeholder="请列出您的专业技能，用逗号分隔"
+              placeholder="例如：Python, SQL, Excel, Power BI"
               value={formData.skills}
               onChange={(e) => handleInputChange("skills", e.target.value)}
               className="min-h-[80px] resize-none text-xs"
@@ -44,7 +44,7 @@ export default function SkillsLanguageModule() {
           ) : (
             <AITextarea
               id="skills"
-              placeholder="请列出您的专业技能，用逗号分隔"
+              placeholder="例如：Python, SQL, Excel, Power BI"
               value={formData.skills}
               onChange={(e) => handleInputChange("skills", e.target.value)}
               className="min-h-[80px] resize-none text-xs"
@@ -79,7 +79,7 @@ export default function SkillsLanguageModule() {
               <Input
                 id="english_level"
                 type="text"
-                placeholder="例如：IELTS 6.5、TOEFL 95、CET-6"
+                placeholder="例如：IELTS 6.5, TOEFL 95, CET-6"
                 value={formData.english_level}
                 onChange={(e) => handleInputChange("english_level", e.target.value)}
                 className="h-10 text-xs"
@@ -94,7 +94,7 @@ export default function SkillsLanguageModule() {
               <Input
                 id="native_language"
                 type="text"
-                placeholder="例如：中文、English"
+                placeholder="例如：Chinese, English"
                 value={formData.native_language}
                 onChange={(e) => handleInputChange("native_language", e.target.value)}
                 className="h-10 text-xs"
@@ -109,7 +109,7 @@ export default function SkillsLanguageModule() {
             <Input
               id="other_languages"
               type="text"
-              placeholder="例如：Japanese – Basic, French – Intermediate"
+              placeholder="例如：Japanese - Basic, French - Intermediate"
               value={formData.other_languages}
               onChange={(e) => handleInputChange("other_languages", e.target.value)}
               className="h-10 text-xs"

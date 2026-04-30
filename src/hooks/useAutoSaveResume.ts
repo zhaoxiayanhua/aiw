@@ -31,11 +31,19 @@ export function useAutoSaveResume() {
   const { data, documentState, saveDocument } = useResume();
   const previousDataRef = useRef<string>('');
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasInitializedRef = useRef(false);
+  const isAuthBlocked =
+    documentState.saveError === 'Unauthorized' ||
+    documentState.saveError === 'Session expired, please sign in again';
 
   // Create a debounced save function
   const debouncedSave = useCallback(
     debounce(async () => {
       console.log('[AutoSave] Debounced save triggered');
+      if (isAuthBlocked) {
+        console.log('[AutoSave] Save blocked due to auth error');
+        return;
+      }
       if (documentState.documentUuid) {
         console.log('[AutoSave] Saving document with UUID:', documentState.documentUuid);
         await saveDocument();
@@ -43,7 +51,7 @@ export function useAutoSaveResume() {
         console.log('[AutoSave] No document UUID, skipping save');
       }
     }, 500),
-    [documentState.documentUuid, saveDocument]
+    [documentState.documentUuid, isAuthBlocked, saveDocument]
   );
 
   // Save immediately for critical changes
@@ -52,15 +60,19 @@ export function useAutoSaveResume() {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
+    if (isAuthBlocked) {
+      console.log('[AutoSave] Immediate save blocked due to auth error');
+      return;
+    }
     if (documentState.documentUuid) {
       console.log('[AutoSave] Saving immediately with UUID:', documentState.documentUuid);
       await saveDocument();
     }
-  }, [saveDocument, documentState.documentUuid]);
+  }, [saveDocument, documentState.documentUuid, isAuthBlocked]);
 
   useEffect(() => {
     // Skip if loading or no document
-    if (documentState.isLoading || !documentState.documentUuid) {
+    if (documentState.isLoading || !documentState.documentUuid || isAuthBlocked) {
       console.log('[AutoSave] Skipping - isLoading:', documentState.isLoading, 'documentUuid:', documentState.documentUuid);
       return;
     }
@@ -73,6 +85,14 @@ export function useAutoSaveResume() {
       layoutConfiguration: data.layoutConfiguration,
       moduleSelection: data.moduleSelection
     });
+
+    // Initialize baseline after document load to avoid immediately re-saving
+    if (!hasInitializedRef.current) {
+      previousDataRef.current = currentDataString;
+      hasInitializedRef.current = true;
+      console.log('[AutoSave] Initial snapshot recorded');
+      return;
+    }
 
     // Check if data has changed
     if (currentDataString !== previousDataRef.current) {
@@ -109,7 +129,7 @@ export function useAutoSaveResume() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [data, documentState.isLoading, debouncedSave, saveImmediately]);
+  }, [data, documentState.isLoading, documentState.documentUuid, isAuthBlocked, debouncedSave, saveImmediately]);
 
   return {
     isSaving: documentState.isSaving,

@@ -618,6 +618,13 @@ const MainContent = ({
                 >
                   {item.date}
                 </div>
+                {item.location && (
+                  <div
+                    style={{ fontSize: "15px", color: "#333333" }}
+                  >
+                    {item.location}
+                  </div>
+                )}
               </div>
             </div>
             {item.keywords && item.keywords.length > 0 && (
@@ -687,13 +694,13 @@ const MainContent = ({
                       className="font-extrabold"
                       style={{ fontSize: "18px", color: "#333333" }}
                     >
-                      {item.company}
+                      {item.position}
                     </div>
                     <div
-                      className="font-bold"
+                      className="italic"
                       style={{ fontSize: "16px", color: "#333333" }}
                     >
-                      {item.position}
+                      {item.company}
                     </div>
                   </div>
                   <div className="whitespace-nowrap ml-4">
@@ -705,7 +712,7 @@ const MainContent = ({
                     </div>
                     {item.location && (
                       <div
-                        className="font-bold"
+                        className="font-normal"
                         style={{ fontSize: "16px", color: "#333333" }}
                       >
                         {item.location}
@@ -778,14 +785,6 @@ const MainContent = ({
                         {item.location}
                       </div>
                     )}
-                    {item.score && (
-                      <div
-                        className="font-bold"
-                        style={{ fontSize: "16px", color: "#333333" }}
-                      >
-                        GPA: {item.score}
-                      </div>
-                    )}
                   </div>
                   <div className="whitespace-nowrap ml-4">
                     <div
@@ -796,7 +795,7 @@ const MainContent = ({
                     </div>
                     {item.area && (
                       <div
-                        className="font-bold"
+                        className="font-normal"
                         style={{ fontSize: "16px", color: "#333333" }}
                       >
                         {item.area}
@@ -804,21 +803,29 @@ const MainContent = ({
                     )}
                   </div>
                 </div>
-                {item.courses && !isEmptyString(item.courses) && (
-                  <div
-                    className="mb-2"
-                    style={{
-                      fontSize: "13px",
-                      color: theme.accent,
-                      lineHeight: "1.6",
-                    }}
-                  >
-                    {item.courses
-                      .split(",")
-                      .map((course) => course.trim())
-                      .join(" • ")}
-                  </div>
-                )}
+                {[
+                  item.score
+                    ? `GPA: ${/^\s*gpa\b/i.test(item.score) ? item.score.replace(/^\s*gpa\s*:?\s*/i, "") : item.score}`
+                    : "",
+                  item.summary ? `Honors: ${item.summary}` : "",
+                  item.courses
+                    ? `Relevant Coursework: ${item.courses.split(",").map((course) => course.trim()).join(", ")}`
+                    : "",
+                ]
+                  .filter((line) => !isEmptyString(line))
+                  .map((line, idx) => (
+                    <div
+                      key={idx}
+                      className="mb-1"
+                      style={{
+                        fontSize: "13px",
+                        color: idx === 2 ? theme.accent : "#333333",
+                        lineHeight: "1.6",
+                      }}
+                    >
+                      {`\u2022 ${line}`}
+                    </div>
+                  ))}
               </div>
             ))}
           </Section>
@@ -862,13 +869,13 @@ const MainContent = ({
                       className="font-extrabold"
                       style={{ fontSize: "18px", color: "#333333" }}
                     >
-                      {item.name}
+                      {item.role}
                     </div>
                     <div
-                      className="font-bold"
+                      className="font-normal"
                       style={{ fontSize: "16px", color: "#333333" }}
                     >
-                      {item.role}
+                      {item.name}
                     </div>
                   </div>
                   <div className="whitespace-nowrap ml-4">
@@ -880,7 +887,7 @@ const MainContent = ({
                     </div>
                     {item.location && (
                       <div
-                        className="font-bold"
+                        className="font-normal"
                         style={{ fontSize: "16px", color: "#333333" }}
                       >
                         {item.location}

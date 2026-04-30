@@ -4,6 +4,10 @@ import { customAuth } from "@/lib/auth";
 import { DifyService } from "@/services/dify";
 import { checkAndDeductQuota } from "@/lib/check-quota";
 
+function normalizeRevisedContent(content: string) {
+  return content.replace(/^\s*\d+\s*\n\s*\n/, "").trimStart();
+}
+
 export async function POST(request: Request) {
   try {
     const session = await customAuth.api.getSession({ headers: await headers() });
@@ -36,7 +40,8 @@ export async function POST(request: Request) {
     console.log("[Revise SOP API] Dify result:", JSON.stringify(result, null, 2));
 
     // 返回润色后的内容
-    const revisedContent = result.data?.outputs?.text || "";
+    const rawRevisedContent = result.data?.outputs?.text || "";
+    const revisedContent = normalizeRevisedContent(rawRevisedContent);
     console.log("[Revise SOP API] Revised content length:", revisedContent.length);
 
     return NextResponse.json({ 

@@ -3,12 +3,35 @@ import { customAuth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+function normalizeCallbackUrl(value?: string) {
+  if (!value) {
+    return "/";
+  }
+
+  try {
+    const parsedUrl = new URL(value, "http://localhost");
+    const nextUrl = `${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+
+    if (
+      !nextUrl.startsWith("/") ||
+      /^\/([a-z]{2}(?:-[A-Z]{2})?)?\/?auth\/signin(?:[/?#]|$)/.test(nextUrl)
+    ) {
+      return "/";
+    }
+
+    return nextUrl;
+  } catch {
+    return "/";
+  }
+}
+
 export default async function SignInPage({
   searchParams,
 }: {
   searchParams: Promise<{ callbackUrl: string | undefined }>;
 }) {
   const { callbackUrl } = await searchParams;
+  const safeCallbackUrl = normalizeCallbackUrl(callbackUrl);
 
   // Get session using custom auth (matches the session created by /api/auth/login)
   const session = await customAuth.api.getSession({
@@ -16,7 +39,7 @@ export default async function SignInPage({
   });
 
   if (session) {
-    return redirect(callbackUrl || "/");
+    return redirect(safeCallbackUrl);
   }
 
   return (
@@ -28,7 +51,7 @@ export default async function SignInPage({
           </div>
           {process.env.NEXT_PUBLIC_PROJECT_NAME}
         </a>
-        <SignForm />
+        <SignForm callbackUrl={safeCallbackUrl} />
       </div>
     </div>
   );

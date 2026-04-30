@@ -194,6 +194,11 @@ function parseCookieHeader(cookieHeader: string) {
   );
 }
 
+const SESSION_COOKIE_NAMES = [
+  "better-auth.session_token",
+  "__Secure-better-auth.session_token",
+];
+
 async function getCookieHeader(headers?: Headers) {
   const cookieHeader = headers?.get("cookie");
   if (cookieHeader) {
@@ -221,11 +226,16 @@ export async function getCustomSession(headers?: Headers) {
     const cookieHeader = await getCookieHeader(headers);
     if (!cookieHeader) return null;
 
-    const cookies = parseCookieHeader(cookieHeader);
+    const parsedCookies = parseCookieHeader(cookieHeader);
+    const sessionToken = SESSION_COOKIE_NAMES.map(
+      (cookieName) => parsedCookies[cookieName]
+    ).find(Boolean);
 
-    const sessionToken = cookies["better-auth.session_token"];
     if (!sessionToken) {
-      console.log("[get-session] No session token in cookies");
+      console.log(
+        "[get-session] No session token in cookies, available keys:",
+        Object.keys(parsedCookies)
+      );
       return null;
     }
 

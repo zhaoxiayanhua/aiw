@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -101,8 +101,8 @@ const DraggableModuleItem = ({
   title: string;
   area: "main" | "sidebar";
   index: number;
-  onMoveToMain: (moduleId: string) => void;
-  onMoveToSidebar: (moduleId: string) => void;
+  onMoveToMain: (moduleId: string, targetIndex?: number) => void;
+  onMoveToSidebar: (moduleId: string, targetIndex?: number) => void;
   onReorder: (
     dragIndex: number,
     hoverIndex: number,
@@ -132,13 +132,8 @@ const DraggableModuleItem = ({
         return;
       }
 
-      // 如果是不同区域，移动到对应区域
+      // 六个板块列表中仅处理同区域排序，避免跨区域拖拽时状态回退
       if (item.area !== area) {
-        if (area === "main") {
-          onMoveToMain(item.id);
-        } else {
-          onMoveToSidebar(item.id);
-        }
         return;
       }
 
@@ -300,6 +295,27 @@ function ResumeResultContent() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    const container = resumeContainerRef.current;
+    if (!container) return;
+
+    const handleNativeWheel = (event: WheelEvent) => {
+      if (!(event.ctrlKey || event.metaKey)) {
+        return;
+      }
+
+      event.preventDefault();
+      const delta = event.deltaY > 0 ? -0.1 : 0.1;
+      setZoomLevel((prev) => Math.max(0.5, Math.min(2, prev + delta)));
+    };
+
+    container.addEventListener("wheel", handleNativeWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener("wheel", handleNativeWheel);
+    };
+  }, []);
+
   // 获取模块显示名称
   const getSectionDisplayName = (moduleId: string): string => {
     const sectionNames: { [key: string]: string } = {
@@ -308,13 +324,55 @@ function ResumeResultContent() {
       research: "研究项目",
       activities: "课外活动",
       profiles: "个人资料",
-      skills: "技能",
+      skills: "技能与胜任力",
       certifications: "证书",
       awards: "获奖情况",
-      languages: "语言",
+      languages: "语言技能",
     };
     return sectionNames[moduleId] || moduleId;
   };
+
+  type LayoutPanelItem = {
+    moduleId: string;
+    area: "main" | "sidebar";
+    index: number;
+  };
+
+  const managedMainSectionIds = new Set([
+    "education",
+    "experience",
+    "research",
+    "activities",
+  ]);
+
+  const managedSidebarSectionIds = new Set([
+    "skills",
+    "awards",
+    "languages",
+  ]);
+
+  const mainLayoutItems: LayoutPanelItem[] =
+    data.layoutConfiguration.mainSections
+      .filter((moduleId) => managedMainSectionIds.has(moduleId))
+      .map((moduleId, index) => ({
+        moduleId,
+        area: "main" as const,
+        index,
+      }));
+
+  const sidebarLayoutItems: LayoutPanelItem[] =
+    data.layoutConfiguration.sidebarSections
+      .filter((moduleId) => managedSidebarSectionIds.has(moduleId))
+      .map((moduleId) => ({
+        moduleId,
+        area: "sidebar" as const,
+        index: data.layoutConfiguration.sidebarSections.indexOf(moduleId),
+      }));
+
+  const layoutPanelItems: LayoutPanelItem[] = [
+    ...mainLayoutItems,
+    ...sidebarLayoutItems,
+  ];
 
   // 处理重新排序
   const handleReorder = (
@@ -346,15 +404,6 @@ function ResumeResultContent() {
 
   const handleZoomReset = () => {
     setZoomLevel(defaultZoom); // Reset to calculated default
-  };
-
-  // 处理滚轮缩放
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.1 : 0.1;
-      setZoomLevel((prev) => Math.max(0.5, Math.min(2, prev + delta)));
-    }
   };
 
   // 可用模板选项
@@ -731,14 +780,19 @@ function ResumeResultContent() {
         });
 
         // 将 layoutConfiguration 的模块名映射为 StandardResumeData 的 section key
-        const layoutOrder = data.layoutConfiguration.mainSections.map(
+        const mainLayoutOrder = data.layoutConfiguration.mainSections.map(
+          (section: string) => SECTION_KEY_MAP[section] || section
+        );
+        const sidebarLayoutOrder = data.layoutConfiguration.sidebarSections.map(
           (section: string) => SECTION_KEY_MAP[section] || section
         );
 
         await exportResumeDocx(standardResumeData, {
           filename: `${baseFilename}.docx`,
           themePrimary: themePalette.primary,
-          layoutOrder,
+          layoutOrder: mainLayoutOrder,
+          mainLayoutOrder,
+          sidebarLayoutOrder,
         });
 
         toast.success("Word 导出成功！您可以继续在本地修改该文件。", {
@@ -1026,7 +1080,6 @@ function ResumeResultContent() {
                           background:
                             "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
                         }}
-                        onWheel={handleWheel}
                       >
                         {/* 背景装饰 */}
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 rounded-xl pointer-events-none"></div>
@@ -1188,67 +1241,65 @@ function ResumeResultContent() {
                     </div>
 
                     <p className="text-xs text-muted-foreground mb-4 xl:mb-6">
-                      您可以拖动模块调整布局顺序,以自定义简历结构。
+                      您可以拖动模块调整布局顺序，以自定义简历结构。
                     </p>
 
                     <div className="space-y-4">
-                      {/* Main Content Area */}
                       <div>
                         <div className="flex items-center gap-2 mb-2 xl:mb-3">
                           <div className="w-2.5 h-2.5 xl:w-3 xl:h-3 rounded bg-blue-500"></div>
                           <h4 className="text-xs xl:text-sm font-medium text-foreground">
-                            主要内容
+                            六个板块
                           </h4>
                           <span className="text-[10px] xl:text-xs text-muted-foreground">
-                            ({data.layoutConfiguration.mainSections.length}
-                            个模块)
+                            ({layoutPanelItems.length}个模块)
                           </span>
-                        </div>
-                        <div className="space-y-2">
-                          {data.layoutConfiguration.mainSections.map(
-                            (moduleId, index) => (
-                              <DraggableModuleItem
-                                key={moduleId}
-                                moduleId={moduleId}
-                                title={getSectionDisplayName(moduleId)}
-                                area="main"
-                                index={index}
-                                onMoveToMain={moveModuleToMain}
-                                onMoveToSidebar={moveModuleToSidebar}
-                                onReorder={handleReorder}
-                              />
-                            )
-                          )}
                         </div>
                       </div>
 
-                      {/* Sidebar Area */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-2 xl:mb-3">
+                          <div className="w-2.5 h-2.5 xl:w-3 xl:h-3 rounded bg-blue-500"></div>
+                          <h4 className="text-xs xl:text-sm font-medium text-foreground">
+                            主内容区
+                          </h4>
+                        </div>
+                        <div className="space-y-2">
+                          {mainLayoutItems.map((item) => (
+                            <DraggableModuleItem
+                              key={item.moduleId}
+                              moduleId={item.moduleId}
+                              title={getSectionDisplayName(item.moduleId)}
+                              area={item.area}
+                              index={item.index}
+                              onMoveToMain={moveModuleToMain}
+                              onMoveToSidebar={moveModuleToSidebar}
+                              onReorder={handleReorder}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
                       <div>
                         <div className="flex items-center gap-2 mb-2 xl:mb-3">
                           <div className="w-2.5 h-2.5 xl:w-3 xl:h-3 rounded bg-green-500"></div>
                           <h4 className="text-xs xl:text-sm font-medium text-foreground">
                             侧边栏
                           </h4>
-                          <span className="text-[10px] xl:text-xs text-muted-foreground">
-                            ({data.layoutConfiguration.sidebarSections.length}
-                            个模块)
-                          </span>
                         </div>
                         <div className="space-y-2">
-                          {data.layoutConfiguration.sidebarSections.map(
-                            (moduleId, index) => (
-                              <DraggableModuleItem
-                                key={moduleId}
-                                moduleId={moduleId}
-                                title={getSectionDisplayName(moduleId)}
-                                area="sidebar"
-                                index={index}
-                                onMoveToMain={moveModuleToMain}
-                                onMoveToSidebar={moveModuleToSidebar}
-                                onReorder={handleReorder}
-                              />
-                            )
-                          )}
+                          {sidebarLayoutItems.map((item) => (
+                            <DraggableModuleItem
+                              key={item.moduleId}
+                              moduleId={item.moduleId}
+                              title={getSectionDisplayName(item.moduleId)}
+                              area={item.area}
+                              index={item.index}
+                              onMoveToMain={moveModuleToMain}
+                              onMoveToSidebar={moveModuleToSidebar}
+                              onReorder={handleReorder}
+                            />
+                          ))}
                         </div>
                       </div>
                     </div>

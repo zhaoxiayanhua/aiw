@@ -23,13 +23,15 @@ type SocialProvider = "github" | "google";
 type FormMode = "signin" | "signup" | "forgot";
 
 export default function SignForm({
+  callbackUrl,
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: React.ComponentPropsWithoutRef<"div"> & {
+  callbackUrl?: string;
+}) {
   const t = useTranslations();
   const locale = useLocale();
   const isZh = locale.startsWith("zh");
-
   const copy = useMemo(
     () => ({
       passwordRequired: isZh ? "请输入密码" : "Please enter your password",
@@ -118,6 +120,32 @@ export default function SignForm({
     return () => window.clearInterval(timer);
   }, [sendCodeCooldown]);
 
+  const normalizeCallbackUrl = useCallback((value?: string | null) => {
+    const fallbackUrl = `/${locale}`;
+
+    if (!value) {
+      return fallbackUrl;
+    }
+
+    try {
+      const baseOrigin =
+        typeof window !== "undefined" ? window.location.origin : "http://localhost";
+      const parsedUrl = new URL(value, baseOrigin);
+      const nextUrl = `${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+
+      if (
+        !nextUrl.startsWith("/") ||
+        /^\/([a-z]{2}(?:-[A-Z]{2})?)?\/?auth\/signin(?:[/?#]|$)/.test(nextUrl)
+      ) {
+        return fallbackUrl;
+      }
+
+      return nextUrl;
+    } catch {
+      return fallbackUrl;
+    }
+  }, [locale]);
+
   const validateEmail = () => {
     if (!email || email.trim() === "") {
       toast.error(t("sign_modal.email_required"));
@@ -181,12 +209,14 @@ export default function SignForm({
 
   const getPostSignInUrl = useCallback(() => {
     if (typeof window === "undefined") {
-      return `/${locale}`;
+      return normalizeCallbackUrl(callbackUrl);
     }
 
     const currentUrl = new URL(window.location.href);
-    return currentUrl.searchParams.get("callbackUrl") || `/${locale}`;
-  }, [locale]);
+    return normalizeCallbackUrl(
+      callbackUrl || currentUrl.searchParams.get("callbackUrl")
+    );
+  }, [callbackUrl, normalizeCallbackUrl]);
 
   const handleSocialSignIn = useCallback(
     async (provider: SocialProvider) => {
@@ -260,8 +290,9 @@ export default function SignForm({
         return;
       }
 
+      const targetUrl = getPostSignInUrl();
       toast.success(copy.loginSuccess);
-      window.location.href = getPostSignInUrl();
+      window.location.replace(targetUrl);
     } catch (error) {
       console.error("Credentials sign in error:", error);
       toast.error(copy.loginFailed);

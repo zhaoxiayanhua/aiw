@@ -1,4 +1,4 @@
-import { saveAs } from 'file-saver';
+﻿import { saveAs } from 'file-saver';
 import {
   AlignmentType,
   BorderStyle,
@@ -21,9 +21,10 @@ interface DocxExportOptions {
   filename?: string;
   themePrimary?: string;
   sectionTitles?: Partial<Record<SectionKey, string>>;
-  layoutOrder?: string[];  // 模块顺序数组，支持动态排序
+  layoutOrder?: string[];
+  mainLayoutOrder?: string[];
+  sidebarLayoutOrder?: string[];
 }
-
 const FONT_FAMILY = 'Times New Roman';
 const BASE_FONT_SIZE = 22;
 const BASE_TEXT_COLOR = '000000';
@@ -338,6 +339,27 @@ const appendIfTruthy = <T>(collection: T[], item: T | null | undefined) => {
   }
 };
 
+const formatEducationScore = (score?: string): string => {
+  const plainScore = toPlainText(score);
+  if (!plainScore) {
+    return '';
+  }
+
+  return /^\s*gpa\b/i.test(plainScore) ? plainScore : `GPA: ${plainScore}`;
+};
+
+const getEducationPointLines = (item: {
+  score?: string;
+  summary?: string;
+  courses?: string;
+}) => {
+  return [
+    item.score ? formatEducationScore(item.score) : '',
+    item.summary ? `Honors: ${toPlainText(item.summary)}` : '',
+    item.courses ? `Relevant Coursework: ${toPlainText(item.courses)}` : ''
+  ].filter(Boolean);
+};
+
 const DITTO_TEXT_COLOR = '000000';
 const DITTO_SECONDARY_COLOR = '000000';
 
@@ -608,6 +630,8 @@ const buildDittoDocument = (
   options: {
     themeColor: string;
     sectionTitles?: Partial<Record<SectionKey, string>>;
+    mainLayoutOrder?: string[];
+    sidebarLayoutOrder?: string[];
   }
 ): Document => {
   const sections = resume.sections;
@@ -615,9 +639,9 @@ const buildDittoDocument = (
 
   const headingDefaults: Partial<Record<SectionKey, string>> = {
     summary: 'Summary',
-    experience: 'Experience',
+    experience: 'Work Experience',
     education: 'Education',
-    projects: 'Projects',
+    projects: 'Research Experience',
     activities: 'Activities',
     skills: 'Skills',
     certifications: 'Certifications',
@@ -637,8 +661,14 @@ const buildDittoDocument = (
 
   const layoutPages = resume.metadata?.layout ?? [];
   const firstPageLayout = layoutPages[0] ?? [];
-  const layoutMainRaw = asStringArray(firstPageLayout[0]).filter(isSectionKey);
-  const layoutSidebarRaw = asStringArray(firstPageLayout[1]);
+  const layoutMainRaw = (
+    options.mainLayoutOrder?.length
+      ? options.mainLayoutOrder
+      : asStringArray(firstPageLayout[0])
+  ).filter(isSectionKey);
+  const layoutSidebarRaw = options.sidebarLayoutOrder?.length
+    ? options.sidebarLayoutOrder
+    : asStringArray(firstPageLayout[1]);
 
   const allowedMainSections: SectionKey[] = [
     'summary',
@@ -699,12 +729,12 @@ const buildDittoDocument = (
     return sections.experience.items.flatMap((item, index) => {
       const header = createMainEntryHeaderTable({
           leftLines: [
-            { text: item.company, bold: true, fontSize: 28 },
-            { text: item.position, bold: true, fontSize: 24 }
+            { text: item.position, bold: true, fontSize: 28 },
+            { text: item.company, italics: true, fontSize: 24 }
           ],
           rightLines: [
             { text: item.date, bold: true, fontSize: 26 },
-            { text: item.location, bold: true, fontSize: 24 }
+            { text: item.location, fontSize: 24 }
           ],
           spacingBefore: index === 0 ? 60 : 80,
           spacingAfter: 12
@@ -739,7 +769,6 @@ const buildDittoDocument = (
             { text: item.date, bold: true, fontSize: 26 },
             {
               text: [item.studyType, item.area].filter(Boolean).map(toPlainText).join(', '),
-              bold: true,
               fontSize: 24
             }
           ],
@@ -754,7 +783,7 @@ const buildDittoDocument = (
       ]
         .filter(Boolean)
         .join(' • ');
-      if (detailLine) {
+      if (false && detailLine) {
         appendIfTruthy(
           body,
           createPlainParagraph(detailLine, {
@@ -765,6 +794,16 @@ const buildDittoDocument = (
           })
         );
       }
+
+      body.push(
+        ...createBulletParagraphs(getEducationPointLines(item).join('\n'), {
+          color: DITTO_TEXT_COLOR,
+          spacingBeforeFirst: 0,
+          spacingBetween: 20,
+          fontSize: BASE_FONT_SIZE,
+          asHyphen: false
+        })
+      );
 
       if (item.courses) {
         appendIfTruthy(
@@ -797,25 +836,19 @@ const buildDittoDocument = (
 
     return sections.projects.items.flatMap((item, index) => {
       const header = createMainEntryHeaderTable({
-          leftLines: [{ text: item.name, bold: true, fontSize: 28 }],
-          rightLines: [{ text: item.date, bold: true, fontSize: 26 }],
+          leftLines: [
+            { text: item.name, bold: true, fontSize: 28 },
+            { text: item.description, bold: true, fontSize: 24 }
+          ],
+          rightLines: [
+            { text: item.date, bold: true, fontSize: 26 },
+            { text: item.location, fontSize: 24 }
+          ],
           spacingBefore: index === 0 ? 60 : 80,
           spacingAfter: 12
         });
 
       const body: Array<Paragraph | Table> = [];
-      if (item.description) {
-        appendIfTruthy(
-          body,
-          createPlainParagraph(item.description, {
-            spacingBefore: 0,
-            spacingAfter: 20,
-            bold: true,
-            size: 24,
-            color: DITTO_TEXT_COLOR
-          })
-        );
-      }
 
       if (item.keywords && item.keywords.length > 0) {
         appendIfTruthy(
@@ -852,12 +885,12 @@ const buildDittoDocument = (
     return sections.activities.items.flatMap((item, index) => {
       const header = createMainEntryHeaderTable({
           leftLines: [
-            { text: item.name, bold: true, fontSize: 28 },
-            { text: item.role, bold: true, fontSize: 24 }
+            { text: item.role, bold: true, fontSize: 28 },
+            { text: item.name, fontSize: 24 }
           ],
           rightLines: [
             { text: item.date, bold: true, fontSize: 26 },
-            { text: item.location, bold: true, fontSize: 24 }
+            { text: item.location, fontSize: 24 }
           ],
           spacingBefore: index === 0 ? 60 : 80,
           spacingAfter: 15
@@ -1157,8 +1190,7 @@ const buildDittoDocument = (
     }
 
     if (sectionsAlreadyInMain.has(item as SectionKey)) {
-      // 已经在主内容中渲染过，避免重复显示
-      return;
+      // 宸茬粡鍦ㄤ富鍐呭涓覆鏌撹繃锛岄伩鍏嶉噸澶嶆樉绀?      return;
     }
 
     switch (item as SectionKey) {
@@ -1232,7 +1264,7 @@ const buildDittoDocument = (
   });
 
   const nameRun = new TextRun({
-    text: toPlainText(resume.basics.name || '未命名'),
+    text: toPlainText(resume.basics.name || 'Unnamed'),
     font: FONT_FAMILY,
     bold: true,
     size: 48,
@@ -1356,7 +1388,7 @@ const getTemplateSectionTitleOverrides = (
   if (template === 'kakuna') {
     return {
       summary: 'SUMMARY',
-      experience: 'INTERNSHIP EXPERIENCE',
+      experience: 'WORK EXPERIENCE',
       education: 'EDUCATION',
       projects: 'RESEARCH EXPERIENCE',
       activities: 'LEADERSHIP & VOLUNTEERING EXPERIENCE',
@@ -1376,22 +1408,25 @@ export const exportResumeDocx = async (
   options: DocxExportOptions = {}
 ): Promise<void> => {
   const {
-    filename = `简历_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.docx`,
+    filename = `resume-${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.docx`,
     themePrimary,
-    sectionTitles
+    sectionTitles,
+    mainLayoutOrder,
+    sidebarLayoutOrder
   } = options;
   const themeColor = normalizeColor(themePrimary ?? resume.metadata?.theme?.primary);
 
   if (resume.metadata?.template === 'ditto') {
     const doc = buildDittoDocument(resume, {
       themeColor,
-      sectionTitles
+      sectionTitles,
+      mainLayoutOrder,
+      sidebarLayoutOrder
     });
     const blob = await Packer.toBlob(doc);
     saveAs(blob, filename);
     return;
   }
-
   const sectionTitleOverrides: Partial<Record<SectionKey, string>> = {
     ...getTemplateSectionTitleOverrides(resume.metadata?.template),
     ...(sectionTitles ?? {})
@@ -1404,7 +1439,7 @@ export const exportResumeDocx = async (
     new Paragraph({
       children: [
         new TextRun({
-          text: toPlainText(resume.basics.name || '未命名'),
+          text: toPlainText(resume.basics.name || 'Unnamed'),
           font: FONT_FAMILY,
           bold: true,
           size: 36,
@@ -1451,7 +1486,7 @@ export const exportResumeDocx = async (
     sectionIndex += 1;
   };
 
-  // 模块内容生成器
+  // 妯″潡鍐呭鐢熸垚鍣?
   const sectionGenerators: Record<string, () => void> = {
     summary: () => {
       pushSection('summary', resume.sections.summary.name, resume.sections.summary.visible, [
@@ -1468,8 +1503,8 @@ export const exportResumeDocx = async (
         appendIfTruthy(
           paragraphs,
           createAlignedParagraph({
-            left: item.company,
-            right: item.location,
+            left: item.position,
+            right: item.date,
             leftBold: true,
             rightBold: true,
             spacingBefore: idx === 0 ? 40 : 240,
@@ -1479,8 +1514,8 @@ export const exportResumeDocx = async (
         appendIfTruthy(
           paragraphs,
           createAlignedParagraph({
-            left: item.position,
-            right: item.date,
+            left: item.company,
+            right: item.location,
             leftItalic: true,
             spacingBefore: 0,
             spacingAfter: 30
@@ -1509,8 +1544,7 @@ export const exportResumeDocx = async (
 
         const degreeParts = [
           item.studyType,
-          item.area,
-          item.score ? `GPA: ${item.score}` : ''
+          item.area
         ]
           .map(toPlainText)
           .filter(Boolean)
@@ -1521,30 +1555,18 @@ export const exportResumeDocx = async (
           createAlignedParagraph({
             left: degreeParts,
             right: item.date,
-            leftItalic: true,
             spacingBefore: 0,
             spacingAfter: 20
           })
         );
 
-        appendIfTruthy(
-          paragraphs,
-          createPlainParagraph(item.summary, {
-            spacingBefore: 40,
-            spacingAfter: 40
+        paragraphs.push(
+          ...createBulletParagraphs(getEducationPointLines(item).join('\n'), {
+            spacingBeforeFirst: 0,
+            spacingBetween: 20,
+            fontSize: BASE_FONT_SIZE,
+            asHyphen: false
           })
-        );
-
-        appendIfTruthy(
-          paragraphs,
-          createPlainParagraph(
-            item.courses ? `Relevant coursework: ${item.courses}` : '',
-            {
-              spacingBefore: 0,
-              spacingAfter: 40,
-              italics: true
-            }
-          )
         );
 
         return paragraphs;
@@ -1568,13 +1590,24 @@ export const exportResumeDocx = async (
 
         appendIfTruthy(
           paragraphs,
+          createAlignedParagraph({
+            left: item.description,
+            right: item.location,
+            leftBold: true,
+            spacingBefore: 0,
+            spacingAfter: 20
+          })
+        );
+
+        appendIfTruthy(
+          paragraphs,
           createPlainParagraph(
             [item.url?.href, item.keywords?.join(', ')].filter(Boolean).join(' • '),
             { spacingBefore: 0, spacingAfter: 30, italics: true }
           )
         );
 
-        paragraphs.push(...createBulletParagraphs(item.summary || item.description));
+        paragraphs.push(...createBulletParagraphs(item.summary));
         return paragraphs;
       });
       pushSection('projects', resume.sections.projects.name, resume.sections.projects.visible, projectParagraphs);
@@ -1593,7 +1626,7 @@ export const exportResumeDocx = async (
             ...(item.description
               ? [
                   new TextRun({
-                    text: ` – ${toPlainText(item.description)}`,
+                    text: ` - ${toPlainText(item.description)}`,
                     font: FONT_FAMILY,
                     size: BASE_FONT_SIZE
                   })
@@ -1650,8 +1683,8 @@ export const exportResumeDocx = async (
         appendIfTruthy(
           paragraphs,
           createAlignedParagraph({
-            left: item.name,
-            right: item.location,
+            left: item.role,
+            right: item.date,
             leftBold: true,
             rightBold: true,
             spacingBefore: idx === 0 ? 40 : 220,
@@ -1661,9 +1694,8 @@ export const exportResumeDocx = async (
         appendIfTruthy(
           paragraphs,
           createAlignedParagraph({
-            left: item.role,
-            right: item.date,
-            leftItalic: true,
+            left: item.name,
+            right: item.location,
             spacingBefore: 0,
             spacingAfter: 30
           })
@@ -1687,7 +1719,7 @@ export const exportResumeDocx = async (
             ...(item.description
               ? [
                   new TextRun({
-                    text: ` – ${toPlainText(item.description)}`,
+                    text: ` - ${toPlainText(item.description)}`,
                     font: FONT_FAMILY,
                     size: BASE_FONT_SIZE
                   })
@@ -1740,7 +1772,7 @@ export const exportResumeDocx = async (
             ...(item.description
               ? [
                   new TextRun({
-                    text: ` – ${toPlainText(item.description)}`,
+                    text: ` - ${toPlainText(item.description)}`,
                     font: FONT_FAMILY,
                     size: BASE_FONT_SIZE
                   })
@@ -1763,20 +1795,20 @@ export const exportResumeDocx = async (
     }
   };
 
-  // 默认模块顺序
+  // 榛樿妯″潡椤哄簭
   const DEFAULT_SECTION_ORDER = [
     'summary', 'experience', 'education', 'projects',
     'skills', 'awards', 'activities', 'languages',
     'certifications', 'references'
   ];
 
-  // 获取实际顺序：使用 layoutOrder 或默认顺序
+  // 鑾峰彇瀹為檯椤哄簭锛氫娇鐢?layoutOrder 鎴栭粯璁ら『搴?
   const sectionOrder = options.layoutOrder ?? DEFAULT_SECTION_ORDER;
 
-  // 用于追踪已生成的模块，避免重复
+  // 鐢ㄤ簬杩借釜宸茬敓鎴愮殑妯″潡锛岄伩鍏嶉噸澶?
   const generatedSections = new Set<string>();
 
-  // 按顺序生成模块
+  // 鎸夐『搴忕敓鎴愭ā鍧?
   for (const section of sectionOrder) {
     if (!generatedSections.has(section) && sectionGenerators[section]) {
       sectionGenerators[section]();
@@ -1784,7 +1816,7 @@ export const exportResumeDocx = async (
     }
   }
 
-  // 生成 layoutOrder 中未包含但在默认顺序中的模块（追加到末尾）
+  // 鐢熸垚 layoutOrder 涓湭鍖呭惈浣嗗湪榛樿椤哄簭涓殑妯″潡锛堣拷鍔犲埌鏈熬锛?
   for (const section of DEFAULT_SECTION_ORDER) {
     if (!generatedSections.has(section) && sectionGenerators[section]) {
       sectionGenerators[section]();

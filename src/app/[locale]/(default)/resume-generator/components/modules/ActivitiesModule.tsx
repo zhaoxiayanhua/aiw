@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -85,7 +85,7 @@ export default function ActivitiesModule() {
                   <Input
                     id={`activity_name-${index}`}
                     type="text"
-                    placeholder="例如：学生会主席团、环保志愿者协会"
+                    placeholder="例如：Student Union, City Clean-Up Volunteer Program"
                     value={activity.activity_name}
                     onChange={(e) => handleInputChange(index, "activity_name", e.target.value)}
                     className="h-10 text-xs"
@@ -99,7 +99,7 @@ export default function ActivitiesModule() {
                   <Input
                     id={`role-${index}`}
                     type="text"
-                    placeholder="例如：负责人、志愿者、团队成员"
+                    placeholder="例如：Team Leader, Volunteer, Team Member"
                     value={activity.role}
                     onChange={(e) => handleInputChange(index, "role", e.target.value)}
                     className="h-10 text-xs"
@@ -116,7 +116,7 @@ export default function ActivitiesModule() {
                   <Input
                     id={`act_city-${index}`}
                     type="text"
-                    placeholder="例如：上海"
+                    placeholder="例如：Shanghai"
                     value={activity.act_city}
                     onChange={(e) => handleInputChange(index, "act_city", e.target.value)}
                     className="h-10 text-xs"
@@ -130,7 +130,7 @@ export default function ActivitiesModule() {
                   <Input
                     id={`act_country-${index}`}
                     type="text"
-                    placeholder="例如：中国"
+                    placeholder="例如：China"
                     value={activity.act_country}
                     onChange={(e) => handleInputChange(index, "act_country", e.target.value)}
                     className="h-10 text-xs"
@@ -148,7 +148,7 @@ export default function ActivitiesModule() {
                     id={`act_start_date-${index}`}
                     value={activity.act_start_date}
                     onChange={(value) => handleInputChange(index, "act_start_date", value)}
-                    placeholder="选择开始时间"
+                    placeholder="例如：2024-03"
                   />
                 </div>
                 
@@ -160,7 +160,7 @@ export default function ActivitiesModule() {
                     id={`act_end_date-${index}`}
                     value={activity.act_end_date}
                     onChange={(value) => handleInputChange(index, "act_end_date", value)}
-                    placeholder="选择结束时间"
+                    placeholder="例如：2024-12"
                   />
                   <p className="text-[10px] text-muted-foreground">如果活动仍在进行中，请填写预计结束时间</p>
                 </div>
@@ -174,7 +174,7 @@ export default function ActivitiesModule() {
                 {isEditMode ? (
                   <Textarea
                     id={`description-${index}`}
-                    placeholder="请用英文描述您在活动中的具体工作和贡献"
+                    placeholder="例如：Organized events and coordinated volunteers"
                     value={activity.description}
                     onChange={(e) => handleInputChange(index, "description", e.target.value)}
                     className="min-h-[100px] resize-none text-xs"
@@ -183,7 +183,7 @@ export default function ActivitiesModule() {
                 ) : (
                   <AITextarea
                     id={`description-${index}`}
-                    placeholder="请描述您在活动中的具体工作和贡献"
+                    placeholder="例如：Organized events and coordinated volunteers"
                     value={activity.description}
                     onChange={(e) => handleInputChange(index, "description", e.target.value)}
                     className="min-h-[100px] resize-none text-xs"
@@ -211,3 +211,4 @@ export default function ActivitiesModule() {
     </div>
   );
 } 
+
