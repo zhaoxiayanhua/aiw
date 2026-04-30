@@ -12,13 +12,16 @@ interface PageProps {
 
 export default async function ResumeEditPage({ params }: PageProps) {
   const t = await getTranslations();
+  const { uuid, locale } = await params;
   const userInfo = await getUserInfo();
   
   if (!userInfo || !userInfo.email) {
-    redirect("/auth/signin");
+    const callbackUrl =
+      locale === "zh"
+        ? `/resume-generator/edit/${uuid}`
+        : `/${locale}/resume-generator/edit/${uuid}`;
+    redirect("/auth/signin?callbackUrl=" + encodeURIComponent(callbackUrl));
   }
-  
-  const { uuid } = await params;
 
   return <ResumeEditClient documentUuid={uuid} />;
 }

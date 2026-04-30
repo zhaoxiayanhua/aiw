@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       .from("orders")
       .select("order_no, status, paid_at, amount, order_detail")
       .eq("user_uuid", userUuid)
-      .eq("product_id", "polishing-single")
+      .in("product_id", ["polishing-resume", "polishing-ps-sop"])
       .order("created_at", { ascending: false });
 
     if (error || !orders || orders.length === 0) {

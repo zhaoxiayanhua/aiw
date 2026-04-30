@@ -10,6 +10,7 @@ export interface StudyAbroadData {
     wechat: string;
   };
   polishingDetails: {
+    document_type: 'resume' | 'ps_sop' | '';
     uploaded_document_name: string;
     uploaded_document_url: string;
     polishing_requirements: string;
@@ -74,6 +75,7 @@ const initialData: StudyAbroadData = {
     wechat: ''
   },
   polishingDetails: {
+    document_type: '',
     uploaded_document_name: '',
     uploaded_document_url: '',
     polishing_requirements: '',
@@ -142,6 +144,7 @@ export function StudyAbroadProvider({ children }: { children: React.ReactNode })
           // Migrate old data that doesn't have polishingDetails
           if (!parsedData.polishingDetails) {
             parsedData.polishingDetails = {
+              document_type: '',
               uploaded_document_name: '',
               uploaded_document_url: '',
               polishing_requirements: '',
@@ -149,6 +152,8 @@ export function StudyAbroadProvider({ children }: { children: React.ReactNode })
               return_email: '',
               return_wechat: ''
             };
+          } else if (!parsedData.polishingDetails.document_type) {
+            parsedData.polishingDetails.document_type = '';
           }
           setData(parsedData);
         } catch (error) {

@@ -103,11 +103,14 @@ export default function DiscountCheckoutModal({
       }
 
       if (data.free_order) {
-        const isPolishing = item.product_id === "polishing-single";
+        const isPolishing = item.product_id?.startsWith("polishing-");
+        const shouldStayOnResultPage = extraParams.stay_on_result_page === "true";
         toast.success(isPolishing ? "支付成功，我们的专业老师将尽快为您处理" : "订单已生效，积分已到账！");
         setIsOpen(false);
-        if (isPolishing) {
+        if (isPolishing && shouldStayOnResultPage) {
           window.location.reload();
+        } else if (isPolishing) {
+          window.location.href = "/my-orders";
         } else {
           window.location.href = "/my-orders";
         }

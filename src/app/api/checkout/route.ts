@@ -11,6 +11,32 @@ import { handlePaidOrder } from "@/services/order";
 
 const xunhuSdk = require("@/models/xunhu-sdk.js");
 
+const CUSTOM_POLISHING_PRODUCTS: Record<
+  string,
+  {
+    amount: number;
+    cn_amount: number;
+    interval: "one-time";
+    currency: "cny";
+    valid_months: number;
+  }
+> = {
+  "polishing-resume": {
+    amount: 29900,
+    cn_amount: 29900,
+    interval: "one-time",
+    currency: "cny",
+    valid_months: 6,
+  },
+  "polishing-ps-sop": {
+    amount: 59900,
+    cn_amount: 59900,
+    interval: "one-time",
+    currency: "cny",
+    valid_months: 6,
+  },
+};
+
 export async function POST(req: Request) {
   try {
     let {
@@ -43,18 +69,23 @@ export async function POST(req: Request) {
     const item = page.pricing.items.find(
       (pricingItem: PricingItem) => pricingItem.product_id === product_id
     );
+    const customPolishingProduct = CUSTOM_POLISHING_PRODUCTS[product_id];
 
-    const isPriceValid =
-      currency === "cny"
+    const isPriceValid = customPolishingProduct
+      ? customPolishingProduct.cn_amount === amount &&
+        customPolishingProduct.interval === interval &&
+        customPolishingProduct.currency === currency
+      : currency === "cny"
         ? item?.cn_amount === amount
         : item?.amount === amount && item?.currency === currency;
 
     if (
-      !item ||
-      !item.amount ||
-      !item.interval ||
-      !item.currency ||
-      item.interval !== interval ||
+      (!customPolishingProduct && !item) ||
+      (!customPolishingProduct &&
+        (!item?.amount ||
+          !item?.interval ||
+          !item?.currency ||
+          item.interval !== interval)) ||
       !isPriceValid
     ) {
       return respErr("invalid checkout params");

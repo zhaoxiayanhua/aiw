@@ -8,8 +8,8 @@ export default async function ResumeResultPage() {
   const userInfo = await getUserInfo();
   
   if (!userInfo || !userInfo.email) {
-    redirect("/auth/signin");
+    redirect("/auth/signin?callbackUrl=" + encodeURIComponent("/resume-generator/result"));
   }
 
   return <ResumeResultClient />;
-} 
+}

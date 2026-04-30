@@ -13,6 +13,7 @@ import {
   MessageCircle,
   AlertCircle,
   CheckCircle2,
+  Wallet,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -36,6 +37,7 @@ export default function PolishingDetailsModule() {
   }, []);
 
   const polishingDetails = data.polishingDetails || {
+    document_type: "",
     uploaded_document_name: "",
     uploaded_document_url: "",
     polishing_requirements: "",
@@ -106,6 +108,56 @@ export default function PolishingDetailsModule() {
 
   return (
     <div className="space-y-6">
+      <Card className="p-6">
+        <Label className="mb-4 block">
+          <div className="mb-2 flex items-center gap-2">
+            <Wallet className="h-4 w-4" />
+            <span>文件类型 *</span>
+          </div>
+          <span className="text-sm font-normal text-muted-foreground">
+            请选择需要人工润色的文件类型，后续支付金额会随之变化
+          </span>
+        </Label>
+
+        <RadioGroup
+          value={polishingDetails.document_type}
+          onValueChange={(value) =>
+            updatePolishingDetails({
+              document_type: value as "resume" | "ps_sop",
+            })
+          }
+          className="space-y-3"
+        >
+          <label
+            htmlFor="document-type-resume"
+            className="flex cursor-pointer items-start justify-between rounded-lg border border-border p-4 transition-colors hover:border-primary/50"
+          >
+            <div className="flex items-start gap-3">
+              <RadioGroupItem value="resume" id="document-type-resume" className="mt-1" />
+              <div>
+                <p className="font-medium text-foreground">简历</p>
+                <p className="text-sm text-muted-foreground">适用于 Resume / CV 人工润色</p>
+              </div>
+            </div>
+            <span className="text-base font-semibold text-primary">¥299</span>
+          </label>
+
+          <label
+            htmlFor="document-type-ps-sop"
+            className="flex cursor-pointer items-start justify-between rounded-lg border border-border p-4 transition-colors hover:border-primary/50"
+          >
+            <div className="flex items-start gap-3">
+              <RadioGroupItem value="ps_sop" id="document-type-ps-sop" className="mt-1" />
+              <div>
+                <p className="font-medium text-foreground">PS / SOP</p>
+                <p className="text-sm text-muted-foreground">适用于 Personal Statement 或 SOP 人工润色</p>
+              </div>
+            </div>
+            <span className="text-base font-semibold text-primary">¥599</span>
+          </label>
+        </RadioGroup>
+      </Card>
+
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-foreground">文档上传</h3>
         <p className="text-sm text-muted-foreground">

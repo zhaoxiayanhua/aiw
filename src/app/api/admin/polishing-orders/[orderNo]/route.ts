@@ -40,7 +40,7 @@ export async function PUT(
       return respErr("Order not found", 404);
     }
 
-    if (order.product_id !== "polishing-single") {
+    if (!["polishing-resume", "polishing-ps-sop"].includes(order.product_id)) {
       return respErr("Invalid polishing order", 400);
     }
 

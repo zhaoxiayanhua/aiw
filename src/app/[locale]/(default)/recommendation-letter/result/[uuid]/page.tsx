@@ -12,13 +12,16 @@ interface PageProps {
 
 export default async function RecommendationLetterResultPage({ params }: PageProps) {
   const t = await getTranslations();
+  const { uuid, locale } = await params;
   const userInfo = await getUserInfo();
   
   if (!userInfo || !userInfo.email) {
-    redirect("/auth/signin");
+    const callbackUrl =
+      locale === "zh"
+        ? `/recommendation-letter/result/${uuid}`
+        : `/${locale}/recommendation-letter/result/${uuid}`;
+    redirect("/auth/signin?callbackUrl=" + encodeURIComponent(callbackUrl));
   }
-  
-  const { uuid } = await params;
 
   return <RecommendationLetterResultClient documentUuid={uuid} />;
 } 

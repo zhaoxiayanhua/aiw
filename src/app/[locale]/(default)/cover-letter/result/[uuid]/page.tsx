@@ -12,13 +12,16 @@ interface PageProps {
 
 export default async function CoverLetterResultPage({ params }: PageProps) {
   const t = await getTranslations();
+  const { uuid, locale } = await params;
   const userInfo = await getUserInfo();
   
   if (!userInfo || !userInfo.email) {
-    redirect("/auth/signin");
+    const callbackUrl =
+      locale === "zh"
+        ? `/cover-letter/result/${uuid}`
+        : `/${locale}/cover-letter/result/${uuid}`;
+    redirect("/auth/signin?callbackUrl=" + encodeURIComponent(callbackUrl));
   }
-  
-  const { uuid } = await params;
 
   return <CoverLetterResultClient documentUuid={uuid} />;
 } 

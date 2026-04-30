@@ -11,6 +11,29 @@ import { handlePaidOrder } from "@/services/order";
 
 const xunhuSdk = require("@/models/xunhu-sdk.js");
 
+const CUSTOM_POLISHING_PRODUCTS: Record<
+  string,
+  {
+    amount: number;
+    interval: "one-time";
+    currency: "cny";
+    valid_months: number;
+  }
+> = {
+  "polishing-resume": {
+    amount: 29900,
+    interval: "one-time",
+    currency: "cny",
+    valid_months: 6,
+  },
+  "polishing-ps-sop": {
+    amount: 59900,
+    interval: "one-time",
+    currency: "cny",
+    valid_months: 6,
+  },
+};
+
 export async function POST(req: Request) {
   try {
     let {
@@ -44,13 +67,18 @@ export async function POST(req: Request) {
     const item = page.pricing.items.find(
       (pricingItem: PricingItem) => pricingItem.product_id === product_id
     );
+    const customPolishingProduct = CUSTOM_POLISHING_PRODUCTS[product_id];
 
     if (
-      !item ||
-      !item.amount ||
-      !item.interval ||
-      item.interval !== interval ||
-      item.amount !== amount
+      (!customPolishingProduct && !item) ||
+      (customPolishingProduct &&
+        (customPolishingProduct.interval !== interval ||
+          customPolishingProduct.amount !== amount)) ||
+      (!customPolishingProduct &&
+        (!item?.amount ||
+          !item?.interval ||
+          item.interval !== interval ||
+          item.amount !== amount))
     ) {
       return respErr("invalid xunhu checkout params");
     }
@@ -151,6 +179,11 @@ export async function POST(req: Request) {
     const defaultPaymentUrl = process.env.XUNHU_PAYMENT_URL || "https://api.xunhupay.com/payment/do.html";
     const wechatPaymentUrl = process.env.XUNHU_WECHAT_PAYMENT_URL || "https://api2.xunhupay.com/payment/do.html";
     const paymentUrl = payment_method === "wechat" ? wechatPaymentUrl : defaultPaymentUrl;
+    const polishingReturnUrl =
+      document_uuid &&
+      ["polishing-resume", "polishing-ps-sop"].includes(product_id)
+        ? `${webUrl}/zh/study-abroad-consultation/result/${document_uuid}?provider=xunhupay&order_no=${order_no}`
+        : null;
 
     const payment = await xunhuSdk.createPayment({
       appid: process.env.XUNHU_APP_ID,
@@ -161,7 +194,7 @@ export async function POST(req: Request) {
       money: (finalAmount / 100).toFixed(2),
       title: product_name,
       notify_url:         `${webUrl}/api/xunhu-notify`,
-      return_url:         `${webUrl}/zh/pay-success?provider=xunhupay&order_no=${order_no}`,
+      return_url: polishingReturnUrl || `${webUrl}/zh/pay-success?provider=xunhupay&order_no=${order_no}`,
       callback_url: cancel_url,
       attach: JSON.stringify({
         user_uuid,

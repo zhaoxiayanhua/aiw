@@ -12,13 +12,16 @@ interface PageProps {
 
 export default async function PSResultPage({ params }: PageProps) {
   const t = await getTranslations();
+  const { uuid, locale } = await params;
   const userInfo = await getUserInfo();
   
   if (!userInfo || !userInfo.email) {
-    redirect("/auth/signin");
+    const callbackUrl =
+      locale === "zh"
+        ? `/personal-statement/result/${uuid}`
+        : `/${locale}/personal-statement/result/${uuid}`;
+    redirect("/auth/signin?callbackUrl=" + encodeURIComponent(callbackUrl));
   }
-  
-  const { uuid } = await params;
 
   return <PSResultClient documentUuid={uuid} />;
 }

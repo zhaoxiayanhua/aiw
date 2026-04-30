@@ -290,6 +290,32 @@ export default function SignForm({
         return;
       }
 
+      const waitForSessionReady = async () => {
+        for (let attempt = 0; attempt < 5; attempt += 1) {
+          try {
+            const sessionResponse = await fetch("/api/auth/get-session", {
+              method: "GET",
+              credentials: "include",
+              cache: "no-store",
+            });
+
+            if (sessionResponse.ok) {
+              const sessionData = await sessionResponse.json();
+              if (sessionData?.user?.email) {
+                return true;
+              }
+            }
+          } catch (sessionError) {
+            console.error("Session verification error:", sessionError);
+          }
+
+          await new Promise((resolve) => window.setTimeout(resolve, 200));
+        }
+
+        return false;
+      };
+
+      await waitForSessionReady();
       const targetUrl = getPostSignInUrl();
       toast.success(copy.loginSuccess);
       window.location.replace(targetUrl);

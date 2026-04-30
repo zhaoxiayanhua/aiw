@@ -12,13 +12,16 @@ interface PageProps {
 
 export default async function SOPResultPage({ params }: PageProps) {
   const t = await getTranslations();
+  const { uuid, locale } = await params;
   const userInfo = await getUserInfo();
   
   if (!userInfo || !userInfo.email) {
-    redirect("/auth/signin");
+    const callbackUrl =
+      locale === "zh"
+        ? `/sop/result/${uuid}`
+        : `/${locale}/sop/result/${uuid}`;
+    redirect("/auth/signin?callbackUrl=" + encodeURIComponent(callbackUrl));
   }
-  
-  const { uuid } = await params;
 
   return <SOPResultClient documentUuid={uuid} />;
 }
