@@ -273,7 +273,7 @@ const Sidebar = ({
               <div className="space-y-2">
                 {basics.customFields?.map((field) => (
                   <div key={field.id} style={{ fontSize: "14px" }}>
-                    <div style={{ color: "#333333" }}>
+                    <div className="break-words" style={{ color: "#333333" }}>
                       {getSocialDisplayName(field.value, field.name)}
                     </div>
                   </div>
@@ -321,7 +321,7 @@ const Sidebar = ({
                     <div className="font-medium" style={{ fontSize: "14px", color: "#333333" }}>
                       Professional
                     </div>
-                    <div style={{ fontSize: "13px", color: theme.accent, lineHeight: "1.6" }}>
+                    <div className="break-words" style={{ fontSize: "13px", color: theme.accent, lineHeight: "1.6" }}>
                       {professionalText}
                     </div>
                   </div>
@@ -333,7 +333,7 @@ const Sidebar = ({
                     </div>
                     <div className="space-y-1">
                       {languageItems.map((item) => (
-                        <div key={item.id} style={{ fontSize: "13px", color: "#333333" }}>
+                        <div key={item.id} className="break-words" style={{ fontSize: "13px", color: "#333333" }}>
                           <span className="font-medium">{item.name}</span>
                           {item.description && <span>{`: ${item.description}`}</span>}
                         </div>
@@ -403,13 +403,13 @@ const Sidebar = ({
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div
-                          className="font-bold"
+                          className="break-words font-bold"
                           style={{ fontSize: "14px", color: "#333333" }}
                         >
                           {item.title}
                         </div>
                         {item.awarder && (
-                          <div style={{ fontSize: "13px", color: "#666666" }}>
+                          <div className="break-words" style={{ fontSize: "13px", color: "#666666" }}>
                             {item.awarder}
                           </div>
                         )}
@@ -543,20 +543,20 @@ const MainContent = ({
                 }}
               ></div>
             )}
-            <div className="flex justify-between items-start mb-2">
-              <div className="flex-1">
-                <div
-                  className="font-extrabold"
-                  style={{ fontSize: "18px", color: "#333333" }}
-                >
-                  {item.name}
-                </div>
-                {item.description && (
-                  <div
-                    className="font-bold"
-                    style={{ fontSize: "16px", color: "#333333" }}
-                  >
-                    {item.description}
+                  <div className="flex justify-between items-start gap-4 mb-2">
+                    <div className="min-w-0 flex-1">
+                      <div
+                        className="break-words font-extrabold"
+                        style={{ fontSize: "18px", color: "#333333" }}
+                      >
+                        {item.name}
+                      </div>
+                      {item.description && (
+                        <div
+                          className="break-words font-bold"
+                          style={{ fontSize: "16px", color: "#333333" }}
+                        >
+                          {item.description}
                   </div>
                 )}
               </div>
@@ -612,7 +612,7 @@ const MainContent = ({
         return (
           <Section section={sections.experience} title="Experience">
             {sections.experience?.items?.map((item) => (
-              <div key={item.id} className="relative pl-4">
+              <div key={item.id} className="relative min-w-0 pl-4">
                 {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
                 <div
                   className="absolute left-0 top-0 w-1"
@@ -637,16 +637,16 @@ const MainContent = ({
                     }}
                   ></div>
                 )}
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
+                <div className="flex justify-between items-start gap-4 mb-2">
+                  <div className="min-w-0 flex-1">
                     <div
-                      className="font-extrabold"
+                      className="break-words font-extrabold"
                       style={{ fontSize: "18px", color: "#333333" }}
                     >
                       {item.position}
                     </div>
                     <div
-                      className="italic"
+                      className="break-words italic"
                       style={{ fontSize: "16px", color: "#333333" }}
                     >
                       {item.company}
@@ -677,7 +677,7 @@ const MainContent = ({
                       lineHeight: "1.6",
                     }}
                   >
-                    {formatBulletPoints(item.summary || '')}
+                    <div className="break-words">{formatBulletPoints(item.summary || '')}</div>
                   </div>
                 )}
               </div>
@@ -688,7 +688,7 @@ const MainContent = ({
         return (
           <Section section={sections.education} title="Education">
             {sections.education?.items?.map((item) => (
-              <div key={item.id} className="relative pl-4">
+              <div key={item.id} className="relative min-w-0 pl-4">
                 {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
                 <div
                   className="absolute left-0 top-0 w-1"
@@ -718,17 +718,17 @@ const MainContent = ({
                     }}
                   ></div>
                 )}
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
+                <div className="flex justify-between items-start gap-4 mb-2">
+                  <div className="min-w-0 flex-1">
                     <div
-                      className="font-extrabold"
+                      className="break-words font-extrabold"
                       style={{ fontSize: "18px", color: "#333333" }}
                     >
                       {item.institution}
                     </div>
                     {item.location && (
                       <div
-                        className="font-bold"
+                        className="break-words font-bold"
                         style={{ fontSize: "16px", color: "#333333" }}
                       >
                         {item.location}
@@ -743,10 +743,10 @@ const MainContent = ({
                       {item.date}
                     </div>
                     {item.area && (
-                      <div
-                        className="font-normal"
-                        style={{ fontSize: "16px", color: "#333333" }}
-                      >
+                    <div
+                      className="break-words font-normal"
+                      style={{ fontSize: "16px", color: "#333333" }}
+                    >
                         {item.area}
                       </div>
                     )}
@@ -765,7 +765,7 @@ const MainContent = ({
                   .map((line, idx) => (
                     <div
                       key={idx}
-                      className="mb-1"
+                      className="mb-1 break-words"
                       style={{
                         fontSize: "13px",
                         color: idx === 2 ? theme.accent : "#333333",
@@ -787,7 +787,7 @@ const MainContent = ({
         return (
           <Section section={sections.activities} title="Activities">
             {sections.activities?.items?.map((item) => (
-              <div key={item.id} className="relative pl-4">
+              <div key={item.id} className="relative min-w-0 pl-4">
                 {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
                 <div
                   className="absolute left-0 top-0 w-1"
@@ -812,16 +812,16 @@ const MainContent = ({
                     }}
                   ></div>
                 )}
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
+                <div className="flex justify-between items-start gap-4 mb-2">
+                  <div className="min-w-0 flex-1">
                     <div
-                      className="font-extrabold"
+                      className="break-words font-extrabold"
                       style={{ fontSize: "18px", color: "#333333" }}
                     >
                       {item.role}
                     </div>
                     <div
-                      className="font-normal"
+                      className="break-words font-normal"
                       style={{ fontSize: "16px", color: "#333333" }}
                     >
                       {item.name}
@@ -852,7 +852,7 @@ const MainContent = ({
                       lineHeight: "1.6",
                     }}
                   >
-                    {formatBulletPoints(item.summary || '')}
+                    <div className="break-words">{formatBulletPoints(item.summary || '')}</div>
                   </div>
                 )}
               </div>
@@ -910,6 +910,8 @@ export const DittoTemplate = ({
         lineHeight: "1.6",
         color: "#333333",
         fontFamily: "Open Sans,serif",
+        overflowWrap: "anywhere",
+        wordBreak: "break-word",
       }}
     >
       <Header resume={resume} theme={theme} />
@@ -944,8 +946,9 @@ export const DittoTemplate = ({
 
         /* Ensure content flows naturally */
         .resume-content {
-          overflow-wrap: break-word;
+          overflow-wrap: anywhere;
           word-wrap: break-word;
+          word-break: break-word;
         }
       `}</style>
     </div>

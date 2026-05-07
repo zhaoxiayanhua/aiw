@@ -176,14 +176,14 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
               <div key={item.id} className="mb-4">
                 <div className="-mb-1.5">
                   {/* 第一行：公司名称（左） + 地址（右） */}
-                  <div className="flex justify-between items-start -mb-1.5">
-                    <div className="font-bold text-xl">{item.position}</div>
-                    <div className="text-base text-black">{item.date}</div>
+                  <div className="flex justify-between items-start gap-4 -mb-1.5">
+                    <div className="min-w-0 break-words font-bold text-xl">{item.position}</div>
+                    <div className="shrink-0 text-base text-black">{item.date}</div>
                   </div>
                   {/* 第二行：职位（左） + 时间（右） */}
-                  <div className="flex justify-between items-start">
-                    <div className="text-lg italic text-black">{item.company}</div>
-                    {item.location && <div className="text-base text-black">{item.location}</div>}
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="min-w-0 break-words text-lg italic text-black">{item.company}</div>
+                    {item.location && <div className="shrink-0 text-base text-black">{item.location}</div>}
                   </div>
                 </div>
                 {item.summary && !isEmptyString(item.summary) && (
@@ -191,7 +191,7 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                     {item.summary.split('\n').filter((line: string) => line.trim()).map((line: string, index: number) => (
                       <div key={index} className="flex items-start">
                         <span className="mr-2">•</span>
-                        <span>{line.trim().replace(/^[-•]\s*/, '')}</span>
+                        <span className="min-w-0 break-words">{line.trim().replace(/^[-•]\s*/, '')}</span>
                       </div>
                     ))}
                   </div>
@@ -207,16 +207,16 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
               <div key={item.id} className="mb-4">
                 <div className="mb-1">
                   {/* 第一行：大学名称（左） + 地址（右） */}
-                  <div className="flex justify-between items-start -mb-1.5">
-                    <div className="font-bold text-xl">{item.institution}</div>
-                    {item.location && <div className="font-bold text-base text-black">{item.location}</div>}
+                  <div className="flex justify-between items-start gap-4 -mb-1.5">
+                    <div className="min-w-0 break-words font-bold text-xl">{item.institution}</div>
+                    {item.location && <div className="shrink-0 text-right font-bold text-base text-black">{item.location}</div>}
                   </div>
                   {/* 第二行：专业/学位（左） + 时间（右） */}
-                  <div className="flex justify-between items-start">
-                    <div className="text-lg text-black">
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="min-w-0 break-words text-lg text-black">
                       {item.area}
                     </div>
-                    <div className="whitespace-nowrap text-right">
+                    <div className="shrink-0 whitespace-nowrap text-right">
                       <div className="text-base text-black">
                         {item.date}
                       </div>
@@ -232,7 +232,7 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                 ]
                   .filter((line) => !isEmptyString(line))
                   .map((line, idx) => (
-                    <div key={idx} className="ml-4 text-base text-black leading-snug">
+                    <div key={idx} className="ml-4 break-words text-base text-black leading-snug">
                       {`\u2022 ${line}`}
                     </div>
                   ))}
@@ -248,9 +248,9 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
               <div key={item.id} className="mb-4">
                 <div className="mb-2">
                   {/* 第一行：项目名称（左） + 时间（右） */}
-                  <div className="flex justify-between items-start -mb-1.5">
-                    <div className="font-bold text-xl">{item.name}</div>
-                    <div className="whitespace-nowrap text-right">
+                  <div className="flex justify-between items-start gap-4 -mb-1.5">
+                    <div className="min-w-0 break-words font-bold text-xl">{item.name}</div>
+                    <div className="shrink-0 whitespace-nowrap text-right">
                       <div className="text-base text-black">
                         {item.date}
                       </div>
@@ -258,10 +258,10 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                   </div>
                   {/* 第二行：研究单位（左） + 地点（右） */}
                   {(item.description || item.location) && (
-                    <div className="flex justify-between items-start">
-                      <div className="text-lg text-black">{item.description}</div>
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="min-w-0 break-words text-lg text-black">{item.description}</div>
                       {item.location && (
-                        <div className="text-base text-black">{item.location}</div>
+                        <div className="shrink-0 text-base text-black">{item.location}</div>
                       )}
                     </div>
                   )}
@@ -276,7 +276,7 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                     {item.summary.split('\n').filter((line: string) => line.trim()).map((line: string, index: number) => (
                       <div key={index} className="flex items-start">
                         <span className="mr-2">•</span>
-                        <span>{line.trim().replace(/^[-•]\s*/, '')}</span>
+                        <span className="min-w-0 break-words">{line.trim().replace(/^[-•]\s*/, '')}</span>
                       </div>
                     ))}
                   </div>
@@ -292,14 +292,14 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
               <div key={item.id} className="mb-4">
                 <div className="mb-2">
                   {/* 第一行：活动名称（左） + 地址（右） */}
-                  <div className="flex justify-between items-start -mb-1.5">
-                    <div className="font-bold text-xl">{item.role}</div>
-                    <div className="text-base text-black">{item.date}</div>
+                  <div className="flex justify-between items-start gap-4 -mb-1.5">
+                    <div className="min-w-0 break-words font-bold text-xl">{item.role}</div>
+                    <div className="shrink-0 text-base text-black">{item.date}</div>
                   </div>
                   {/* 第二行：角色（左） + 时间（右） */}
-                  <div className="flex justify-between items-start ">
-                    <div className="text-lg text-black">{item.name}</div>
-                    {item.location && <div className="text-base text-black">{item.location}</div>}
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="min-w-0 break-words text-lg text-black">{item.name}</div>
+                    {item.location && <div className="shrink-0 text-base text-black">{item.location}</div>}
                   </div>
                 </div>
                 {item.summary && !isEmptyString(item.summary) && (
@@ -307,7 +307,7 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                     {item.summary.split('\n').filter((line: string) => line.trim()).map((line: string, index: number) => (
                       <div key={index} className="flex items-start">
                         <span className="mr-2">•</span>
-                        <span>{line.trim().replace(/^[-•]\s*/, '')}</span>
+                        <span className="min-w-0 break-words">{line.trim().replace(/^[-•]\s*/, '')}</span>
                       </div>
                     ))}
                   </div>
@@ -347,7 +347,7 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
               {hasProfessional && (
                 <div>
                   <div className="font-bold text-xl text-black">Professional</div>
-                  <div className="text-base text-black leading-snug">{professionalText}</div>
+                  <div className="break-words text-base text-black leading-snug">{professionalText}</div>
                 </div>
               )}
               {hasLanguages && (
@@ -355,7 +355,7 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
                   <div className="font-bold text-xl text-black">Languages</div>
                   <div className="space-y-1">
                     {languageItems.map((item) => (
-                      <div key={item.id} className="text-base text-black">
+                      <div key={item.id} className="break-words text-base text-black">
                         <span className="font-semibold">{item.name}</span>
                         {item.description && <span>{`: ${item.description}`}</span>}
                       </div>
@@ -395,15 +395,15 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
 
               return (
                 <div key={item.id} className="mb-2">
-                  <div className="flex justify-between items-start -mb-2.5">
-                    <div className="text-base">
+                  <div className="flex justify-between items-start gap-4 -mb-2.5">
+                    <div className="min-w-0 break-words text-base">
                       {displayTitle}
                       {/* 如果有发证单位/颁奖机构，显示在标题后 */}
                       {displayIssuer && <span>, {displayIssuer}</span>}
                       {/* 如果有排名信息，显示在括号中 */}
                       {displayRank && <span> ({displayRank})</span>}
                     </div>
-                    <div className="whitespace-nowrap text-base">{year}</div>
+                    <div className="shrink-0 whitespace-nowrap text-base">{year}</div>
                   </div>
                 </div>
               );
@@ -488,6 +488,8 @@ export const KakunaTemplate = ({ resume, themeColor = 'sky-500', layoutConfigura
         lineHeight: '1.25',
         color: '#333333',
         fontFamily: 'Times New Roman, serif',
+        overflowWrap: 'anywhere',
+        wordBreak: 'break-word',
       }}
     >
       <Header resume={resume} theme={theme} />
@@ -511,8 +513,9 @@ export const KakunaTemplate = ({ resume, themeColor = 'sky-500', layoutConfigura
         
         /* Ensure content flows naturally */
         .resume-content {
-          overflow-wrap: break-word;
+          overflow-wrap: anywhere;
           word-wrap: break-word;
+          word-break: break-word;
         }
         
         /* Style adjustments for Kakuna template - scoped to resume content only */

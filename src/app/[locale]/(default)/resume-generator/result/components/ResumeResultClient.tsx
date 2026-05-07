@@ -841,7 +841,7 @@ function ResumeResultContent() {
           filename: `${baseFilename}.pdf`,
           quality: 0.95,
           scale: 2,
-          margin: 0,
+          margin: 10,
         });
       } else {
         toast.loading("正在生成 Word 文件，请稍候...", {
@@ -1178,7 +1178,7 @@ function ResumeResultContent() {
                     <div className="flex-1 p-1 relative">
                       <div
                         ref={resumeContainerRef}
-                        className="w-full h-full overflow-y-auto overflow-x-auto rounded-xl relative resume-scroll-container"
+                        className="w-full h-full overflow-y-auto overflow-x-hidden rounded-xl relative resume-scroll-container"
                         style={{
                           background:
                             "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
@@ -1200,6 +1200,8 @@ function ResumeResultContent() {
                                 className="transform-gpu origin-top transition-all duration-300 ease-out"
                                 style={{
                                   transform: `scale(${zoomLevel})`,
+                                  overflowWrap: "anywhere",
+                                  wordBreak: "break-word",
                                   filter:
                                     "drop-shadow(0 25px 50px rgba(0, 0, 0, 0.15))",
                                   boxShadow: `

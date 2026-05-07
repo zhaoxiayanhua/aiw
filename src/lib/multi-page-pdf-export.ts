@@ -21,6 +21,7 @@ export class MultiPagePDFExporter {
   private static readonly A4_WIDTH_MM = 210;
   private static readonly A4_HEIGHT_MM = 297;
   private static readonly MM_TO_PX_RATIO = 3.779527559; // 1mm = 3.78px at 96dpi
+  private static readonly PDF_FOOTER_RESERVED_MM = 10;
 
   /**
    * 导出多页PDF
@@ -151,7 +152,8 @@ export class MultiPagePDFExporter {
     const pdfWidth = this.A4_WIDTH_MM;
     const pdfHeight = this.A4_HEIGHT_MM;
     const contentWidth = pdfWidth - (margin * 2);
-    const contentHeight = pdfHeight - (margin * 2);
+    const contentHeight =
+      pdfHeight - margin - (margin + this.PDF_FOOTER_RESERVED_MM);
 
     // 计算缩放比例
     const canvasWidth = canvas.width;
