@@ -1,11 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import {
   ChevronDown,
   ChevronRight,
-  Home,
   Lightbulb,
   Menu,
   MoveLeft,
@@ -14,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import SopTutorialModule from "./SopTutorialModule";
 
 import zhMessages from "@/i18n/pages/help/zh.json";
 import enMessages from "@/i18n/pages/help/en.json";
@@ -65,7 +65,8 @@ const RESUME_TUTORIAL_PAGES: TutorialPage[] = [
   {
     key: "resume_page_1",
     title: "第1页：基础信息与主要经历",
-    description: "本页面重点讲解如何填写基础信息、教育经历与实习/工作经历，搭建你的简历基础内容框架。",
+    description:
+      "本页面重点讲解如何填写基础信息、教育经历与实习/工作经历，搭建你的简历基础内容框架。",
     images: [
       "/imgs/jiaocheng/pic1.png",
       "/imgs/jiaocheng/pic2.png",
@@ -76,8 +77,9 @@ const RESUME_TUTORIAL_PAGES: TutorialPage[] = [
   },
   {
     key: "resume_page_2",
-    title: "第2页：经历补充与AI优化",
-    description: "补充更多可选信息，让你的简历内容更完整，专业，提升申请竞争力。",
+    title: "第2页：经历补充与 AI 优化",
+    description:
+      "补充更多可选信息，让你的简历内容更完整、更专业，提升申请竞争力。",
     images: [
       "/imgs/jiaocheng/pic6.png",
       "/imgs/jiaocheng/pic7.png",
@@ -88,7 +90,8 @@ const RESUME_TUTORIAL_PAGES: TutorialPage[] = [
   {
     key: "resume_page_3",
     title: "第3页：预览、编辑与导出",
-    description: "本页核心：调整简历结构与展示内容，选择模版并导出最终版本。",
+    description:
+      "本页核心是调整简历结构与展示内容，选择模版并导出最终版本。",
     images: [
       "/imgs/jiaocheng/pic10.png",
       "/imgs/jiaocheng/pic11.png",
@@ -103,12 +106,12 @@ const zhTutorialNavItems: TutorialNavItem[] = [
     title: "简历 CV 教程",
     children: [
       { key: "resume_page_1", title: "第1页：基础信息与主要经历" },
-      { key: "resume_page_2", title: "第2页：经历补充与AI优化" },
+      { key: "resume_page_2", title: "第2页：经历补充与 AI 优化" },
       { key: "resume_page_3", title: "第3页：预览、编辑与导出" },
     ],
   },
-  { key: "ps_tutorial", title: "PS教程" },
-  { key: "sop_tutorial", title: "SOP教程" },
+  { key: "ps_tutorial", title: "PS 教程" },
+  { key: "sop_tutorial", title: "SOP 教程" },
   { key: "recommendation_tutorial", title: "推荐信教程" },
   { key: "cover_letter_tutorial", title: "求职信教程" },
 ];
@@ -135,7 +138,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
 
   const selectedMainTitle =
     zhTutorialNavItems.find((item) => item.key === selectedMainKey)?.title ??
-    "简历CV教程";
+    "简历 CV 教程";
 
   const toggleCategory = (category: string) => {
     setExpandedCategories((prev) =>
@@ -513,7 +516,7 @@ export default function HelpClient({ locale }: HelpClientProps) {
             <div className="mb-8">
               <h1 className="ml-1 mb-3 text-3xl font-bold">
                 {selectedMainKey === "resume_cv_tutorial"
-                  ? "简历CV使用教程"
+                  ? "简历 CV 使用教程"
                   : selectedMainTitle}
               </h1>
               {selectedMainKey === "resume_cv_tutorial" &&
@@ -560,7 +563,11 @@ export default function HelpClient({ locale }: HelpClientProps) {
                 </div>
               </>
             ) : selectedMainKey === "ps_tutorial" ? (
-              <>{renderPsTutorialImages()}</>
+              <SopTutorialModule />
+            ) : selectedMainKey === "sop_tutorial" ? (
+              <div className="rounded-xl border border-border/70 p-6 text-sm text-muted-foreground">
+                该教程模块暂未上线。
+              </div>
             ) : (
               <div className="rounded-xl border border-border/70 p-6 text-sm text-muted-foreground">
                 该教程模块暂未上线。
@@ -573,3 +580,4 @@ export default function HelpClient({ locale }: HelpClientProps) {
     </div>
   );
 }
+
