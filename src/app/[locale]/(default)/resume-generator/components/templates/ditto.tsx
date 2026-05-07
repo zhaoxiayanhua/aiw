@@ -1,37 +1,38 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import { StandardResumeData } from "@/lib/resume-field-mapping";
 import { cn, isEmptyString } from "./shared/utils";
 import { Rating } from "./shared/components";
 import { getThemeColor, getThemeFromScale } from "./shared/theme-colors";
 
-// Helper function to transform bullet points from "-" to "•" with proper indentation
+// Helper function to normalize bullet lines with proper indentation
 const formatBulletPoints = (text: string): React.ReactNode => {
   if (!text) return null;
-  const lines = text.split('\n');
+  const lines = text.split("\n");
+  const bulletChar = "\u2022";
 
   return (
     <>
       {lines.map((line: string, index: number) => {
-        const isBullet = line.trim().startsWith('-') || line.trim().startsWith('•');
+        const trimmedLine = line.trim();
+        const isBullet =
+          trimmedLine.startsWith("-") || trimmedLine.startsWith(bulletChar);
 
         if (isBullet) {
-          // Remove the bullet/dash and leading space from the text
-          const textContent = line.trim().replace(/^[-•]\s*/, '');
+          const textContent = trimmedLine.replace(/^[-•]\s*/, "");
           return (
             <div
               key={index}
               style={{
-                display: 'flex',
-                alignItems: 'flex-start',
+                display: "flex",
+                alignItems: "flex-start",
               }}
             >
-              <span style={{ flexShrink: 0, width: '16px' }}>•</span>
+              <span style={{ flexShrink: 0, width: "16px" }}>{bulletChar}</span>
               <span>{textContent}</span>
             </div>
           );
         }
 
-        // Non-bullet line
         return (
           <div key={index}>
             {line}
@@ -53,7 +54,7 @@ const Header = ({
 
   return (
     <div>
-      {/* 主要头部区域 */}
+      {/* 涓昏澶撮儴鍖哄煙 */}
       <div
         className="relative flex items-center"
         style={{
@@ -62,7 +63,7 @@ const Header = ({
           height: "150px",
         }}
       >
-        {/* 头像 - 绝对定位实现跨越效果 */}
+        {/* 澶村儚 - 缁濆瀹氫綅瀹炵幇璺ㄨ秺鏁堟灉 */}
         {basics.picture?.url && !basics.picture?.effects?.hidden && (
           <div
             className="absolute z-10"
@@ -91,7 +92,7 @@ const Header = ({
           className="flex items-center gap-1"
           style={{ marginLeft: basics.picture?.url && !basics.picture?.effects?.hidden ? "260px" : "80px" }}
         >
-          {/* 姓名和标题 - 右移为头像留出空间 */}
+          {/* 濮撳悕鍜屾爣棰?- 鍙崇Щ涓哄ご鍍忕暀鍑虹┖闂?*/}
           <div className="flex-1 space-y-1">
             <h1
               className="text-5xl font-bold"
@@ -103,7 +104,7 @@ const Header = ({
         </div>
       </div>
 
-      {/* 联系信息区域 - 分界线下面 */}
+      {/* 鑱旂郴淇℃伅鍖哄煙 - 鍒嗙晫绾夸笅闈?*/}
       <div
         className="bg-white"
         style={{
@@ -114,7 +115,7 @@ const Header = ({
         }}
       >
         <div className="flex flex-wrap gap-x-6 gap-y-2 items-center justify-start text-sm">
-          {/* 位置信息 */}
+          {/* 浣嶇疆淇℃伅 */}
           {basics.location && (
             <div className="flex items-center gap-2">
               <svg
@@ -130,7 +131,7 @@ const Header = ({
             </div>
           )}
 
-          {/* 手机号 */}
+          {/* 鎵嬫満鍙?*/}
           {basics.phone && (
             <div className="flex items-center gap-2">
               <svg
@@ -146,7 +147,7 @@ const Header = ({
             </div>
           )}
 
-          {/* 邮箱 */}
+          {/* 閭 */}
           {basics.email && (
             <div className="flex items-center gap-2">
               <svg
@@ -162,7 +163,7 @@ const Header = ({
             </div>
           )}
 
-          {/* 网站链接 */}
+          {/* 缃戠珯閾炬帴 */}
           {basics.url?.href && (
             <div className="flex items-center gap-2">
               <svg
@@ -194,7 +195,7 @@ const Sidebar = ({
 }) => {
   const { basics, sections } = resume;
 
-  // 获取社交媒体图标和显示名称
+  // 鑾峰彇绀句氦濯掍綋鍥炬爣鍜屾樉绀哄悕绉?
   const getSocialIcon = (url: string, name: string) => {
     const lowerName = name.toLowerCase();
     const lowerUrl = url.toLowerCase();
@@ -225,7 +226,7 @@ const Sidebar = ({
         </svg>
       );
     }
-    return "🔗";
+    return "馃敆";
   };
 
   const getSocialDisplayName = (url: string, name: string) => {
@@ -252,7 +253,7 @@ const Sidebar = ({
     return name;
   };
 
-  // 定义侧边栏各个模块的渲染函数
+  // 瀹氫箟渚ц竟鏍忓悇涓ā鍧楃殑娓叉煋鍑芥暟
   const renderSidebarContent = (sectionId: string) => {
     switch (sectionId) {
       case "profiles":
@@ -281,10 +282,28 @@ const Sidebar = ({
             </div>
           )
         );
-      case "skills":
+      case "skills": {
+        const professionalText =
+          sections.skills?.items
+            ?.flatMap((skill) => {
+              if (skill.keywords && skill.keywords.length > 0) {
+                return skill.keywords;
+              }
+              if (skill.description) {
+                return skill.description
+                  .split(",")
+                  .map((value) => value.trim())
+                  .filter(Boolean);
+              }
+              return [];
+            })
+            .join(", ") ?? "";
+        const languageItems = sections.languages?.items ?? [];
+        const hasProfessional = sections.skills?.visible && professionalText.trim().length > 0;
+        const hasLanguages = sections.languages?.visible && languageItems.length > 0;
+
         return (
-          sections.skills?.visible &&
-          sections.skills?.items?.length > 0 && (
+          (hasProfessional || hasLanguages) && (
             <div className="space-y-3">
               <h3
                 className="font-semibold"
@@ -294,52 +313,39 @@ const Sidebar = ({
                   marginBottom: "6px",
                 }}
               >
-                Skills
+                SKILLS
               </h3>
               <div className="space-y-3">
-                {sections.skills?.items?.map((skill) => (
-                  <div key={skill.id} className="space-y-2">
-                    {skill.name === "Technical Skills" &&
-                    skill.keywords &&
-                    skill.keywords.length > 0 ? (
-                      <div className="space-y-2">
-                        <div
-                          className="font-medium"
-                          style={{ fontSize: "14px", color: "#333333" }}
-                        >
-                          {skill.name}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "13px",
-                            color: theme.accent,
-                            lineHeight: "1.6",
-                          }}
-                        >
-                          {skill.keywords.join(" • ")}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-1">
-                        <div
-                          className="font-medium"
-                          style={{ fontSize: "14px", color: "#333333" }}
-                        >
-                          {skill.name}
-                        </div>
-                        {skill.description && (
-                          <div style={{ fontSize: "13px", color: "#666666" }}>
-                            {skill.description}
-                          </div>
-                        )}
-                      </div>
-                    )}
+                {hasProfessional && (
+                  <div className="space-y-1">
+                    <div className="font-medium" style={{ fontSize: "14px", color: "#333333" }}>
+                      Professional
+                    </div>
+                    <div style={{ fontSize: "13px", color: theme.accent, lineHeight: "1.6" }}>
+                      {professionalText}
+                    </div>
                   </div>
-                ))}
+                )}
+                {hasLanguages && (
+                  <div className="space-y-1">
+                    <div className="font-medium" style={{ fontSize: "14px", color: "#333333" }}>
+                      Languages
+                    </div>
+                    <div className="space-y-1">
+                      {languageItems.map((item) => (
+                        <div key={item.id} style={{ fontSize: "13px", color: "#333333" }}>
+                          <span className="font-medium">{item.name}</span>
+                          {item.description && <span>{`: ${item.description}`}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )
         );
+      }
       case "certifications":
         return (
           sections.certifications?.visible &&
@@ -435,70 +441,13 @@ const Sidebar = ({
           )
         );
       case "languages":
-        return (
-          sections.languages?.visible &&
-          sections.languages?.items?.length > 0 && (
-            <div className="space-y-3">
-              <h3
-                className="font-semibold"
-                style={{
-                  fontSize: "20px",
-                  color: "#333333",
-                  marginBottom: "6px",
-                }}
-              >
-                Languages
-              </h3>
-              <div className="space-y-2">
-                {sections.languages?.items?.map((item) => (
-                  <div key={item.id}>
-                    {item.name === "Other Languages" && item.description ? (
-                      item.description
-                        .split(",")
-                        .map((lang: string, index: number) => (
-                          <div key={index} className="mb-1">
-                            <span
-                              className="font-bold"
-                              style={{ fontSize: "16px", color: "#333333" }}
-                            >
-                              {lang.trim()}
-                            </span>
-                          </div>
-                        ))
-                    ) : (
-                      <div>
-                        <span
-                          className="font-bold"
-                          style={{ fontSize: "16px", color: "#333333" }}
-                        >
-                          {item.name}
-                        </span>
-                        {item.description && item.description !== "Native" && (
-                          <span style={{ fontSize: "13px", color: "#333333" }}>
-                            {" "}
-                            – {item.description}
-                          </span>
-                        )}
-                        {item.description === "Native" && (
-                          <span style={{ fontSize: "13px", color: "#333333" }}>
-                            {" "}
-                            – Native Speaker
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )
-        );
+        return null;
       default:
         return null;
     }
   };
 
-  // 使用布局配置或默认配置
+  // 浣跨敤甯冨眬閰嶇疆鎴栭粯璁ら厤缃?
   const sidebarSections = layoutConfiguration?.sidebarSections || [
     "profiles",
     "skills",
@@ -512,7 +461,7 @@ const Sidebar = ({
       className="w-1/3 space-y-2"
       style={{ backgroundColor: "#FFFFFF", padding: "25px 20px 20px 20px" }}
     >
-      {/* 根据配置渲染侧边栏内容 */}
+      {/* 鏍规嵁閰嶇疆娓叉煋渚ц竟鏍忓唴瀹?*/}
       {sidebarSections.map((sectionId) => (
         <div key={sectionId}>{renderSidebarContent(sectionId)}</div>
       ))}
@@ -565,7 +514,7 @@ const MainContent = ({
       <Section section={projectsSection} title={title}>
         {projectsSection?.items?.map((item) => (
           <div key={item.id} className="relative pl-4">
-            {/* 标题部分的粗竖线 */}
+            {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
             <div
               className="absolute left-0 top-0 w-1"
               style={{
@@ -578,7 +527,7 @@ const MainContent = ({
                     : "100%",
               }}
             ></div>
-            {/* Summary部分的细竖线 - 相对于粗线居中 */}
+            {/* Summary閮ㄥ垎鐨勭粏绔栫嚎 - 鐩稿浜庣矖绾垮眳涓?*/}
             {item.summary && !isEmptyString(item.summary) && (
               <div
                 className="absolute"
@@ -636,7 +585,7 @@ const MainContent = ({
                   lineHeight: "1.6",
                 }}
               >
-                {item.keywords.map((keyword) => keyword.trim()).join(" • ")}
+                {item.keywords.map((keyword) => keyword.trim()).join(" 鈥?")}
               </div>
             )}
             {item.summary && !isEmptyString(item.summary) && (
@@ -656,7 +605,7 @@ const MainContent = ({
     );
   };
 
-  // 定义各个模块的渲染函数
+  // 瀹氫箟鍚勪釜妯″潡鐨勬覆鏌撳嚱鏁?
   const renderSectionContent = (sectionId: string) => {
     switch (sectionId) {
       case "experience":
@@ -664,7 +613,7 @@ const MainContent = ({
           <Section section={sections.experience} title="Experience">
             {sections.experience?.items?.map((item) => (
               <div key={item.id} className="relative pl-4">
-                {/* 标题部分的粗竖线 */}
+                {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
                 <div
                   className="absolute left-0 top-0 w-1"
                   style={{
@@ -675,7 +624,7 @@ const MainContent = ({
                         : "100%",
                   }}
                 ></div>
-                {/* Summary部分的细竖线 - 相对于粗线居中 */}
+                {/* Summary閮ㄥ垎鐨勭粏绔栫嚎 - 鐩稿浜庣矖绾垮眳涓?*/}
                 {item.summary && !isEmptyString(item.summary) && (
                   <div
                     className="absolute"
@@ -740,7 +689,7 @@ const MainContent = ({
           <Section section={sections.education} title="Education">
             {sections.education?.items?.map((item) => (
               <div key={item.id} className="relative pl-4">
-                {/* 标题部分的粗竖线 */}
+                {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
                 <div
                   className="absolute left-0 top-0 w-1"
                   style={{
@@ -753,7 +702,7 @@ const MainContent = ({
                         : "100%",
                   }}
                 ></div>
-                {/* Summary部分的细竖线 - 相对于粗线居中 */}
+                {/* Summary閮ㄥ垎鐨勭粏绔栫嚎 - 鐩稿浜庣矖绾垮眳涓?*/}
                 {item.summary && !isEmptyString(item.summary) && (
                   <div
                     className="absolute"
@@ -839,7 +788,7 @@ const MainContent = ({
           <Section section={sections.activities} title="Activities">
             {sections.activities?.items?.map((item) => (
               <div key={item.id} className="relative pl-4">
-                {/* 标题部分的粗竖线 */}
+                {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
                 <div
                   className="absolute left-0 top-0 w-1"
                   style={{
@@ -850,7 +799,7 @@ const MainContent = ({
                         : "100%",
                   }}
                 ></div>
-                {/* Summary部分的细竖线 - 相对于粗线居中 */}
+                {/* Summary閮ㄥ垎鐨勭粏绔栫嚎 - 鐩稿浜庣矖绾垮眳涓?*/}
                 {item.summary && !isEmptyString(item.summary) && (
                   <div
                     className="absolute"
@@ -915,7 +864,7 @@ const MainContent = ({
     }
   };
 
-  // 使用布局配置或默认配置
+  // 浣跨敤甯冨眬閰嶇疆鎴栭粯璁ら厤缃?
   const mainSections = layoutConfiguration?.mainSections || [
     "experience",
     "education",
@@ -926,7 +875,7 @@ const MainContent = ({
   return (
     <div className="w-2/3 bg-white" style={{ padding: "20px 30px 30px 0px" }}>
       <div className="space-y-0">
-        {/* 根据配置渲染主要内容 */}
+        {/* 鏍规嵁閰嶇疆娓叉煋涓昏鍐呭 */}
         {mainSections.map((sectionId) => (
           <div key={sectionId}>{renderSectionContent(sectionId)}</div>
         ))}
@@ -944,7 +893,7 @@ export const DittoTemplate = ({
   themeColor?: string;
   layoutConfiguration?: { mainSections: string[]; sidebarSections: string[] };
 }) => {
-  // 判断是否是新的色阶格式（如 "blue-500"）或旧的格式（如 "blue"）
+  // 鍒ゆ柇鏄惁鏄柊鐨勮壊闃舵牸寮忥紙濡?"blue-500"锛夋垨鏃х殑鏍煎紡锛堝 "blue"锛?
   const theme = themeColor.includes("-")
     ? getThemeFromScale(themeColor)
     : getThemeColor(themeColor);
@@ -1002,3 +951,5 @@ export const DittoTemplate = ({
     </div>
   );
 };
+
+

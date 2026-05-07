@@ -317,60 +317,53 @@ const MainContent = ({ resume, theme, layoutConfiguration }: {
           </Section>
         );
       case 'skills': {
-        const skillItems =
-          sections.skills?.items?.flatMap((skill) => {
-            if (skill.keywords && skill.keywords.length > 0) {
-              return skill.keywords.map((keyword, index) => (
-                <div key={`${skill.id}-${index}`} className="flex items-start text-base -mb-1.5">
-                  <span className="mr-2">•</span>
-                  <span>{keyword}</span>
-                </div>
-              ));
-            }
-            if (skill.description) {
-              return (
-                <div key={skill.id} className="flex items-start text-base ">
-                  <span className="mr-2">•</span>
-                  <span>{skill.description}</span>
-                </div>
-              );
-            }
-            return [];
-          }) ?? [];
+        const professionalText =
+          sections.skills?.items
+            ?.flatMap((skill) => {
+              if (skill.keywords && skill.keywords.length > 0) {
+                return skill.keywords;
+              }
+              if (skill.description) {
+                return skill.description
+                  .split(',')
+                  .map((value) => value.trim())
+                  .filter(Boolean);
+              }
+              return [];
+            })
+            .join(', ') ?? '';
 
-        const languageItems =
-          sections.languages?.items?.map((item) => (
-            <div
-              key={item.id}
-              className="text-base text-black"
-              style={{ display: "block" }}
-            >
-              <span className="font-bold text-xl">{item.name}</span>
-              {item.description && (
-                <span className="text-base text-black"> – {item.description}</span>
-              )}
-            </div>
-          )) ?? [];
+        const languageItems = sections.languages?.items ?? [];
+        const hasProfessional = sections.skills?.visible && professionalText.trim().length > 0;
+        const hasLanguages = sections.languages?.visible && languageItems.length > 0;
 
-        if (
-          (!sections.skills?.visible || skillItems.length === 0) &&
-          (!sections.languages?.visible || languageItems.length === 0)
-        ) {
+        if (!hasProfessional && !hasLanguages) {
           return null;
         }
 
         return (
-          <Section section={{ ...sections.skills, visible: true }} title="LANGUAGE SKILLS" theme={theme}>
-            {skillItems.length > 0 && (
-              <div className="grid grid-cols-2 gap-x-8 gap-y-1 ">
-                {skillItems}
-              </div>
-            )}
-            {languageItems.length > 0 && (
-              <div className="space-y-2">
-                {languageItems}
-              </div>
-            )}
+          <Section section={{ ...sections.skills, visible: true }} title="SKILLS" theme={theme}>
+            <div className="space-y-3">
+              {hasProfessional && (
+                <div>
+                  <div className="font-bold text-xl text-black">Professional</div>
+                  <div className="text-base text-black leading-snug">{professionalText}</div>
+                </div>
+              )}
+              {hasLanguages && (
+                <div>
+                  <div className="font-bold text-xl text-black">Languages</div>
+                  <div className="space-y-1">
+                    {languageItems.map((item) => (
+                      <div key={item.id} className="text-base text-black">
+                        <span className="font-semibold">{item.name}</span>
+                        {item.description && <span>{`: ${item.description}`}</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </Section>
         );
       }
@@ -530,3 +523,4 @@ export const KakunaTemplate = ({ resume, themeColor = 'sky-500', layoutConfigura
     </div>
   );
 };
+

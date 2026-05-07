@@ -30,8 +30,8 @@ const BASE_FONT_SIZE = 22;
 const BASE_TEXT_COLOR = '000000';
 const SECONDARY_TEXT_COLOR = '000000';
 const PAGE_WIDTH_TWIP = 11906; // A4 width in twips (8.27in * 1440)
-const PAGE_MARGIN_LEFT = 250;
-const PAGE_MARGIN_RIGHT = 250;
+const PAGE_MARGIN_LEFT = 720;
+const PAGE_MARGIN_RIGHT = 720;
 const TEXT_WIDTH = PAGE_WIDTH_TWIP - PAGE_MARGIN_LEFT - PAGE_MARGIN_RIGHT;
 const RIGHT_TAB_POSITION = TEXT_WIDTH;
 const MAIN_COLUMN_RIGHT_PADDING = 240;
@@ -646,7 +646,7 @@ const buildDittoDocument = (
     skills: 'Skills',
     certifications: 'Certifications',
     awards: 'Awards',
-    languages: 'LANGUAGE SKILLS',
+    languages: 'SKILLS',
     references: 'References'
   };
 
@@ -995,29 +995,34 @@ const buildDittoDocument = (
       return [];
     }
 
-    return sections.languages.items.map((item, index) => {
-      const paragraphs: Paragraph[] = [];
+    const paragraphs: Paragraph[] = [];
+    appendIfTruthy(
+      paragraphs,
+      createPlainParagraph('Languages', {
+        bold: true,
+        size: 22,
+        color: DITTO_TEXT_COLOR,
+        spacingBefore: 20,
+        spacingAfter: 6
+      })
+    );
+
+    sections.languages.items.forEach((item, index) => {
       appendIfTruthy(
         paragraphs,
-        createPlainParagraph(item.name, {
-          bold: true,
-          size: 22,
-          color: DITTO_TEXT_COLOR,
-          spacingBefore: index === 0 ? 20 : 40,
-          spacingAfter: 6
-        })
+        createPlainParagraph(
+          item.description ? `${item.name}: ${item.description}` : item.name,
+          {
+            color: DITTO_SECONDARY_COLOR,
+            size: BASE_FONT_SIZE - 2,
+            spacingBefore: index === 0 ? 0 : 10,
+            spacingAfter: 8
+          }
+        )
       );
-      appendIfTruthy(
-        paragraphs,
-        createPlainParagraph(item.description, {
-          color: DITTO_SECONDARY_COLOR,
-          size: BASE_FONT_SIZE - 2,
-          spacingBefore: 0,
-          spacingAfter: 10
-        })
-      );
-      return paragraphs;
-    }).flat();
+    });
+
+    return paragraphs;
   };
 
   const buildSkills = (): Paragraph[] => {
@@ -1025,43 +1030,47 @@ const buildDittoDocument = (
       return [];
     }
 
-    return sections.skills.items.map((item, index) => {
-      const paragraphs: Paragraph[] = [];
-      appendIfTruthy(
-        paragraphs,
-        createPlainParagraph(item.name, {
-          bold: true,
-          size: 22,
-          color: DITTO_TEXT_COLOR,
-          spacingBefore: index === 0 ? 20 : 40,
-          spacingAfter: 6
-        })
-      );
+    const professionalText = sections.skills.items
+      .flatMap((item) => {
+        if (item.keywords && item.keywords.length > 0) {
+          return item.keywords;
+        }
+        if (item.description) {
+          return item.description
+            .split(',')
+            .map((value) => value.trim())
+            .filter(Boolean);
+        }
+        return [];
+      })
+      .join(', ');
 
-      if (item.keywords && item.keywords.length > 0) {
-        appendIfTruthy(
-          paragraphs,
-          createPlainParagraph(item.keywords.join(' • '), {
-            color: accentColor,
-            size: BASE_FONT_SIZE - 2,
-            spacingBefore: 0,
-            spacingAfter: 10
-          })
-        );
-      } else if (item.description) {
-        appendIfTruthy(
-          paragraphs,
-          createPlainParagraph(item.description, {
-            color: DITTO_SECONDARY_COLOR,
-            size: BASE_FONT_SIZE - 2,
-            spacingBefore: 0,
-            spacingAfter: 10
-          })
-        );
-      }
+    if (!professionalText) {
+      return [];
+    }
 
-      return paragraphs;
-    }).flat();
+    const paragraphs: Paragraph[] = [];
+    appendIfTruthy(
+      paragraphs,
+      createPlainParagraph('Professional', {
+        bold: true,
+        size: 22,
+        color: DITTO_TEXT_COLOR,
+        spacingBefore: 20,
+        spacingAfter: 6
+      })
+    );
+    appendIfTruthy(
+      paragraphs,
+      createPlainParagraph(professionalText, {
+        color: accentColor,
+        size: BASE_FONT_SIZE - 2,
+        spacingBefore: 0,
+        spacingAfter: 10
+      })
+    );
+
+    return paragraphs;
   };
 
   const buildReferences = (): Paragraph[] => {
@@ -1394,10 +1403,10 @@ const getTemplateSectionTitleOverrides = (
       education: 'EDUCATION',
       projects: 'RESEARCH EXPERIENCE',
       activities: 'EXTRACURRICULAR ACTIVITIES',
-      skills: 'LANGUAGE SKILLS',
+      skills: 'SKILLS',
       certifications: 'Certifications',
       awards: 'HONOURS & AWARDS',
-      languages: 'LANGUAGE SKILLS',
+      languages: 'SKILLS',
       references: 'References'
     };
   }
@@ -1615,68 +1624,87 @@ export const exportResumeDocx = async (
     },
 
     skills: () => {
-      const skillParagraphs: Array<Paragraph | null> = [
-        ...resume.sections.skills.items.map((item, idx) =>
+      const professionalText = resume.sections.skills.items
+        .flatMap((item) => {
+          if (item.keywords?.length) {
+            return item.keywords.map(toPlainText);
+          }
+          if (item.description) {
+            return item.description
+              .split(',')
+              .map((value) => toPlainText(value).trim())
+              .filter(Boolean);
+          }
+          return [];
+        })
+        .join(', ');
+
+      const skillParagraphs: Array<Paragraph | null> = [];
+
+      if (professionalText) {
+        skillParagraphs.push(
           new Paragraph({
             children: [
               new TextRun({
-                text: toPlainText(item.name),
+                text: 'Professional',
                 font: FONT_FAMILY,
                 bold: true,
                 size: BASE_FONT_SIZE
-              }),
-              ...(item.description
-                ? [
-                    new TextRun({
-                      text: ` - ${toPlainText(item.description)}`,
-                      font: FONT_FAMILY,
-                      size: BASE_FONT_SIZE
-                    })
-                  ]
-                : []),
-              ...(item.keywords?.length
-                ? [
-                    new TextRun({
-                      text: ` (${item.keywords.map(toPlainText).join(', ')})`,
-                      font: FONT_FAMILY,
-                      size: BASE_FONT_SIZE
-                    })
-                  ]
-                : [])
+              })
             ],
-            spacing: { before: idx === 0 ? 40 : 120, after: 40 }
+            spacing: { before: 40, after: 20 }
           })
-        ),
-        ...resume.sections.languages.items.map((item, idx) =>
+        );
+        skillParagraphs.push(
           new Paragraph({
             children: [
               new TextRun({
-                text: toPlainText(item.name),
+                text: professionalText,
                 font: FONT_FAMILY,
-                bold: true,
                 size: BASE_FONT_SIZE
-              }),
-              ...(item.description
-                ? [
-                    new TextRun({
-                      text: ` - ${toPlainText(item.description)}`,
-                      font: FONT_FAMILY,
-                      size: BASE_FONT_SIZE
-                    })
-                  ]
-                : [])
+              })
             ],
-            spacing: {
-              before:
-                resume.sections.skills.items.length === 0 && idx === 0 ? 40 : 120,
-              after: 40
-            }
+            spacing: { before: 0, after: 40 }
           })
-        )
-      ];
+        );
+      }
+
+      resume.sections.languages.items.forEach((item, idx) => {
+        if (idx === 0) {
+          skillParagraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: 'Languages',
+                  font: FONT_FAMILY,
+                  bold: true,
+                  size: BASE_FONT_SIZE
+                })
+              ],
+              spacing: { before: professionalText ? 80 : 40, after: 20 }
+            })
+          );
+        }
+
+        skillParagraphs.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: item.description
+                  ? `${toPlainText(item.name)}: ${toPlainText(item.description)}`
+                  : toPlainText(item.name),
+                font: FONT_FAMILY,
+                size: BASE_FONT_SIZE
+              })
+            ],
+            spacing: { before: 0, after: 30 }
+          })
+        );
+      });
+
       pushSection(
         'skills',
-        resume.sections.skills.name,
+        'SKILLS',
         resume.sections.skills.visible || resume.sections.languages.visible,
         skillParagraphs
       );
@@ -1880,3 +1908,5 @@ export const exportResumeDocx = async (
   const blob = await Packer.toBlob(doc);
   saveAs(blob, filename);
 };
+
+

@@ -22,7 +22,11 @@ export default function CTA({ section }: { section: SectionType }) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isPending || session) {
+    if (isPending) {
+      return;
+    }
+
+    if (session) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       setShowSignModal(true);

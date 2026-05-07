@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { SiGithub, SiGoogle } from "react-icons/si";
+import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -76,6 +77,8 @@ export default function SignForm({
   const [inviteCode, setInviteCode] = useState("");
   const [resetCode, setResetCode] = useState("");
   const [resetPassword, setResetPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [sendCodeCooldown, setSendCodeCooldown] = useState(0);
@@ -513,20 +516,40 @@ export default function SignForm({
 
           <div className="grid gap-2">
             <Label htmlFor="reset-password">{copy.newPasswordLabel}</Label>
-            <Input
-              id="reset-password"
-              type="password"
-              placeholder={copy.newPasswordPlaceholder}
-              value={resetPassword}
-              onChange={(e) => setResetPassword(e.target.value)}
-            />
+            <div className="relative">
+              <Input
+                id="reset-password"
+                type={showResetPassword ? "text" : "password"}
+                placeholder={copy.newPasswordPlaceholder}
+                value={resetPassword}
+                onChange={(e) => setResetPassword(e.target.value)}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                aria-label={showResetPassword ? "Hide password" : "Show password"}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                onClick={() => setShowResetPassword((prev) => !prev)}
+              >
+                {showResetPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <Button onClick={handleResetPassword} className="w-full h-12" disabled={isLoading}>
             {isLoading ? copy.resettingPassword : copy.resetPassword}
           </Button>
 
-          <Button type="button" variant="ghost" className="w-full" onClick={() => setMode("signin")}>
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            onClick={() => {
+              setMode("signin");
+              setShowResetPassword(false);
+              setShowPassword(false);
+            }}
+          >
             {copy.backToLogin}
           </Button>
         </>
@@ -614,14 +637,25 @@ export default function SignForm({
               </button>
             )}
           </div>
-          <Input
-            id="password"
-            type="password"
-            placeholder={mode === "signup" ? copy.newPasswordPlaceholder : copy.passwordLabel}
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder={mode === "signup" ? copy.newPasswordPlaceholder : copy.passwordLabel}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pr-10"
+            />
+            <button
+              type="button"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
 
         <Button
@@ -645,6 +679,8 @@ export default function SignForm({
           onClick={() => {
             setMode(mode === "signup" ? "signin" : "signup");
             setPassword("");
+            setShowPassword(false);
+            setShowResetPassword(false);
             setNickname("");
             setNicknameStatus({ isChecking: false, isAvailable: null, message: "" });
           }}

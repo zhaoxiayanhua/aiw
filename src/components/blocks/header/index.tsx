@@ -50,7 +50,6 @@ export default function Header({ header }: { header: HeaderType }) {
   const handleCreationCenterClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (isPending) {
-      router.push("/creation-center");
       return;
     }
     if (!session) {

@@ -19,7 +19,7 @@ function getAuthBaseURL() {
     process.env.AUTH_URL ||
     process.env.BETTER_AUTH_URL ||
     process.env.NEXT_PUBLIC_WEB_URL ||
-    "";
+    (process.env.NODE_ENV !== "production" ? "http://localhost:3000" : "");
 
   if (!rawBaseURL) {
     return undefined;

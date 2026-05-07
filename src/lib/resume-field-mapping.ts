@@ -1,4 +1,4 @@
-import { ResumeData } from '@/app/[locale]/(default)/resume-generator/components/ResumeContext';
+﻿import { ResumeData } from '@/app/[locale]/(default)/resume-generator/components/ResumeContext';
 
 function normalizeRelevantCoursework(value: string): string {
   if (!value || value.trim().length === 0) {
@@ -50,8 +50,8 @@ function buildDateRange(start: unknown, end: unknown): string {
 function formatDateToMMYYYY(dateStr: string): string {
   if (!dateStr) return '';
   
-  // Handle "Present" or "现在" case
-  if (dateStr.toLowerCase() === 'present' || dateStr === '现在' || dateStr.toLowerCase() === 'current') {
+  // Handle "Present" or "鐜板湪" case
+  if (dateStr.toLowerCase() === 'present' || dateStr === '鐜板湪' || dateStr.toLowerCase() === 'current') {
     return 'Present';
   }
   
@@ -301,11 +301,11 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
     const trimmed = entry.trim();
     if (!trimmed) return null;
 
-    const dashParts = trimmed.split(/\s[-–—]\s/);
+    const dashParts = trimmed.split(/\s(?:-|\u2013|\u2014)\s/);
     if (dashParts.length > 1) {
       return {
         name: dashParts[0].trim(),
-        level: dashParts.slice(1).join(' – ').trim(),
+        level: dashParts.slice(1).join(' - ').trim(),
       };
     }
 
@@ -383,7 +383,7 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
       .map((entry, index) => ({
         id: `lang-${index}`,
         name: entry.name,
-        description: entry.descriptions.join(' · '),
+        description: entry.descriptions.join(', '),
         level: entry.level,
         visible: true,
       }));
@@ -471,7 +471,7 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
         name: 'Skills',
         items: data.moduleSelection.skillsLanguage && data.skillsLanguage.skills ? [{
           id: 'skills-0',
-          name: 'Technical Skills',
+          name: 'Professional',
           description: safeText(data.skillsLanguage.skills),
           level: 0,
           keywords: safeText(data.skillsLanguage.skills)
@@ -528,8 +528,7 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
         name: 'Awards',
         items: data.awards.flatMap((award, index) => {
           const items = [];
-          
-          // 如果有奖项信息，添加奖项
+
           if (award.award_name) {
             items.push({
               id: `award-${index}-a`,
@@ -541,8 +540,7 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
               visible: true
             });
           }
-          
-          // 如果有证书信息，添加证书
+
           if (award.certificate_name) {
             items.push({
               id: `award-${index}-c`,
@@ -554,8 +552,7 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
               visible: true
             });
           }
-          
-          // 如果既没有奖项也没有证书，返回空项
+
           if (items.length === 0 && (award.award_year || award.award_rank)) {
             items.push({
               id: `award-${index}`,
@@ -567,7 +564,7 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
               visible: true
             });
           }
-          
+
           return items;
         }),
         visible: data.moduleSelection.awards && data.awards.length > 0,
@@ -623,3 +620,4 @@ export function mapToStandardFormat(data: ResumeData, selectedTemplate: string =
     }
   };
 }
+

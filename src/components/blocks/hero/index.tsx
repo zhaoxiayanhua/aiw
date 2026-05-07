@@ -33,7 +33,11 @@ export default function Hero({ hero }: { hero: HeroType }) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isPending || session) {
+    if (isPending) {
+      return;
+    }
+
+    if (session) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       setShowSignModal(true);
