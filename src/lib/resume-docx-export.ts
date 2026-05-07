@@ -1199,7 +1199,8 @@ const buildDittoDocument = (
     }
 
     if (sectionsAlreadyInMain.has(item as SectionKey)) {
-      // 宸茬粡鍦ㄤ富鍐呭涓覆鏌撹繃锛岄伩鍏嶉噸澶嶆樉绀?      return;
+      // 已经在主内容中渲染过，避免重复显示
+      return;
     }
 
     switch (item as SectionKey) {
@@ -1842,13 +1843,13 @@ export const exportResumeDocx = async (
     'certifications', 'references'
   ];
 
-  // 鑾峰彇瀹為檯椤哄簭锛氫娇鐢?layoutOrder 鎴栭粯璁ら『搴?
+  // 获取实际顺序：使用 layoutOrder 或默认顺序
   const sectionOrder = options.layoutOrder ?? DEFAULT_SECTION_ORDER;
 
-  // 鐢ㄤ簬杩借釜宸茬敓鎴愮殑妯″潡锛岄伩鍏嶉噸澶?
+  // 用于追踪已生成的模块，避免重复
   const generatedSections = new Set<string>();
 
-  // 鎸夐『搴忕敓鎴愭ā鍧?
+  // 按顺序生成模块
   for (const section of sectionOrder) {
     if (!generatedSections.has(section) && sectionGenerators[section]) {
       sectionGenerators[section]();

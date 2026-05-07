@@ -92,7 +92,7 @@ const Header = ({
           className="flex items-center gap-1"
           style={{ marginLeft: basics.picture?.url && !basics.picture?.effects?.hidden ? "260px" : "80px" }}
         >
-          {/* 濮撳悕鍜屾爣棰?- 鍙崇Щ涓哄ご鍍忕暀鍑虹┖闂?*/}
+          {/* 姓名和标题，右侧为头像预留空间 */}
           <div className="flex-1 space-y-1">
             <h1
               className="text-5xl font-bold"
@@ -115,7 +115,7 @@ const Header = ({
         }}
       >
         <div className="flex flex-wrap gap-x-6 gap-y-2 items-center justify-start text-sm">
-          {/* 浣嶇疆淇℃伅 */}
+          {/* 位置信息 */}
           {basics.location && (
             <div className="flex items-center gap-2">
               <svg
@@ -131,7 +131,7 @@ const Header = ({
             </div>
           )}
 
-          {/* 鎵嬫満鍙?*/}
+          {/* 手机号 */}
           {basics.phone && (
             <div className="flex items-center gap-2">
               <svg
@@ -447,7 +447,7 @@ const Sidebar = ({
     }
   };
 
-  // 浣跨敤甯冨眬閰嶇疆鎴栭粯璁ら厤缃?
+  // 使用布局配置或默认配置
   const sidebarSections = layoutConfiguration?.sidebarSections || [
     "profiles",
     "skills",
@@ -514,7 +514,7 @@ const MainContent = ({
       <Section section={projectsSection} title={title}>
         {projectsSection?.items?.map((item) => (
           <div key={item.id} className="relative pl-4">
-            {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
+            {/* 标题部分的粗竖线 */}
             <div
               className="absolute left-0 top-0 w-1"
               style={{
@@ -527,7 +527,7 @@ const MainContent = ({
                     : "100%",
               }}
             ></div>
-            {/* Summary閮ㄥ垎鐨勭粏绔栫嚎 - 鐩稿浜庣矖绾垮眳涓?*/}
+            {/* Summary 部分的细竖线，相对粗线居中 */}
             {item.summary && !isEmptyString(item.summary) && (
               <div
                 className="absolute"
@@ -585,7 +585,7 @@ const MainContent = ({
                   lineHeight: "1.6",
                 }}
               >
-                {item.keywords.map((keyword) => keyword.trim()).join(" 鈥?")}
+                {item.keywords.map((keyword) => keyword.trim()).join(" • ")}
               </div>
             )}
             {item.summary && !isEmptyString(item.summary) && (
@@ -605,7 +605,7 @@ const MainContent = ({
     );
   };
 
-  // 瀹氫箟鍚勪釜妯″潡鐨勬覆鏌撳嚱鏁?
+  // 定义各个模块的渲染函数
   const renderSectionContent = (sectionId: string) => {
     switch (sectionId) {
       case "experience":
@@ -613,7 +613,7 @@ const MainContent = ({
           <Section section={sections.experience} title="Experience">
             {sections.experience?.items?.map((item) => (
               <div key={item.id} className="relative min-w-0 pl-4">
-                {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
+                {/* 标题部分的粗竖线 */}
                 <div
                   className="absolute left-0 top-0 w-1"
                   style={{
@@ -624,7 +624,7 @@ const MainContent = ({
                         : "100%",
                   }}
                 ></div>
-                {/* Summary閮ㄥ垎鐨勭粏绔栫嚎 - 鐩稿浜庣矖绾垮眳涓?*/}
+                {/* Summary 部分的细竖线，相对粗线居中 */}
                 {item.summary && !isEmptyString(item.summary) && (
                   <div
                     className="absolute"
@@ -689,7 +689,7 @@ const MainContent = ({
           <Section section={sections.education} title="Education">
             {sections.education?.items?.map((item) => (
               <div key={item.id} className="relative min-w-0 pl-4">
-                {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
+                {/* 标题部分的粗竖线 */}
                 <div
                   className="absolute left-0 top-0 w-1"
                   style={{
@@ -702,7 +702,7 @@ const MainContent = ({
                         : "100%",
                   }}
                 ></div>
-                {/* Summary閮ㄥ垎鐨勭粏绔栫嚎 - 鐩稿浜庣矖绾垮眳涓?*/}
+                {/* Summary 部分的细竖线，相对粗线居中 */}
                 {item.summary && !isEmptyString(item.summary) && (
                   <div
                     className="absolute"
@@ -788,7 +788,7 @@ const MainContent = ({
           <Section section={sections.activities} title="Activities">
             {sections.activities?.items?.map((item) => (
               <div key={item.id} className="relative min-w-0 pl-4">
-                {/* 鏍囬閮ㄥ垎鐨勭矖绔栫嚎 */}
+                {/* 标题部分的粗竖线 */}
                 <div
                   className="absolute left-0 top-0 w-1"
                   style={{
@@ -799,7 +799,7 @@ const MainContent = ({
                         : "100%",
                   }}
                 ></div>
-                {/* Summary閮ㄥ垎鐨勭粏绔栫嚎 - 鐩稿浜庣矖绾垮眳涓?*/}
+                {/* Summary 部分的细竖线，相对粗线居中 */}
                 {item.summary && !isEmptyString(item.summary) && (
                   <div
                     className="absolute"
@@ -864,7 +864,7 @@ const MainContent = ({
     }
   };
 
-  // 浣跨敤甯冨眬閰嶇疆鎴栭粯璁ら厤缃?
+  // 使用布局配置或默认配置
   const mainSections = layoutConfiguration?.mainSections || [
     "experience",
     "education",
@@ -893,7 +893,7 @@ export const DittoTemplate = ({
   themeColor?: string;
   layoutConfiguration?: { mainSections: string[]; sidebarSections: string[] };
 }) => {
-  // 鍒ゆ柇鏄惁鏄柊鐨勮壊闃舵牸寮忥紙濡?"blue-500"锛夋垨鏃х殑鏍煎紡锛堝 "blue"锛?
+  // 判断是否是新的色阶格式（如 "blue-500"）或旧格式（如 "blue"）
   const theme = themeColor.includes("-")
     ? getThemeFromScale(themeColor)
     : getThemeColor(themeColor);
